@@ -21,17 +21,23 @@ Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
 Exportaciones <- Exportaciones[100:378,]
 ```
 
+## Serie de tiempo del total de exportaciones (en miles de dólares)
+
 ```{r}
 #| echo: false
 ggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = "#FF1744", lwd = 0.8) + 
   theme_dark(18) + ylab("Total Exportaciones") 
 ```
 
+## Serie de tiempo de exportaciones tradicionales (en miles de dólares)
+
 ```{r}
 #| echo: false
 ggplot(Exportaciones) + geom_line(aes(x = Mes, y = Tradicionales), color = "#00B0FF", lwd = 0.8) + 
   theme_dark(18) + ylab("Total Exportaciones Tradicionales") 
 ```
+
+## Serie de tiempo de exportaciones No tradicionales (en miles de dólares)
 
 ```{r}
 #| echo: false

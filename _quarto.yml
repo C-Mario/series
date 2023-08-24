@@ -3,12 +3,19 @@ project:
   output-dir: docs
 
 website:
-  title: "series"
+  title: "Series de Tiempo"
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: Inicio
       - propuestas.qmd
+    right: 
+      - text: GitHub
+        icon: github
+        href: https://github.com/C-Mario/series
+        target: _blank
+    logo: images/logo2.png
+  back-to-top-navigation: true
 
 format:
   html:
