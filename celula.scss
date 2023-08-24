@@ -572,9 +572,9 @@ body .nav-footer {
 
 //Logo de la navbar
 .navbar-logo {
-    max-height: 27px;
+    max-height: 32px;
     width: auto;
-    padding-right: 4px
+    padding-right: 5px
 }
 
 .sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active {
@@ -663,4 +663,33 @@ body .nav-footer {
     color: black;
     font-size: 18px;
     font-weight: 500
+}
+
+// Navbar
+.navbar-dark .navbar-nav .nav-link {
+    color: #fff;
+    font-weight: 400;
+    font-size: 23px;
+}
+
+.navbar-brand {
+    padding-top: 0.3125rem;
+    padding-bottom: 0.3125rem;
+    margin-right: 1rem;
+    font-size: 1.8rem;
+    text-decoration: none;
+    -webkit-text-decoration: underline;
+    -moz-text-decoration: none;
+    -ms-text-decoration: none;
+    -o-text-decoration: none;
+    white-space: nowrap;
+}
+
+.navbar-dark .navbar-brand {
+    color: #0E0E10;		
+}
+
+.nav-link.active {
+  color: $Pink-A400;
+  text-decoration: underline solid black;
 }
