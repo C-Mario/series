@@ -1,6 +1,7 @@
 ---
 title: "Series de tiempo univariadas"
+author: "Kevin Rubiano, Mario Castaño y  José Valdés"
+date: "2023-08-23"
 ---
 
-Página web del curso.
-
+Página web del curso 🤪.

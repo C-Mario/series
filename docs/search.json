@@ -1,30 +1,65 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "Propuestas de series de tiempo",
-    "section": "",
-    "text": "Exportaciones &lt;- read_excel(\"C:/Users/dofca/Desktop/Rar/Exportaciones.xlsx\")\nExportaciones$Total &lt;- round(Exportaciones$Total)\nExportaciones$Tradicionales &lt;- round(Exportaciones$Tradicionales)\nExportaciones$Notradicionales &lt;- round(Exportaciones$Notradicionales)\nExportaciones$Mes &lt;- as.yearmon(Exportaciones$Mes)\nExportaciones &lt;- Exportaciones[100:378,]\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = \"#FF1744\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones\") \n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Tradicionales), color = \"#00B0FF\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones Tradicionales\") \n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Notradicionales), color = \"#00E676\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones No Tradicionales\")"
-  },
-  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Series de tiempo univariadas",
     "section": "",
-    "text": "Página web del curso.\n\n\n\n Volver arriba"
+    "text": "Página web del curso 🤪.\n\n\n\n Volver arriba"
   },
   {
-    "objectID": "propuestas.html#serie-de-tiempo-de-exportaciones-tradicionales-en-miles-de-dólares",
-    "href": "propuestas.html#serie-de-tiempo-de-exportaciones-tradicionales-en-miles-de-dólares",
+    "objectID": "propuestas.html",
+    "href": "propuestas.html",
     "title": "Propuestas de series de tiempo",
-    "section": "Serie de tiempo de exportaciones tradicionales (en miles de dólares)",
-    "text": "Serie de tiempo de exportaciones tradicionales (en miles de dólares)"
+    "section": "",
+    "text": "Primero limpiaremos un poco la base de datos y la dejaremos como la necesitamos."
   },
   {
-    "objectID": "propuestas.html#serie-de-tiempo-de-exportaciones-no-tradicionales-en-miles-de-dólares",
-    "href": "propuestas.html#serie-de-tiempo-de-exportaciones-no-tradicionales-en-miles-de-dólares",
+    "objectID": "propuestas.html#traer-datos",
+    "href": "propuestas.html#traer-datos",
     "title": "Propuestas de series de tiempo",
-    "section": "Serie de tiempo de exportaciones No tradicionales (en miles de dólares)",
-    "text": "Serie de tiempo de exportaciones No tradicionales (en miles de dólares)"
+    "section": "",
+    "text": "Primero limpiaremos un poco la base de datos y la dejaremos como la necesitamos."
+  },
+  {
+    "objectID": "propuestas.html#número-de-desaparecidos-reportados-al-año-en-colombia",
+    "href": "propuestas.html#número-de-desaparecidos-reportados-al-año-en-colombia",
+    "title": "Propuestas de series de tiempo",
+    "section": "Número de desaparecidos reportados al año en Colombia",
+    "text": "Número de desaparecidos reportados al año en Colombia"
+  },
+  {
+    "objectID": "propuestas.html#número-de-desaparecidos-reportados-por-mes-en-colombia",
+    "href": "propuestas.html#número-de-desaparecidos-reportados-por-mes-en-colombia",
+    "title": "Propuestas de series de tiempo",
+    "section": "Número de desaparecidos reportados por mes en Colombia",
+    "text": "Número de desaparecidos reportados por mes en Colombia"
+  },
+  {
+    "objectID": "propuestas.html#tasa-de-crecimiento-mensual-con-respecto-al-periodo-anterior-del-ipc-de-servicios-en-colombia",
+    "href": "propuestas.html#tasa-de-crecimiento-mensual-con-respecto-al-periodo-anterior-del-ipc-de-servicios-en-colombia",
+    "title": "Propuestas de series de tiempo",
+    "section": "Tasa de crecimiento mensual con respecto al periodo anterior del IPC de servicios en Colombia",
+    "text": "Tasa de crecimiento mensual con respecto al periodo anterior del IPC de servicios en Colombia\n\n\nWarning: object timezone (UTC) is different from system timezone ()\n  NOTE: set 'options(xts_check_TZ = FALSE)'to disable this warning\n    This note is displayed once per session"
+  },
+  {
+    "objectID": "propuestas.html#exportaciones-mensuales-desde-colombia-en-miles-de-dólares",
+    "href": "propuestas.html#exportaciones-mensuales-desde-colombia-en-miles-de-dólares",
+    "title": "Propuestas de series de tiempo",
+    "section": "Exportaciones mensuales desde Colombia en miles de dólares",
+    "text": "Exportaciones mensuales desde Colombia en miles de dólares"
+  },
+  {
+    "objectID": "propuestas.html#temperatura-en-la-ciudad-de-miami-durante-un-fenomeno-tropical-sucedido-en-puerto-rico-zona-cercana-a-miami",
+    "href": "propuestas.html#temperatura-en-la-ciudad-de-miami-durante-un-fenomeno-tropical-sucedido-en-puerto-rico-zona-cercana-a-miami",
+    "title": "Propuestas de series de tiempo",
+    "section": "Temperatura en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami",
+    "text": "Temperatura en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami\nMiraremos primero las temperaturas en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami.\n\ntrabajo con los datos\n\n\nWarning: object timezone (UTC) is different from system timezone ()"
+  },
+  {
+    "objectID": "propuestas.html#calor-de-cierre-en-bolsa-del-bitcoin-entre-un-periodo-en-noviembre-del-2021",
+    "href": "propuestas.html#calor-de-cierre-en-bolsa-del-bitcoin-entre-un-periodo-en-noviembre-del-2021",
+    "title": "Propuestas de series de tiempo",
+    "section": "Calor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021",
+    "text": "Calor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021\nMiraremos el valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021.\n\ntrabajo con los datos"
   }
 ]

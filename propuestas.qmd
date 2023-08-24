@@ -3,45 +3,290 @@ title: "Propuestas de series de tiempo"
 ---
 
 ```{r}
-#| message: false
 #| echo: false
-library(readxl)
+#| message: false
+
+# librerias
 library(zoo)
+library(xts) # se requiere de zoo para xts
+library(TSstudio) # necesario pata ts_info
+library(lubridate) # trabajar con fechas
+library(tidyverse) #procesamiento de datos
 library(ggplot2)
-options(scipen = 12)
+library(readxl)
 ```
 
 ```{r}
 #| echo: false
-Exportaciones <- read_excel("C:/Users/dofca/Desktop/Rar/Exportaciones.xlsx")
+
+#| message: false
+load(file = "_environment.RData")
+```
+
+## Traer datos
+
+Primero limpiaremos un poco la base de datos y la dejaremos como la necesitamos.
+
+```{r}
+#| echo: false
+#| message: false
+#| results: false
+
+##########analisis previo de la base
+# mirar algunas varibles
+str(Desaparecidos)
+table(Desaparecidos$`Estado de la desaparición`)
+table(Desaparecidos$Contexto)
+# mirar datos faltantes
+sum(is.na(Desaparecidos$`Fecha de la desaparición`)) # 126
+```
+
+# Anual
+como el $%$ de datos faltantes es menor al 1% de los datos disponibles los eliminaremos para mayor facilidad de trabajo. AdemÃ¡s pasrameos la variable 
+'Fecha de la desaparición' a formato character para luego pasarla a fecha. 
+Por ultimo haremos un procesamiento de los datos para un conteo
+
+```{r}
+#| echo: false
+#| results: false
+
+# datos de trabajo
+Data <- data.frame(Desaparecidos$`Fecha de la desaparición`,Desaparecidos$Contexto)
+colnames(Data) <- c("Fecha", "Dummy")
+# limpiando datoa faltantes
+Data <- Data[-which(is.na(Data$Fecha)),]
+Data$Fecha <- as.character(Data$Fecha)
+str(Data)
+# procesamiento de los datos
+Desa_año <- Data %>% 
+      mutate(Fecha = as.Date(Fecha)) %>% 
+      group_by(Fecha = floor_date(Fecha, unit = 'year')) %>% 
+      summarise(Conteo = n())
+str(Desa_año)
+```
+Ahora intentaremos usar **xts** para poder trabajar con un objeto que sea un serie
+de tiempo en R
+
+## Número de desaparecidos reportados al año en Colombia
+
+```{r}
+#| echo: false
+#| results: false
+
+# objeto serie de tiempo
+Data_xts <- xts(Desa_año$Conteo, order.by = Desa_año$Fecha)
+head(Data_xts)
+ts_info(Data_xts)
+class(Data_xts)
+frequency(Data_xts)
+#
+periodicity(Data_xts)
+tclass(Data_xts)
+```
+
+```{r}
+#| echo: false
+
+plot(Data_xts)
+```
+
+# Mensual 
+
+## Número de desaparecidos reportados por mes en Colombia
+
+```{r}
+#| echo: false
+#| results: false
+
+# procesamiento de los datos
+Desa_mes <- Data %>% 
+      mutate(Fecha = as.Date(Fecha)) %>% 
+      filter(Fecha >= as.Date('2000-01-01'),
+             Fecha <= as.Date('2022-12-31')) %>% 
+      group_by(Fecha = floor_date(Fecha, unit = 'month')) %>% 
+      summarise(Conteo = n())
+str(Desa_mes)
+```
+
+
+```{r}
+#| echo: false
+#| results: false
+
+# objeto serie de tiempo
+Data_xts <- xts(Desa_mes$Conteo, order.by = Desa_mes$Fecha)
+
+head(Data_xts)
+ts_info(Data_xts)
+class(Data_xts)
+frequency(Data_xts)
+#
+periodicity(Data_xts)
+tclass(Data_xts)
+```
+
+```{r}
+#| echo: false
+
+plot(Data_xts,ylim=c(200,1800))
+```
+
+## Tasa de crecimiento mensual con respecto al periodo anterior del IPC de servicios en Colombia 
+
+```{r}
+#| echo: false
+#| results: false
+#| message: false
+
+IPCservPAserie<-xts(IPCservPA$COLCPGRSE01GPM,order.by=IPCservPA$observation_date)
+head(IPCservPAserie)
+ts_info(IPCservPAserie)
+class(IPCservPAserie)
+frequency(IPCservPAserie)
+#
+periodicity(IPCservPAserie)
+tclass(IPCservPAserie)
+```
+
+```{r}
+#| echo: false
+#| message: false
+
+plot(IPCservPAserie)
+```
+
+## Exportaciones mensuales desde Colombia en miles de dólares 
+
+```{r}
+#| echo: false
+
+options(scipen = 12)
+
+Exportaciones <- read_excel("datos/Exportaciones.xlsx")
 Exportaciones$Total <- round(Exportaciones$Total)
 Exportaciones$Tradicionales <- round(Exportaciones$Tradicionales)
 Exportaciones$Notradicionales <- round(Exportaciones$Notradicionales)
 Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
-Exportaciones <- Exportaciones[100:378,]
+Exportaciones <- Exportaciones[10:378,]
 ```
 
-## Serie de tiempo del total de exportaciones (en miles de dólares)
 
 ```{r}
 #| echo: false
+
 ggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = "#FF1744", lwd = 0.8) + 
-  theme_dark(18) + ylab("Total Exportaciones") 
+  theme_dark(18) + ylab("Total Exportaciones")
 ```
 
-## Serie de tiempo de exportaciones tradicionales (en miles de dólares)
 
 ```{r}
 #| echo: false
+
 ggplot(Exportaciones) + geom_line(aes(x = Mes, y = Tradicionales), color = "#00B0FF", lwd = 0.8) + 
-  theme_dark(18) + ylab("Total Exportaciones Tradicionales") 
+  theme_dark(18) + ylab("Total Exportaciones Tradicionales")
 ```
 
-## Serie de tiempo de exportaciones No tradicionales (en miles de dólares)
 
 ```{r}
 #| echo: false
+
 ggplot(Exportaciones) + geom_line(aes(x = Mes, y = Notradicionales), color = "#00E676", lwd = 0.8) + 
   theme_dark(18) + ylab("Total Exportaciones No Tradicionales") 
+
 ```
 
+# Por Hora
+
+## Temperatura en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami
+
+Miraremos primero las temperaturas en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami.
+
+#### trabajo con los datos
+
+```{r}
+#| echo: false
+#| results: false
+#| message: false
+
+# datos de trabajo
+Data <- data.frame(temperature$datetime,temperature$Miami)
+colnames(Data) <- c("Fecha tiempo", "Temperatura")
+# limpiando datos faltantes
+str(Data)
+# procesamiento de los datos
+Temp_hour <- Data %>% 
+      filter(`Fecha tiempo` >= as.Date("2015-01-01"),
+             `Fecha tiempo` < as.Date("2017-12-31"))
+str(Temp_hour)
+```
+
+```{r}
+#| echo: false
+#| results: false
+#| message: false
+
+# objeto serie de tiempo
+Data_xts <- xts(Temp_hour$Temperatura, order.by = Temp_hour$`Fecha tiempo`)
+
+head(Data_xts)
+ts_info(Data_xts)
+class(Data_xts)
+frequency(Data_xts)
+#
+periodicity(Data_xts)
+tclass(Data_xts)
+```
+
+```{r}
+#| echo: false
+#| message: false
+
+plot(Data_xts)
+```
+
+
+## Calor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021
+
+Miraremos el valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021.
+
+#### trabajo con los datos
+
+```{r}
+#| echo: false
+#| results: false
+
+# datos de trabajo
+# Data <- data.frame(BTC_Daily$date,BTC_Daily$close)
+# colnames(Data) <- c("Fecha tiempo", "Valor")
+# # limpiando datos faltantes
+# str(Data)
+# Data$`Fecha tiempo` <- as.POSIXct(Data$`Fecha tiempo`, format = "%d/%m/%Y %H:%M")
+# str(Data)
+# # procesamiento de los datos
+# Bitcoin <- Data %>% 
+#       filter(`Fecha tiempo` >= as.Date("2017-01-01"),
+#              `Fecha tiempo` < as.Date("2021-12-31"))
+# str(Bitcoin)
+```
+
+```{r}
+#| echo: false
+#| results: false
+
+# objeto serie de tiempo
+# Data_xts <- xts(Bitcoin$Valor, order.by = Bitcoin$`Fecha tiempo`)
+# 
+# head(Data_xts)
+# ts_info(Data_xts)
+#       class(Data_xts)
+# frequency(Data_xts)
+# #
+# periodicity(Data_xts)
+# tclass(Data_xts)
+```
+
+```{r}
+#| echo: false
+
+# plot(Data_xts)
+```

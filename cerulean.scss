@@ -1,0 +1,756 @@
+/*-- scss:defaults --*/
+
+$theme: "cerulean" !default;
+
+// Color System
+
+$white:    #fff !default;
+$black:    #000 !default;
+
+$Red-50:   #FFEBEE !default;
+$Red-100:  #FFCDD2 !default;
+$Red-200:  #EF9A9A !default;
+$Red-300:  #E57373 !default;
+$Red-400:  #EF5350 !default;
+$Red-500:  #F44336 !default;
+$Red-600:  #E53935 !default;
+$Red-700:  #D32F2F !default;
+$Red-800:  #C62828 !default;
+$Red-900:  #B71C1C !default;
+$Red-A100: #FF8A80 !default;
+$Red-A200: #FF5252 !default;
+$Red-A400: #FF1744 !default;
+$Red-A700: #D50000 !default;
+
+$Pink-50:   #FCE4EC !default;
+$Pink-100:  #F8BBD0 !default;
+$Pink-200:  #F48FB1 !default;
+$Pink-300:  #F06292 !default;
+$Pink-400:  #EC407A !default;
+$Pink-500:  #E91E63 !default;
+$Pink-600:  #D81B60 !default;
+$Pink-700:  #C2185B !default;
+$Pink-800:  #AD1457 !default;
+$Pink-900:  #880E4F !default;
+$Pink-A100: #FF80AB !default;
+$Pink-A200: #FF4081 !default;
+$Pink-A400: #F50057 !default;
+$Pink-A700: #C51162 !default;
+
+$Purple-50:   #F3E5F5 !default;
+$Purple-100:  #E1BEE7 !default;
+$Purple-200:  #CE93D8 !default;
+$Purple-300:  #BA68C8 !default;
+$Purple-400:  #AB47BC !default;
+$Purple-500:  #9C27B0 !default;
+$Purple-600:  #8E24AA !default;
+$Purple-700:  #7B1FA2 !default;
+$Purple-800:  #6A1B9A !default;
+$Purple-900:  #4A148C !default;
+$Purple-A100: #EA80FC !default;
+$Purple-A200: #E040FB !default;
+$Purple-A400: #D500F9 !default;
+$Purple-A700: #AA00FF !default;
+
+$DeepPurple-50:   #EDE7F6 !default;
+$DeepPurple-100:  #D1C4E9 !default;
+$DeepPurple-200:  #B39DDB !default;
+$DeepPurple-300:  #9575CD !default;
+$DeepPurple-400:  #7E57C2 !default;
+$DeepPurple-500:  #673AB7 !default;
+$DeepPurple-600:  #5E35B1 !default;
+$DeepPurple-700:  #512DA8 !default;
+$DeepPurple-800:  #4527A0 !default;
+$DeepPurple-900:  #311B92 !default;
+$DeepPurple-A100: #B388FF !default;
+$DeepPurple-A200: #7C4DFF !default;
+$DeepPurple-A400: #651FFF !default;
+$DeepPurple-A700: #6200EA !default;
+
+$Indigo-50:   #E8EAF6 !default;
+$Indigo-100:  #C5CAE9 !default;
+$Indigo-200:  #9FA8DA !default;
+$Indigo-300:  #7986CB !default;
+$Indigo-400:  #5C6BC0 !default;
+$Indigo-500:  #3F51B5 !default;
+$Indigo-600:  #3949AB !default;
+$Indigo-700:  #303F9F !default;
+$Indigo-800:  #283593 !default;
+$Indigo-900:  #1A237E !default;
+$Indigo-A100: #8C9EFF !default;
+$Indigo-A200: #536DFE !default;
+$Indigo-A400: #3D5AFE !default;
+$Indigo-A700: #304FFE !default;
+
+$Blue-50:   #E3F2FD !default;
+$Blue-100:  #BBDEFB !default;
+$Blue-200:  #90CAF9 !default;
+$Blue-300:  #64B5F6 !default;
+$Blue-400:  #42A5F5 !default;
+$Blue-500:  #2196F3 !default;
+$Blue-600:  #1E88E5 !default;
+$Blue-700:  #1976D2 !default;
+$Blue-800:  #1565C0 !default;
+$Blue-900:  #0D47A1 !default;
+$Blue-A100: #82B1FF !default;
+$Blue-A200: #448AFF !default;
+$Blue-A400: #2979FF !default;
+$Blue-A700: #2962FF !default;
+
+$LightBlue-50:   #E1F5FE !default;
+$LightBlue-100:  #B3E5FC !default;
+$LightBlue-200:  #81D4FA !default;
+$LightBlue-300:  #4FC3F7 !default;
+$LightBlue-400:  #29B6F6 !default;
+$LightBlue-500:  #03A9F4 !default;
+$LightBlue-600:  #039BE5 !default;
+$LightBlue-700:  #0288D1 !default;
+$LightBlue-800:  #0277BD !default;
+$LightBlue-900:  #01579B !default;
+$LightBlue-A100: #80D8FF !default;
+$LightBlue-A200: #40C4FF !default;
+$LightBlue-A400: #00B0FF !default;
+$LightBlue-A700: #0091EA !default;
+
+$Cyan-50:   #E0F7FA !default;
+$Cyan-100:  #B2EBF2 !default;
+$Cyan-200:  #80DEEA !default;
+$Cyan-300:  #4DD0E1 !default;
+$Cyan-400:  #26C6DA !default;
+$Cyan-500:  #00BCD4 !default;
+$Cyan-600:  #00ACC1 !default;
+$Cyan-700:  #0097A7 !default;
+$Cyan-800:  #00838F !default;
+$Cyan-900:  #006064 !default;
+$Cyan-A100: #84FFFF !default;
+$Cyan-A200: #18FFFF !default;
+$Cyan-A400: #00E5FF !default;
+$Cyan-A700: #00B8D4 !default;
+
+$Teal-50:   #E0F2F1 !default;
+$Teal-100:  #B2DFDB !default;
+$Teal-200:  #80CBC4 !default;
+$Teal-300:  #4DB6AC !default;
+$Teal-400:  #26A69A !default;
+$Teal-500:  #009688 !default;
+$Teal-600:  #00897B !default;
+$Teal-700:  #00796B !default;
+$Teal-800:  #00695C !default;
+$Teal-900:  #004D40 !default;
+$Teal-A100: #A7FFEB !default;
+$Teal-A200: #64FFDA !default;
+$Teal-A400: #1DE9B6 !default;
+$Teal-A700: #00BFA5 !default;
+
+$Green-50:   #E8F5E9 !default;
+$Green-100:  #C8E6C9 !default;
+$Green-200:  #A5D6A7 !default;
+$Green-300:  #81C784 !default;
+$Green-400:  #66BB6A !default;
+$Green-500:  #4CAF50 !default;
+$Green-600:  #43A047 !default;
+$Green-700:  #388E3C !default;
+$Green-800:  #2E7D32 !default;
+$Green-900:  #1B5E20 !default;
+$Green-A100: #B9F6CA !default;
+$Green-A200: #69F0AE !default;
+$Green-A400: #00E676 !default;
+$Green-A700: #00C853 !default;
+
+$LightGreen-50:   #F1F8E9 !default;
+$LightGreen-100:  #DCEDC8 !default;
+$LightGreen-200:  #C5E1A5 !default;
+$LightGreen-300:  #AED581 !default;
+$LightGreen-400:  #9CCC65 !default;
+$LightGreen-500:  #8BC34A !default;
+$LightGreen-600:  #7CB342 !default;
+$LightGreen-700:  #689F38 !default;
+$LightGreen-800:  #558B2F !default;
+$LightGreen-900:  #33691E !default;
+$LightGreen-A100: #CCFF90 !default;
+$LightGreen-A200: #B2FF59 !default;
+$LightGreen-A400: #76FF03 !default;
+$LightGreen-A700: #64DD17 !default;
+
+$Lime-50:   #F9FBE7 !default;
+$Lime-100:  #F0F4C3 !default;
+$Lime-200:  #E6EE9C !default;
+$Lime-300:  #DCE775 !default;
+$Lime-400:  #D4E157 !default;
+$Lime-500:  #CDDC39 !default;
+$Lime-600:  #C0CA33 !default;
+$Lime-700:  #AFB42B !default;
+$Lime-800:  #9E9D24 !default;
+$Lime-900:  #827717 !default;
+$Lime-A100: #F4FF81 !default;
+$Lime-A200: #EEFF41 !default;
+$Lime-A400: #C6FF00 !default;
+$Lime-A700: #AEEA00 !default;
+
+$Yellow-50:   #FFFDE7 !default;
+$Yellow-100:  #FFF9C4 !default;
+$Yellow-200:  #FFF59D !default;
+$Yellow-300:  #FFF176 !default;
+$Yellow-400:  #FFEE58 !default;
+$Yellow-500:  #FFEB3B !default;
+$Yellow-600:  #FDD835 !default;
+$Yellow-700:  #FBC02D !default;
+$Yellow-800:  #F9A825 !default;
+$Yellow-900:  #F57F17 !default;
+$Yellow-A100: #FFFF8D !default;
+$Yellow-A200: #FFFF00 !default;
+$Yellow-A400: #FFEA00 !default;
+$Yellow-A700: #FFD600 !default;
+
+$Amber-50:   #FFF8E1 !default;
+$Amber-100:  #FFECB3 !default;
+$Amber-200:  #FFE082 !default;
+$Amber-300:  #FFD54F !default;
+$Amber-400:  #FFCA28 !default;
+$Amber-500:  #FFC107 !default;
+$Amber-600:  #FFB300 !default;
+$Amber-700:  #FFA000 !default;
+$Amber-800:  #FF8F00 !default;
+$Amber-900:  #FF6F00 !default;
+$Amber-A100: #FFE57F !default;
+$Amber-A200: #FFD740 !default;
+$Amber-A400: #FFC400 !default;
+$Amber-A700: #FFAB00 !default;
+
+$Orange-50:   #FFF3E0 !default;
+$Orange-100:  #FFE0B2 !default;
+$Orange-200:  #FFCC80 !default;
+$Orange-300:  #FFB74D !default;
+$Orange-400:  #FFA726 !default;
+$Orange-500:  #FF9800 !default;
+$Orange-600:  #FB8C00 !default;
+$Orange-700:  #F57C00 !default;
+$Orange-800:  #EF6C00 !default;
+$Orange-900:  #E65100 !default;
+$Orange-A100: #FFD180 !default;
+$Orange-A200: #FFAB40 !default;
+$Orange-A400: #FF9100 !default;
+$Orange-A700: #FF6D00 !default;
+
+$DeepOrange-50:   #FBE9E7 !default;
+$DeepOrange-100:  #FFCCBC !default;
+$DeepOrange-200:  #FFAB91 !default;
+$DeepOrange-300:  #FF8A65 !default;
+$DeepOrange-400:  #FF7043 !default;
+$DeepOrange-500:  #FF5722 !default;
+$DeepOrange-600:  #F4511E !default;
+$DeepOrange-700:  #E64A19 !default;
+$DeepOrange-800:  #D84315 !default;
+$DeepOrange-900:  #BF360C !default;
+$DeepOrange-A100: #FF9E80 !default;
+$DeepOrange-A200: #FF6E40 !default;
+$DeepOrange-A400: #FF3D00 !default;
+$DeepOrange-A700: #DD2C00 !default;
+
+$Brown-50:   #EFEBE9 !default;
+$Brown-100:  #D7CCC8 !default;
+$Brown-200:  #BCAAA4 !default;
+$Brown-300:  #A1887F !default;
+$Brown-400:  #8D6E63 !default;
+$Brown-500:  #795548 !default;
+$Brown-600:  #6D4C41 !default;
+$Brown-700:  #5D4037 !default;
+$Brown-800:  #4E342E !default;
+$Brown-900:  #3E2723 !default;
+
+$Grey-50:   #FAFAFA !default;
+$Grey-100:  #F5F5F5 !default;
+$Grey-200:  #EEEEEE !default;
+$Grey-300:  #E0E0E0 !default;
+$Grey-400:  #BDBDBD !default;
+$Grey-500:  #9E9E9E !default;
+$Grey-600:  #757575 !default;
+$Grey-700:  #616161 !default;
+$Grey-800:  #424242 !default;
+$Grey-900:  #212121 !default;
+
+$BlueGrey-50:   #ECEFF1 !default;
+$BlueGrey-100:  #CFD8DC !default;
+$BlueGrey-200:  #B0BEC5 !default;
+$BlueGrey-300:  #90A4AE !default;
+$BlueGrey-400:  #78909C !default;
+$BlueGrey-500:  #607D8B !default;
+$BlueGrey-600:  #546E7A !default;
+$BlueGrey-700:  #455A64 !default;
+$BlueGrey-800:  #37474F !default;
+$BlueGrey-900:  #263238 !default;
+
+$blue: #64DD17 !default;
+$indigo: #6610f2 !default;
+$purple: #6f42c1 !default;
+$pink: #d63384 !default;
+$red: #dc3545 !default;
+$orange: #fd7e14 !default;
+$yellow: #ffc107 !default;
+$green: #198754 !default;
+$teal: #20c997 !default;
+$cyan: #0dcaf0 !default;
+//$gray-500: #adb5bd !default;
+$black: #000 !default;
+$white: #fff !default;
+
+//$primary:       $Red-400 !default;
+//$secondary:     $BlueGrey-900 !default;
+//$success:       $BlueGrey-900 !default;
+//$info:          $BlueGrey-900 !default;
+//$warning:       $BlueGrey-900 !default;
+//$danger:       $BlueGrey-900 !default;
+//$light:         $BlueGrey-900 !default;
+//$dark:          $BlueGrey-900 !default;
+
+//$min-contrast-ratio: 50% !default;
+
+// Body
+$body-bg:	 $Grey-100 !default;
+$body-color:    $Grey-900 !default;
+//$link-color:	$Green-A400;
+//$input-bg:      $LightBlue-50 !default;
+$popover-bg:	white !default;
+//$selection-bg: $Indigo-100 !default;
+
+.sidebar-title {
+  color: $Red-A700;
+}
+$sidebar-bg: $Grey-200 !default;
+$sidebar-fg: $Red-900 !default;
+$sidebar-hl: $Blue-500 !default;
+
+div.sidebar-item-container .active {
+ font-weight: 500;
+}
+.sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active{
+  font-weight: bold;
+}
+//img.quarto-cover-image {
+//  box-shadow: 0 0.3rem 0.5rem $Red-A400;
+//}
+
+
+//headings
+$headings-color: $Red-900 !default;
+//#title-block-header.quarto-title-block.default .quarto-title h1.title {
+//  margin-bottom: 0.5rem;
+//}
+
+//h2 {
+//  margin-top: 2rem;
+//  margin-bottom: 1.4rem;
+//  font-size: 1.4rem;
+//  font-weight: 600;
+//}
+//h3 { margin-top: 1.5em; font-size: 1.2rem; font-weight: 500; }
+//h4 { margin-top: 1.5em; font-size: 1.1rem; }
+//h5 { margin-top: 1.5em; font-size: 1rem; }
+
+//.quarto-section-identifier {
+//  color: $Blue-500;
+//  font-weight: normal;
+//}
+
+// Fonts
+//$font-family-sans-serif:    "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+//$font-family-sans-serif: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+//$font-family-sans-serif: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+//$font-family-monospace: default;
+//$font-size-root: 18px !default;
+//$font-size-base:  1rem !default;
+//$font-weight-base: 380 !default;
+
+
+// Code Blocks
+//$code-block-border-left: $BlueGrey-100 !default;
+//$code-block-border-left-style: solid !default;
+//$code-block-border-left-size: 5px  !default;  
+//$code-block-padding-left: default;
+$code-block-bg: $BlueGrey-100 !default;
+//$code-block-bg-padding: default;
+//$code-block-bg-alpha: -0.35 !default;
+
+// Code Copy
+//$btn-code-copy-color: $Grey-800 !default;
+//$btn-code-copy-color-active: $Grey-900 !default;
+
+// Inline Code
+//$code-bg:  $blue !default;
+//$code-color: $green !default;
+
+// Table of Contents
+$toc-color: $LightBlue-A700 !default;
+$toc-font-size: 18px !default;
+$toc-active-border: $Red-A400 !default;
+$toc-inactive-border: $Grey-400 !default;
+div.toc-item-container .active {
+  font-weight: bold;
+}
+
+
+// Layout
+//$content-padding-top: 1px default;
+
+// Navigation
+//$navbar-bg: $black !default;
+//$navbar-fg:
+//$navbar-hl:
+//$sidebar-bg:
+//$sidebar-fg:
+//$sidebar-hl:
+//$footer-bg:
+//$footer-fg:
+
+// Callouts
+//$callout-border-width: $blue !default;
+//$callout-border-scale: 100% !default;
+//$callout-icon-scale
+//$callout-margin-top
+//$callout-margin-bottom
+//$callout-color-<type>
+
+// Dropdowns
+//$dropdown-link-color: $Green-A400 !default;
+//$dropdown-link-hover-color: $Green-A400 !default;
+//$dropdown-link-hover-bg:  $Green-A400 !default;
+//$hover-color: $Green-A400;
+//$visited-color: $Green-A400;
+//$actived-color: $Green-A400;
+
+$link-color: $LightBlue-A400;
+
+
+// Tables
+//$table-border-color: red !default;
+//$table-bg-scale:              0 !default;
+
+// Forms buscador
+$input-bg:  			white !default;
+$input-color:  		black !default;
+$input-border-color:            black !default;
+//$input-group-addon-color:       red !default;
+//$input-group-addon-bg:          red !default;
+//$form-check-input-bg:           red !default;
+//$form-check-input-border:       none !default;
+//$form-file-button-color:        red !default;
+
+// Navbar
+//$navbar-padding-y:         $Red-100 !default;
+//$navbar-light-bg:          $Red-100 !default;
+//$navbar-dark-bg:           $Red-100 !default;
+//$navbar-dark-color:        $Red-100 !default;
+//$navbar-dark-hover-color:  $Red-100 !default;
+
+// Pagination
+//$pagination-color:                  $LightBlue-500 !default;
+//$pagination-bg:                     $LightBlue-500 !default;
+//$pagination-border-width:           0 !default;
+//$pagination-border-color:           $LightBlue-500 !default;
+//$pagination-hover-color:            $LightBlue-500 !default;
+//$pagination-hover-bg:               $LightBlue-500 !default;
+//$pagination-hover-border-color:     $LightBlue-500 !default;
+//$pagination-active-bg:              $pagination-hover-bg !default;
+//$pagination-active-border-color:    $LightBlue-500 !default;
+//$pagination-disabled-color:         $LightBlue-500 !default;
+//$pagination-disabled-bg:            $LightBlue-500 !default;
+//$pagination-disabled-border-color:  $LightBlue-500 !default;
+
+// Cards
+//$card-cap-bg:                       $LightBlue-500 !default;
+//$card-bg:                           $LightBlue-500 !default;
+
+// Toasts
+//$toast-background-color:            $LightBlue-500 !default;
+//$toast-header-background-color:     $LightBlue-500 !default;
+
+// Modals
+//$modal-content-bg:                  $LightBlue-500 !default;
+//$modal-content-border-color:        $LightBlue-500 !default;
+//$modal-header-border-color:         $LightBlue-500 !default;
+
+// Progress bars
+//$progress-bg:                       $LightBlue-500 !default;
+//$progress-height:               .5rem !default;
+
+// Alerts
+//$alert-border-width:            0 !default;
+
+// List group
+//$list-group-color:                  $LightBlue-500 !default;
+//$list-group-bg:                     $LightBlue-500 !default;
+//$list-group-border-color:           $LightBlue-500 !default;
+//$list-group-hover-bg:               $LightBlue-500 !default;
+//$list-group-action-hover-color:     $LightBlue-500 !default;
+//$list-group-action-active-bg:       $LightBlue-500 !default;
+
+// Breadcrumbs
+//$breadcrumb-padding-y:              .375rem !default;
+//$breadcrumb-padding-x:              .75rem !default;
+//$breadcrumb-bg:                     $LightBlue-500 !default;
+//$breadcrumb-border-radius:          .25rem !default;
+
+// Close
+//$btn-close-color:            $LightBlue-500 !default;
+//$btn-close-opacity:          .4 !default;
+//$btn-close-hover-opacity:    1 !default;
+
+// Code
+//$pre-color:      inherit !default;
+
+/*-- scss:rules --*/
+
+
+// Variables
+
+$text-shadow: 0 1px 0 rgba(0, 0, 0, .05) !default;
+
+// Mixins
+
+@mixin btn-shadow($color){
+  @include gradient-y-three-colors(tint-color($color, 16%), $color, 60%, shade-color($color, 6%));
+}
+
+// Navbar
+
+.navbar {
+  @each $color, $value in $theme-colors {
+    &.bg-#{$color} {
+      @include btn-shadow($value);
+    }
+  }
+}
+
+.navbar-brand,
+.nav-link {
+  text-shadow: $text-shadow;
+}
+
+// Buttons
+
+.btn {
+  text-shadow: $text-shadow;
+}
+
+.btn-secondary {
+  color: $gray-700;
+}
+
+@each $color, $value in $theme-colors {
+  .btn-#{$color} {
+    @include btn-shadow($value);
+  }
+}
+
+// Typography
+
+.text-secondary {
+  color: $Grey-500 !important;
+}
+
+.bg-primary,
+.bg-success,
+.bg-info,
+.bg-warning,
+.bg-danger,
+.bg-dark {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: $white;
+  }
+}
+
+// Navs
+
+.dropdown-menu {
+  .dropdown-header {
+    color: $Grey-600;
+  }
+}
+
+// Indicators
+
+.badge {
+  &.bg-secondary,
+  &.bg-light {
+    color: $dark;
+  }
+}
+
+
+
+//Primer barra (arriba) del buscador
+.aa-DetachedOverlay .aa-SourceHeader .search-result-header, #quarto-search-results .aa-SourceHeader .search-result-header { 
+    color: white;
+    font-size: 0.9rem;
+    background-color: black;
+    padding-left: 14px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+}
+
+//Color del fondo cuando se navega en el buscador
+.aa-DetachedOverlay li.aa-Item[aria-selected=true] .search-item.search-result-more, .aa-DetachedOverlay li.aa-Item[aria-selected=true] .search-item .search-result-section, .aa-DetachedOverlay li.aa-Item[aria-selected=true] .search-item .search-result-text, .aa-DetachedOverlay li.aa-Item[aria-selected=true] .search-item .search-result-title-container, .aa-DetachedOverlay li.aa-Item[aria-selected=true] .search-item .search-result-text-container, #quarto-search-results li.aa-Item[aria-selected=true] .search-item.search-result-more, #quarto-search-results li.aa-Item[aria-selected=true] .search-item .search-result-section, #quarto-search-results li.aa-Item[aria-selected=true] .search-item .search-result-text, #quarto-search-results li.aa-Item[aria-selected=true] .search-item .search-result-title-container, #quarto-search-results li.aa-Item[aria-selected=true] .search-item .search-result-text-container {
+    color: black;
+    background-color: $Cyan-300;
+}
+
+//Color del texto del buscador
+.aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item.search-result-more, .aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item .search-result-section, .aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item .search-result-text, .aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item .search-result-title-container, .aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item .search-result-text-container, #quarto-search-results li.aa-Item[aria-selected=false] .search-item.search-result-more, #quarto-search-results li.aa-Item[aria-selected=false] .search-item .search-result-section, #quarto-search-results li.aa-Item[aria-selected=false] .search-item .search-result-text, #quarto-search-results li.aa-Item[aria-selected=false] .search-item .search-result-title-container, #quarto-search-results li.aa-Item[aria-selected=false] .search-item .search-result-text-container {
+    weight: 2rem;
+    color: black;
+}
+
+//Cuadrito a la izquierda en el buscador
+.aa-DetachedOverlay li.aa-Item[aria-selected=true] .search-item, #quarto-search-results li.aa-Item[aria-selected=true] .search-item {
+    background-color: $Cyan-300;
+}
+
+//Color de las coincidencias en el buscador
+.aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item mark.search-match, .aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item .search-match.mark, #quarto-search-results li.aa-Item[aria-selected=false] .search-item mark.search-match, #quarto-search-results li.aa-Item[aria-selected=false] .search-item .search-match.mark {
+    color: black;
+    background-color: $Pink-200;
+}
+
+//Color de las coincidencias cuando se navega en el buscador
+.aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item mark.search-match, .aa-DetachedOverlay li.aa-Item[aria-selected=false] .search-item .search-match.mark, #quarto-search-results li.aa-Item[aria-selected=true] .search-item mark.search-match, #quarto-search-results li.aa-Item[aria-selected=false] .search-item .search-match.mark {
+    color: black;
+    background-color: $Pink-A200;
+}
+
+//Ícono del buscador
+.aa-DetachedOverlay .aa-Item .search-item i.bi, #quarto-search-results .aa-Item .search-item i.bi {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 1.5em;
+}
+
+
+
+//Navegación de capítulos
+.nav-page a {
+    color: 	#222021;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.nav-page .nav-page-text {
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.nav-page .bi {
+    font-size: 2.2rem;
+    vertical-align: middle;
+}
+
+//pie de página
+body .nav-footer {
+    border-top: 0.5px solid $BlueGrey-200;
+}
+
+.nav-footer {
+    min-height: 3.5em;
+    color: #37474f;
+}
+
+
+//Logo de la navbar
+.navbar-logo {
+    max-height: 27px;
+    width: auto;
+    padding-right: 4px
+}
+
+.sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active {
+    font-weight: 500; 
+    font-style: italic
+}
+
+//Contenido de la tabla de contenido
+.sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active {
+    border-left: 2px solid #0091ea;
+    color: #0091ea !important;
+}
+
+.sidebar nav[role=doc-toc]>ul a {
+    border-left: 2px solid #bdbdbd;
+    padding-left: 0.5rem;
+}
+
+//Texto: Tabla de contenido
+.sidebar .quarto-alternate-notebooks h2, .sidebar .quarto-alternate-notebooks .h2, .sidebar .quarto-alternate-formats h2, .sidebar .quarto-alternate-formats .h2, .sidebar nav[role=doc-toc]>h2, .sidebar nav[role=doc-toc]>.h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    margin-top: 0.3rem;
+    font-family: inherit;
+    border-bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0px;
+}
+
+//BACK TO TOP
+#quarto-back-to-top {
+    display: none;
+    position: fixed;
+    bottom: 50px;
+    background-color: #f5f5f5;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.2rem 0.5rem #6c757d, 0 0 0.05rem #6c757d;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: .9em;
+    text-align: center;
+    left: 50%;
+    padding: 0.4rem 0.8rem;
+    transform: translate(-50%, 0);
+}
+
+//BUSCADOR (LUPA)
+.aa-Autocomplete .aa-Form .aa-InputWrapper .aa-Input, .aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input {
+    appearance: none;
+    background: none;
+    border: 0;
+    color: black;
+    font: inherit;
+    height: calc(1.6em + 0.1rem + 2px);
+    padding: 1;
+    width: 100%;
+}
+
+.aa-Autocomplete .aa-Form, .aa-DetachedFormContainer .aa-Form {
+    align-items: center;
+    background-color: white;
+    border: 1.9px solid #000;
+    border-radius: 0.5rem;
+    color: #000;
+    display: flex;
+    line-height: 1em;
+    margin: 0;
+    position: relative;
+    width: 100%;
+}
+
+//Buscador cuando se achiquita la pantalla
+.aa-DetachedFormContainer {
+    background-color: green;
+    border-bottom: 10px solid #000;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10;
+    padding: 3em;
+}
+
+//Números del íncide
+.sidebar-item .chapter-number {
+    color: black;
+    font-size: 18px;
+    font-weight: 500
+}
