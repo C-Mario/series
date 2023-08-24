@@ -693,3 +693,7 @@ body .nav-footer {
   color: $Pink-A400;
   text-decoration: underline solid black;
 }
+
+.sidebar nav[role=doc-toc]>ul a {
+  text-decoration: none;
+}
