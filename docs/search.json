@@ -2,9 +2,9 @@
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About",
+    "title": "Propuestas de series de tiempo",
     "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "Exportaciones &lt;- read_excel(\"C:/Users/dofca/Desktop/Rar/Exportaciones.xlsx\")\nExportaciones$Total &lt;- round(Exportaciones$Total)\nExportaciones$Tradicionales &lt;- round(Exportaciones$Tradicionales)\nExportaciones$Notradicionales &lt;- round(Exportaciones$Notradicionales)\nExportaciones$Mes &lt;- as.yearmon(Exportaciones$Mes)\nExportaciones &lt;- Exportaciones[100:378,]\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = \"#FF1744\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones\") \n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Tradicionales), color = \"#00B0FF\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones Tradicionales\") \n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Notradicionales), color = \"#00E676\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones No Tradicionales\")"
   },
   {
     "objectID": "index.html",
