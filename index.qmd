@@ -2,7 +2,7 @@
 title: "series"
 ---
 
-This is a Quarto website. Hola
+This is a Quarto website. Hola hola hola
 
 To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
 
