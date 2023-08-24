@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -54,7 +88,7 @@ ul.task-list li input[type="checkbox"] {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
-    "search-detached-cancel-button-title": "Cancel",
+    "search-detached-cancel-button-title": "Cancelar",
     "search-submit-button-title": ""
   }
 }</script>
@@ -62,10 +96,9 @@ ul.task-list li input[type="checkbox"] {
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -166,6 +199,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="número-de-desaparecidos-reportados-al-año-en-colombia" class="level2">
 <h2 class="anchored" data-anchor-id="número-de-desaparecidos-reportados-al-año-en-colombia">Número de desaparecidos reportados al año en Colombia</h2>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -177,6 +211,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="número-de-desaparecidos-reportados-por-mes-en-colombia" class="level2">
 <h2 class="anchored" data-anchor-id="número-de-desaparecidos-reportados-por-mes-en-colombia">Número de desaparecidos reportados por mes en Colombia</h2>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">plot</span>(Data_xts,<span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">200</span>,<span class="dv">1800</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -185,13 +220,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="tasa-de-crecimiento-mensual-con-respecto-al-periodo-anterior-del-ipc-de-servicios-en-colombia" class="level2">
 <h2 class="anchored" data-anchor-id="tasa-de-crecimiento-mensual-con-respecto-al-periodo-anterior-del-ipc-de-servicios-en-colombia">Tasa de crecimiento mensual con respecto al periodo anterior del IPC de servicios en Colombia</h2>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: object timezone (UTC) is different from system timezone ()
-  NOTE: set 'options(xts_check_TZ = FALSE)'to disable this warning
-    This note is displayed once per session</code></pre>
-</div>
-</div>
-<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">plot</span>(IPCservPAserie)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -200,16 +229,22 @@ ul.task-list li input[type="checkbox"] {
 <section id="exportaciones-mensuales-desde-colombia-en-miles-de-dólares" class="level2">
 <h2 class="anchored" data-anchor-id="exportaciones-mensuales-desde-colombia-en-miles-de-dólares">Exportaciones mensuales desde Colombia en miles de dólares</h2>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">ggplot</span>(Exportaciones) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Mes, <span class="at">y =</span> Total), <span class="at">color =</span> <span class="st">"#FF1744"</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> </span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="fu">theme_dark</span>(<span class="dv">18</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Total Exportaciones"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">ggplot</span>(Exportaciones) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Mes, <span class="at">y =</span> Tradicionales), <span class="at">color =</span> <span class="st">"#00B0FF"</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> </span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">theme_dark</span>(<span class="dv">18</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Total Exportaciones Tradicionales"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">ggplot</span>(Exportaciones) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Mes, <span class="at">y =</span> Notradicionales), <span class="at">color =</span> <span class="st">"#00E676"</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> </span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">theme_dark</span>(<span class="dv">18</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Total Exportaciones No Tradicionales"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -224,11 +259,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="trabajo-con-los-datos" class="level4">
 <h4 class="anchored" data-anchor-id="trabajo-con-los-datos">trabajo con los datos</h4>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: object timezone (UTC) is different from system timezone ()</code></pre>
-</div>
-</div>
-<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -241,6 +272,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="trabajo-con-los-datos-1" class="level4">
 <h4 class="anchored" data-anchor-id="trabajo-con-los-datos-1">trabajo con los datos</h4>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="propuestas_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>

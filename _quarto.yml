@@ -16,12 +16,18 @@ website:
         target: _blank
     logo: images/logo2.png
   back-to-top-navigation: true
+  
 
 format:
   html:
-    theme: cerulean
-    css: styles.css
+    theme: celula.scss
     toc: true
-
+    code-line-numbers: true
+    code-copy: hover
+    grid: 
+      body-width: 1200px
+      content-mode: slim
+      margin-width: 300px
+      
 editor: visual
 

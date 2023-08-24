@@ -332,7 +332,7 @@ div.sidebar-item-container .active {
 
 
 //headings
-$headings-color: $Red-900 !default;
+$headings-color: $BlueGrey-900 !default;
 //#title-block-header.quarto-title-block.default .quarto-title h1.title {
 //  margin-bottom: 0.5rem;
 //}
@@ -363,9 +363,9 @@ $headings-color: $Red-900 !default;
 
 
 // Code Blocks
-//$code-block-border-left: $BlueGrey-100 !default;
-//$code-block-border-left-style: solid !default;
-//$code-block-border-left-size: 5px  !default;  
+$code-block-border-left: #F50057 !default;
+$code-block-border-left-style: solid !default;
+$code-block-border-left-size: 2px  !default;  
 //$code-block-padding-left: default;
 $code-block-bg: $BlueGrey-100 !default;
 //$code-block-bg-padding: default;
@@ -389,114 +389,24 @@ div.toc-item-container .active {
 }
 
 
-// Layout
-//$content-padding-top: 1px default;
-
 // Navigation
-//$navbar-bg: $black !default;
-//$navbar-fg:
-//$navbar-hl:
+$navbar-bg: $LightBlue-A700 !default;
+$navbar-fg: $black !default;
+$navbar-hl: $white !default;
 //$sidebar-bg:
 //$sidebar-fg:
 //$sidebar-hl:
 //$footer-bg:
 //$footer-fg:
 
-// Callouts
-//$callout-border-width: $blue !default;
-//$callout-border-scale: 100% !default;
-//$callout-icon-scale
-//$callout-margin-top
-//$callout-margin-bottom
-//$callout-color-<type>
-
-// Dropdowns
-//$dropdown-link-color: $Green-A400 !default;
-//$dropdown-link-hover-color: $Green-A400 !default;
-//$dropdown-link-hover-bg:  $Green-A400 !default;
-//$hover-color: $Green-A400;
-//$visited-color: $Green-A400;
-//$actived-color: $Green-A400;
-
 $link-color: $LightBlue-A400;
 
-
-// Tables
-//$table-border-color: red !default;
-//$table-bg-scale:              0 !default;
 
 // Forms buscador
 $input-bg:  			white !default;
 $input-color:  		black !default;
 $input-border-color:            black !default;
-//$input-group-addon-color:       red !default;
-//$input-group-addon-bg:          red !default;
-//$form-check-input-bg:           red !default;
-//$form-check-input-border:       none !default;
-//$form-file-button-color:        red !default;
 
-// Navbar
-//$navbar-padding-y:         $Red-100 !default;
-//$navbar-light-bg:          $Red-100 !default;
-//$navbar-dark-bg:           $Red-100 !default;
-//$navbar-dark-color:        $Red-100 !default;
-//$navbar-dark-hover-color:  $Red-100 !default;
-
-// Pagination
-//$pagination-color:                  $LightBlue-500 !default;
-//$pagination-bg:                     $LightBlue-500 !default;
-//$pagination-border-width:           0 !default;
-//$pagination-border-color:           $LightBlue-500 !default;
-//$pagination-hover-color:            $LightBlue-500 !default;
-//$pagination-hover-bg:               $LightBlue-500 !default;
-//$pagination-hover-border-color:     $LightBlue-500 !default;
-//$pagination-active-bg:              $pagination-hover-bg !default;
-//$pagination-active-border-color:    $LightBlue-500 !default;
-//$pagination-disabled-color:         $LightBlue-500 !default;
-//$pagination-disabled-bg:            $LightBlue-500 !default;
-//$pagination-disabled-border-color:  $LightBlue-500 !default;
-
-// Cards
-//$card-cap-bg:                       $LightBlue-500 !default;
-//$card-bg:                           $LightBlue-500 !default;
-
-// Toasts
-//$toast-background-color:            $LightBlue-500 !default;
-//$toast-header-background-color:     $LightBlue-500 !default;
-
-// Modals
-//$modal-content-bg:                  $LightBlue-500 !default;
-//$modal-content-border-color:        $LightBlue-500 !default;
-//$modal-header-border-color:         $LightBlue-500 !default;
-
-// Progress bars
-//$progress-bg:                       $LightBlue-500 !default;
-//$progress-height:               .5rem !default;
-
-// Alerts
-//$alert-border-width:            0 !default;
-
-// List group
-//$list-group-color:                  $LightBlue-500 !default;
-//$list-group-bg:                     $LightBlue-500 !default;
-//$list-group-border-color:           $LightBlue-500 !default;
-//$list-group-hover-bg:               $LightBlue-500 !default;
-//$list-group-action-hover-color:     $LightBlue-500 !default;
-//$list-group-action-active-bg:       $LightBlue-500 !default;
-
-// Breadcrumbs
-//$breadcrumb-padding-y:              .375rem !default;
-//$breadcrumb-padding-x:              .75rem !default;
-//$breadcrumb-bg:                     $LightBlue-500 !default;
-//$breadcrumb-border-radius:          .25rem !default;
-
-// Close
-//$btn-close-color:            $LightBlue-500 !default;
-//$btn-close-opacity:          .4 !default;
-//$btn-close-hover-opacity:    1 !default;
-
-// Code
-//$pre-color:      inherit !default;
 
 /*-- scss:rules --*/
 
@@ -685,7 +595,7 @@ body .nav-footer {
 
 //Texto: Tabla de contenido
 .sidebar .quarto-alternate-notebooks h2, .sidebar .quarto-alternate-notebooks .h2, .sidebar .quarto-alternate-formats h2, .sidebar .quarto-alternate-formats .h2, .sidebar nav[role=doc-toc]>h2, .sidebar nav[role=doc-toc]>.h2 {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     margin-bottom: 0.5rem;
     margin-top: 0.3rem;
@@ -739,13 +649,13 @@ body .nav-footer {
 
 //Buscador cuando se achiquita la pantalla
 .aa-DetachedFormContainer {
-    background-color: green;
-    border-bottom: 10px solid #000;
+    background-color: $Grey-300;
+    border-bottom: 2px solid #000;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     margin: 10;
-    padding: 3em;
+    padding: 2em;
 }
 
 //Números del íncide
