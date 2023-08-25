@@ -46,7 +46,7 @@
     "href": "propuestas.html#exportaciones-mensuales-desde-colombia-en-miles-de-dólares",
     "title": "Propuestas de series de tiempo",
     "section": "Exportaciones mensuales desde Colombia en miles de dólares",
-    "text": "Exportaciones mensuales desde Colombia en miles de dólares\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = \"#FF1744\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones\")\n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Tradicionales), color = \"#00B0FF\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones Tradicionales\")\n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Notradicionales), color = \"#00E676\", lwd = 0.8) + \n  theme_dark(18) + ylab(\"Total Exportaciones No Tradicionales\")"
+    "text": "Exportaciones mensuales desde Colombia en miles de dólares\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = \"#FF1744\", lwd = 0.8) + \n  theme_minimal(18) + ylab(\"Total Exportaciones\")\n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Tradicionales), color = \"#00B0FF\", lwd = 0.8) + \n  theme_minimal(18) + ylab(\"Total Exportaciones Tradicionales\")\n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Notradicionales), color = \"#00E676\", lwd = 0.8) + \n  theme_minimal(18) + ylab(\"Total Exportaciones No Tradicionales\")"
   },
   {
     "objectID": "propuestas.html#temperatura-en-la-ciudad-de-miami-durante-un-fenomeno-tropical-sucedido-en-puerto-rico-zona-cercana-a-miami",
