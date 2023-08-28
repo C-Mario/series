@@ -14,7 +14,7 @@ library(xts) # se requiere de zoo para xts
 library(TSstudio) # necesario pata ts_info
 library(lubridate) # trabajar con fechas
 library(tidyverse) #procesamiento de datos
-library(ggplot2)
+library(ggplot2) #graficos
 library(readxl)
 ```
 
@@ -154,6 +154,37 @@ Exportaciones <- Exportaciones[1:378,]
 
 ggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = "#FF1744", lwd = 0.8) + 
   theme_minimal(18) + ylab("Total Exportaciones")
+```
+
+Propuesta para las exportaciones con otra visualización
+
+```{r}
+#| echo: true 
+#| output: true
+#| fig-width: 9
+# mirar fromato de exportaciones
+str(Exportaciones)
+# cambiar la ventana de datos
+Exportaciones <- Exportaciones[97:378,]
+Data_xts <- xts(Exportaciones$Total, order.by = Exportaciones$Mes)
+#
+
+head(Data_xts)
+ts_info(Data_xts)
+class(Data_xts)
+frequency(Data_xts)
+#
+periodicity(Data_xts)
+tclass(Data_xts)
+
+
+```
+
+```{r}
+#| echo: true 
+#| output: true
+
+plot(Data_xts)
 ```
 
 ```{r}
