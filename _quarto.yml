@@ -9,6 +9,7 @@ website:
       - href: index.qmd
         text: Inicio
       - propuestas.qmd
+      - Descriptiva.qmd
     right: 
       - text: GitHub
         icon: github

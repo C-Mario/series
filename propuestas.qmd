@@ -183,6 +183,7 @@ tclass(Data_xts)
 ```{r}
 #| echo: true 
 #| output: true
+#| fig-width: 10
 
 plot(Data_xts)
 ```
