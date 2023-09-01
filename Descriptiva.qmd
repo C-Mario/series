@@ -20,7 +20,7 @@ library(readxl)
 ```
 
 ```{r}
-load(file = "_environment2.RData")
+load(file = "_environment.RData")
 ```
 
 ## Serie exportaciones totales Colombia (2000-2023\[junio\])
