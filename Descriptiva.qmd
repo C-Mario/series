@@ -1,0 +1,108 @@
+---
+title: "Descriptiva"
+editor_options: 
+chunk_output_type: console
+execute: 
+  echo: false
+  output: false
+---
+
+```{r}
+# librerias
+library(zoo)
+library(xts) # se requiere de zoo para xts
+library(TSstudio) # necesario pata ts_info
+library(lubridate) # trabajar con fechas
+library(tidyverse) #procesamiento de datos
+library(ggplot2) #graficos
+library(readxl)
+
+```
+
+```{r}
+load(file = "_environment2.RData")
+```
+
+## Serie exportaciones totales Colombia (2000-2023\[junio\])
+
+```{r}
+options(scipen = 12)
+Exportaciones <- read_excel("datos/Exportaciones.xlsx")
+Exportaciones$Total <- round(Exportaciones$Total)
+Exportaciones$Tradicionales <- round(Exportaciones$Tradicionales)
+Exportaciones$Notradicionales <- round(Exportaciones$Notradicionales)
+Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
+Exportaciones <- Exportaciones[1:378,]
+```
+
+```{r}
+#| echo: true 
+#| output: true
+#| fig-width: 9
+# mirar fromato de exportaciones
+str(Exportaciones)
+# cambiar la ventana de datos
+Exportaciones <- Exportaciones[97:378,]
+Data_xts <- xts(Exportaciones$Total, order.by = Exportaciones$Mes)
+#
+
+head(Data_xts)
+ts_info(Data_xts)
+class(Data_xts)
+frequency(Data_xts)
+#
+periodicity(Data_xts)
+tclass(Data_xts)
+
+```
+
+```{r}
+#| echo: true 
+#| output: true
+
+plot(Data_xts)
+```
+
+## Serie Valor cierre de bolsa bitcoin (2017-2021)
+
+```{r}
+#| echo: true 
+#| output: true
+# datos de trabajo
+BTC_Daily <- read.csv("datos/BTC-Daily.csv")
+Data <- data.frame(BTC_Daily$date,BTC_Daily$close)
+colnames(Data) <- c("Fecha tiempo", "Valor")
+# limpiando datos faltantes
+str(Data)
+Data$`Fecha tiempo` <- strftime(Data$`Fecha tiempo`, format="%Y-%m-%d")
+str(Data)
+Data$`Fecha tiempo` <- as.Date(Data$`Fecha tiempo`)
+# procesamiento de los datos
+
+Bitcoin <- Data %>%
+      filter(`Fecha tiempo` >= as.Date("2017-01-01"),
+             `Fecha tiempo` < as.Date("2021-12-31"))
+str(Bitcoin)
+```
+
+```{r}
+#| echo: true 
+#| output: true
+# objeto serie de tiempo
+Data_xts <- xts(Bitcoin$Valor, order.by = Bitcoin$`Fecha tiempo`)
+
+head(Data_xts)
+ts_info(Data_xts)
+class(Data_xts)
+frequency(Data_xts)
+#
+periodicity(Data_xts)
+tclass(Data_xts)
+```
+
+```{r}
+#| echo: true 
+#| output: true
+
+plot(Data_xts)
+```

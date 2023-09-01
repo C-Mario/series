@@ -235,18 +235,75 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="propuestas_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="864"></p>
 </div>
 </div>
+<p>Propuesta para las exportaciones con otra visualización</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">ggplot</span>(Exportaciones) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Mes, <span class="at">y =</span> Tradicionales), <span class="at">color =</span> <span class="st">"#00B0FF"</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> </span>
-<span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">theme_minimal</span>(<span class="dv">18</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Total Exportaciones Tradicionales"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="propuestas_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="864"></p>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># mirar fromato de exportaciones</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">str</span>(Exportaciones)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [378 × 4] (S3: tbl_df/tbl/data.frame)
+ $ Mes            : 'yearmon' num [1:378] ene. 1992 feb. 1992 mar. 1992 abr. 1992 ...
+ $ Total          : num [1:378] 531771 573004 552307 531825 628717 ...
+ $ Tradicionales  : num [1:378] 281755 290901 247223 293150 302261 ...
+ $ Notradicionales: num [1:378] 250016 282103 305084 238675 326457 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># cambiar la ventana de datos</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>Exportaciones <span class="ot">&lt;-</span> Exportaciones[<span class="dv">97</span><span class="sc">:</span><span class="dv">378</span>,]</span>
+<span id="cb7-3"><a href="#cb7-3"></a>Data_xts <span class="ot">&lt;-</span> <span class="fu">xts</span>(Exportaciones<span class="sc">$</span>Total, <span class="at">order.by =</span> Exportaciones<span class="sc">$</span>Mes)</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="fu">head</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             [,1]
+ene. 2000 1011676
+feb. 2000 1054098
+mar. 2000 1053546
+abr. 2000  886359
+may. 2000 1146258
+jun. 2000 1153956</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">ts_info</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> The Data_xts series is a xts object with 1 variable and 282 observations
+ Frequency: monthly 
+ Start time: ene. 2000 
+ End time: jun. 2023 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">class</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "xts" "zoo"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">frequency</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co">#</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">periodicity</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Monthly periodicity from ene. 2000 to jun. 2023 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">tclass</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "yearmon"</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">ggplot</span>(Exportaciones) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Mes, <span class="at">y =</span> Notradicionales), <span class="at">color =</span> <span class="st">"#00E676"</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> </span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">theme_minimal</span>(<span class="dv">18</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Total Exportaciones No Tradicionales"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="propuestas_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="864"></p>
+<p><img src="propuestas_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">ggplot</span>(Exportaciones) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Mes, <span class="at">y =</span> Tradicionales), <span class="at">color =</span> <span class="st">"#00B0FF"</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> </span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="fu">theme_minimal</span>(<span class="dv">18</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Total Exportaciones Tradicionales"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="propuestas_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="864"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">ggplot</span>(Exportaciones) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Mes, <span class="at">y =</span> Notradicionales), <span class="at">color =</span> <span class="st">"#00E676"</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> </span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">theme_minimal</span>(<span class="dv">18</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Total Exportaciones No Tradicionales"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="propuestas_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="864"></p>
 </div>
 </div>
 </section>
@@ -259,9 +316,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="trabajo-con-los-datos" class="level4">
 <h4 class="anchored" data-anchor-id="trabajo-con-los-datos">trabajo con los datos</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="propuestas_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+<p><img src="propuestas_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -272,9 +329,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="trabajo-con-los-datos-1" class="level4">
 <h4 class="anchored" data-anchor-id="trabajo-con-los-datos-1">trabajo con los datos</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="propuestas_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+<p><img src="propuestas_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 
