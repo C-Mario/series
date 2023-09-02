@@ -4,7 +4,7 @@
     "href": "Descriptiva.html",
     "title": "Descriptiva",
     "section": "",
-    "text": "Serie Exportaciones mensuales\n\n\nDesde Colombia en miles de dólares (2000-2023)\n\n# mirar fromato de exportaciones\nstr(Exportaciones)\n\ntibble [378 × 4] (S3: tbl_df/tbl/data.frame)\n $ Mes            : 'yearmon' num [1:378] Jan 1992 Feb 1992 Mar 1992 Apr 1992 ...\n $ Total          : num [1:378] 531771 573004 552307 531825 628717 ...\n $ Tradicionales  : num [1:378] 281755 290901 247223 293150 302261 ...\n $ Notradicionales: num [1:378] 250016 282103 305084 238675 326457 ...\n\n# cambiar la ventana de datos\nExportaciones &lt;- Exportaciones[97:378,]\nData_xts &lt;- xts(Exportaciones$Total, order.by = Exportaciones$Mes)\n#\n\nhead(Data_xts)\n\n            [,1]\nJan 2000 1011676\nFeb 2000 1054098\nMar 2000 1053546\nApr 2000  886359\nMay 2000 1146258\nJun 2000 1153956\n\nts_info(Data_xts)\n\n The Data_xts series is a xts object with 1 variable and 282 observations\n Frequency: monthly \n Start time: Jan 2000 \n End time: Jun 2023 \n\nclass(Data_xts)\n\n[1] \"xts\" \"zoo\"\n\nfrequency(Data_xts)\n\n[1] 12\n\n#\nperiodicity(Data_xts)\n\nMonthly periodicity from Jan 2000 to Jun 2023 \n\ntclass(Data_xts)\n\n[1] \"yearmon\"\n\n\n\nplot(Data_xts)\n\n\n\n\n\n\nSerie valor de cierre en bolsa\n\n\ndiario del bitcoin (2017-2021)\n\nplot(Data_xts)\n\n\n\n\n\n\n\n\n Volver arriba"
+    "text": "Serie Exportaciones mensuales\n\n\nDesde Colombia en miles de dólares (2000-2023)\n\n\n\n\n\n\n\nSerie valor de cierre en bolsa\n\n\ndiario del bitcoin (2017-2021)\n\n\n\n\n\n\n\n\n\n Volver arriba"
   },
   {
     "objectID": "index.html",
@@ -68,5 +68,12 @@
     "title": "Propuestas de series de tiempo",
     "section": "Valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021",
     "text": "Valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021\nMiraremos el valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021.\n\ntrabajo con los datos\n\nplot(Data_xts)"
+  },
+  {
+    "objectID": "Descriptiva.html#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021",
+    "href": "Descriptiva.html#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021",
+    "title": "Descriptiva",
+    "section": "Serie valor de cierre en bolsa diario del bitcoin (2017-2021)",
+    "text": "Serie valor de cierre en bolsa diario del bitcoin (2017-2021)"
   }
 ]
