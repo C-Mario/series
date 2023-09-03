@@ -19,7 +19,8 @@ library(readxl)
 ```
 
 ```{r}
-load(file = "_environment.RData")
+# Cargando bases de datos: Exportaciones y bitcoin
+load(file = "_environment.RData") 
 ```
 
 ## Serie Exportaciones mensuales Desde Colombia en miles de dólares (2000-2023)
@@ -31,7 +32,7 @@ Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
 ```
 
 ```{r}
-# mirar fromato de exportaciones
+# mirar formato de exportaciones
 str(Exportaciones)
 # cambiar la ventana de datos
 Exportaciones <- Exportaciones[97:378,]

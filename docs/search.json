@@ -1,10 +1,10 @@
 [
   {
-    "objectID": "Descriptiva.html",
-    "href": "Descriptiva.html",
+    "objectID": "Descriptiva.html#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021",
+    "href": "Descriptiva.html#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021",
     "title": "Descriptiva",
-    "section": "",
-    "text": "Serie Exportaciones mensuales\n\n\nDesde Colombia en miles de dólares (2000-2023)\n\n\n\n\n\n\n\nSerie valor de cierre en bolsa\n\n\ndiario del bitcoin (2017-2021)\n\n\n\n\n\n\n\n\n\n Volver arriba"
+    "section": "Serie valor de cierre en bolsa diario del bitcoin (2017-2021)",
+    "text": "Serie valor de cierre en bolsa diario del bitcoin (2017-2021)"
   },
   {
     "objectID": "index.html",
@@ -12,68 +12,5 @@
     "title": "Series de tiempo univariadas",
     "section": "",
     "text": "Página web del curso 🤪.\n\n\n\n Volver arriba"
-  },
-  {
-    "objectID": "propuestas.html",
-    "href": "propuestas.html",
-    "title": "Propuestas de series de tiempo",
-    "section": "",
-    "text": "Primero limpiaremos un poco la base de datos y la dejaremos como la necesitamos."
-  },
-  {
-    "objectID": "propuestas.html#traer-datos",
-    "href": "propuestas.html#traer-datos",
-    "title": "Propuestas de series de tiempo",
-    "section": "",
-    "text": "Primero limpiaremos un poco la base de datos y la dejaremos como la necesitamos."
-  },
-  {
-    "objectID": "propuestas.html#número-de-desaparecidos-reportados-al-año-en-colombia",
-    "href": "propuestas.html#número-de-desaparecidos-reportados-al-año-en-colombia",
-    "title": "Propuestas de series de tiempo",
-    "section": "Número de desaparecidos reportados al año en Colombia",
-    "text": "Número de desaparecidos reportados al año en Colombia\n\nplot(Data_xts)"
-  },
-  {
-    "objectID": "propuestas.html#número-de-desaparecidos-reportados-por-mes-en-colombia",
-    "href": "propuestas.html#número-de-desaparecidos-reportados-por-mes-en-colombia",
-    "title": "Propuestas de series de tiempo",
-    "section": "Número de desaparecidos reportados por mes en Colombia",
-    "text": "Número de desaparecidos reportados por mes en Colombia\n\nplot(Data_xts,ylim=c(200,1800))"
-  },
-  {
-    "objectID": "propuestas.html#tasa-de-crecimiento-mensual-con-respecto-al-periodo-anterior-del-ipc-de-servicios-en-colombia",
-    "href": "propuestas.html#tasa-de-crecimiento-mensual-con-respecto-al-periodo-anterior-del-ipc-de-servicios-en-colombia",
-    "title": "Propuestas de series de tiempo",
-    "section": "Tasa de crecimiento mensual con respecto al periodo anterior del IPC de servicios en Colombia",
-    "text": "Tasa de crecimiento mensual con respecto al periodo anterior del IPC de servicios en Colombia\n\nplot(IPCservPAserie)"
-  },
-  {
-    "objectID": "propuestas.html#exportaciones-mensuales-desde-colombia-en-miles-de-dólares",
-    "href": "propuestas.html#exportaciones-mensuales-desde-colombia-en-miles-de-dólares",
-    "title": "Propuestas de series de tiempo",
-    "section": "Exportaciones mensuales desde Colombia en miles de dólares",
-    "text": "Exportaciones mensuales desde Colombia en miles de dólares\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Total), color = \"#FF1744\", lwd = 0.8) + \n  theme_minimal(18) + ylab(\"Total Exportaciones\")\n\n\n\n\nPropuesta para las exportaciones con otra visualización\n\n# mirar fromato de exportaciones\nstr(Exportaciones)\n\ntibble [378 × 4] (S3: tbl_df/tbl/data.frame)\n $ Mes            : 'yearmon' num [1:378] Jan 1992 Feb 1992 Mar 1992 Apr 1992 ...\n $ Total          : num [1:378] 531771 573004 552307 531825 628717 ...\n $ Tradicionales  : num [1:378] 281755 290901 247223 293150 302261 ...\n $ Notradicionales: num [1:378] 250016 282103 305084 238675 326457 ...\n\n# cambiar la ventana de datos\nExportaciones &lt;- Exportaciones[97:378,]\nData_xts &lt;- xts(Exportaciones$Total, order.by = Exportaciones$Mes)\n#\n\nhead(Data_xts)\n\n            [,1]\nJan 2000 1011676\nFeb 2000 1054098\nMar 2000 1053546\nApr 2000  886359\nMay 2000 1146258\nJun 2000 1153956\n\nts_info(Data_xts)\n\n The Data_xts series is a xts object with 1 variable and 282 observations\n Frequency: monthly \n Start time: Jan 2000 \n End time: Jun 2023 \n\nclass(Data_xts)\n\n[1] \"xts\" \"zoo\"\n\nfrequency(Data_xts)\n\n[1] 12\n\n#\nperiodicity(Data_xts)\n\nMonthly periodicity from Jan 2000 to Jun 2023 \n\ntclass(Data_xts)\n\n[1] \"yearmon\"\n\n\n\nplot(Data_xts)\n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Tradicionales), color = \"#00B0FF\", lwd = 0.8) + \n  theme_minimal(18) + ylab(\"Total Exportaciones Tradicionales\")\n\n\n\n\n\nggplot(Exportaciones) + geom_line(aes(x = Mes, y = Notradicionales), color = \"#00E676\", lwd = 0.8) + \n  theme_minimal(18) + ylab(\"Total Exportaciones No Tradicionales\")"
-  },
-  {
-    "objectID": "propuestas.html#temperatura-en-la-ciudad-de-miami-durante-un-fenomeno-tropical-sucedido-en-puerto-rico-zona-cercana-a-miami",
-    "href": "propuestas.html#temperatura-en-la-ciudad-de-miami-durante-un-fenomeno-tropical-sucedido-en-puerto-rico-zona-cercana-a-miami",
-    "title": "Propuestas de series de tiempo",
-    "section": "Temperatura en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami",
-    "text": "Temperatura en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami\nMiraremos primero las temperaturas en la ciudad de miami durante un fenomeno tropical sucedido en puerto rico zona cercana a miami.\n\ntrabajo con los datos\n\nplot(Data_xts)"
-  },
-  {
-    "objectID": "propuestas.html#valor-de-cierre-en-bolsa-del-bitcoin-entre-un-periodo-en-noviembre-del-2021",
-    "href": "propuestas.html#valor-de-cierre-en-bolsa-del-bitcoin-entre-un-periodo-en-noviembre-del-2021",
-    "title": "Propuestas de series de tiempo",
-    "section": "Valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021",
-    "text": "Valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021\nMiraremos el valor de cierre en bolsa del bitcoin entre un periodo en noviembre del 2021.\n\ntrabajo con los datos\n\nplot(Data_xts)"
-  },
-  {
-    "objectID": "Descriptiva.html#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021",
-    "href": "Descriptiva.html#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021",
-    "title": "Descriptiva",
-    "section": "Serie valor de cierre en bolsa diario del bitcoin (2017-2021)",
-    "text": "Serie valor de cierre en bolsa diario del bitcoin (2017-2021)"
   }
 ]
