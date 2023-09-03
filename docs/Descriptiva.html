@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -121,10 +87,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Inicio</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./propuestas.html" rel="" target="">
- <span class="menu-text">Propuestas de series de tiempo</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link active" href="./Descriptiva.html" rel="" target="" aria-current="page">
  <span class="menu-text">Descriptiva</span></a>
   </li>  
@@ -151,10 +113,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Tabla de contenido</h2>
    
   <ul>
-  <li><a href="#serie-exportaciones-mensuales" id="toc-serie-exportaciones-mensuales" class="nav-link active" data-scroll-target="#serie-exportaciones-mensuales">Serie Exportaciones mensuales</a></li>
-  <li><a href="#desde-colombia-en-miles-de-dólares-2000-2023" id="toc-desde-colombia-en-miles-de-dólares-2000-2023" class="nav-link" data-scroll-target="#desde-colombia-en-miles-de-dólares-2000-2023">Desde Colombia en miles de dólares (2000-2023)</a></li>
-  <li><a href="#serie-valor-de-cierre-en-bolsa" id="toc-serie-valor-de-cierre-en-bolsa" class="nav-link" data-scroll-target="#serie-valor-de-cierre-en-bolsa">Serie valor de cierre en bolsa</a></li>
-  <li><a href="#diario-del-bitcoin-2017-2021" id="toc-diario-del-bitcoin-2017-2021" class="nav-link" data-scroll-target="#diario-del-bitcoin-2017-2021">diario del bitcoin (2017-2021)</a></li>
+  <li><a href="#serie-exportaciones-mensuales-desde-colombia-en-miles-de-dólares-2000-2023" id="toc-serie-exportaciones-mensuales-desde-colombia-en-miles-de-dólares-2000-2023" class="nav-link active" data-scroll-target="#serie-exportaciones-mensuales-desde-colombia-en-miles-de-dólares-2000-2023">Serie Exportaciones mensuales Desde Colombia en miles de dólares (2000-2023)</a></li>
+  <li><a href="#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021" id="toc-serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021" class="nav-link" data-scroll-target="#serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021">Serie valor de cierre en bolsa diario del bitcoin (2017-2021)</a></li>
   </ul>
 </nav>
     </div>
@@ -178,75 +138,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="serie-exportaciones-mensuales" class="level1">
-<h1>Serie Exportaciones mensuales</h1>
-</section>
-<section id="desde-colombia-en-miles-de-dólares-2000-2023" class="level1">
-<h1>Desde Colombia en miles de dólares (2000-2023)</h1>
+<section id="serie-exportaciones-mensuales-desde-colombia-en-miles-de-dólares-2000-2023" class="level2">
+<h2 class="anchored" data-anchor-id="serie-exportaciones-mensuales-desde-colombia-en-miles-de-dólares-2000-2023">Serie Exportaciones mensuales Desde Colombia en miles de dólares (2000-2023)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># mirar fromato de exportaciones</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">str</span>(Exportaciones)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>tibble [378 × 4] (S3: tbl_df/tbl/data.frame)
- $ Mes            : 'yearmon' num [1:378] Jan 1992 Feb 1992 Mar 1992 Apr 1992 ...
- $ Total          : num [1:378] 531771 573004 552307 531825 628717 ...
- $ Tradicionales  : num [1:378] 281755 290901 247223 293150 302261 ...
- $ Notradicionales: num [1:378] 250016 282103 305084 238675 326457 ...</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># cambiar la ventana de datos</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>Exportaciones <span class="ot">&lt;-</span> Exportaciones[<span class="dv">97</span><span class="sc">:</span><span class="dv">378</span>,]</span>
-<span id="cb3-3"><a href="#cb3-3"></a>Data_xts <span class="ot">&lt;-</span> <span class="fu">xts</span>(Exportaciones<span class="sc">$</span>Total, <span class="at">order.by =</span> Exportaciones<span class="sc">$</span>Mes)</span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a></span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="fu">head</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>            [,1]
-Jan 2000 1011676
-Feb 2000 1054098
-Mar 2000 1053546
-Apr 2000  886359
-May 2000 1146258
-Jun 2000 1153956</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">ts_info</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> The Data_xts series is a xts object with 1 variable and 282 observations
- Frequency: monthly 
- Start time: Jan 2000 
- End time: Jun 2023 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">class</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "xts" "zoo"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">frequency</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 12</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">#</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a><span class="fu">periodicity</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Monthly periodicity from Jan 2000 to Jun 2023 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">tclass</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "yearmon"</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Descriptiva_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="960"></p>
 </div>
 </div>
 </section>
-<section id="serie-valor-de-cierre-en-bolsa" class="level1">
-<h1>Serie valor de cierre en bolsa</h1>
-</section>
-<section id="diario-del-bitcoin-2017-2021" class="level1">
-<h1>diario del bitcoin (2017-2021)</h1>
+<section id="serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021" class="level2">
+<h2 class="anchored" data-anchor-id="serie-valor-de-cierre-en-bolsa-diario-del-bitcoin-2017-2021">Serie valor de cierre en bolsa diario del bitcoin (2017-2021)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">plot</span>(Data_xts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Descriptiva_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
