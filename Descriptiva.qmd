@@ -1,6 +1,7 @@
 ---
 title: "Descriptiva"
 editor_options: 
+  chunk_output_type: console
 chunk_output_type: console
 execute: 
   echo: false
@@ -16,6 +17,9 @@ library(lubridate) # trabajar con fechas
 library(tidyverse) #procesamiento de datos
 library(ggplot2) #graficos
 library(readxl)
+library(forecast)
+library(MASS)
+options(scipen = 12)
 ```
 
 ```{r}
@@ -26,7 +30,6 @@ load(file = "_environment.RData")
 ## Serie Exportaciones mensuales Desde Colombia en miles de dólares (2000-2023)
 
 ```{r}
-options(scipen = 12)
 Exportaciones$Total <- round(Exportaciones$Total)
 Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
 ```
@@ -36,22 +39,119 @@ Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
 str(Exportaciones)
 # cambiar la ventana de datos
 Exportaciones <- Exportaciones[97:378,]
-Data_xts <- xts(Exportaciones$Total, order.by = Exportaciones$Mes)
+Exportaciones_xts <- xts(Exportaciones$Total, order.by = Exportaciones$Mes)
 
-head(Data_xts)
-ts_info(Data_xts)
-class(Data_xts)
-frequency(Data_xts)
+head(Exportaciones_xts)
+ts_info(Exportaciones_xts)
+class(Exportaciones_xts)
+frequency(Exportaciones_xts)
 #
-periodicity(Data_xts)
-tclass(Data_xts)
+periodicity(Exportaciones_xts)
+tclass(Exportaciones_xts)
 ```
+
+### Gráficos de la serie de tiempo
+
+#### Gráfico base
 
 ```{r}
 #| output: true
 #| fig-width: 10
 
-plot(Data_xts)
+plot(Exportaciones_xts)
+```
+
+#### Gráfico ts_plot
+
+```{r}
+#| output: true
+
+ts_plot(Exportaciones_xts,
+           title = "Total de exportaciones colombianas 2000 - 2023",
+           Ytitle = "Total de las importaciones (Millones de dólares)",
+           Xtitle = "Año",
+           Xgrid = TRUE,
+Ygrid = TRUE)
+```
+
+```{r}
+require(feasts)
+require(fable)
+require(timetk)
+require(tsibble)
+```
+
+#### Gráfico timetk con suavizado
+
+```{r}
+#| output: true
+
+Exportaciones |> plot_time_series(.value = Total,.date_var = Mes)
+```
+
+### Análisis de tendencias
+
+```{r}
+fit <- lm(Exportaciones_xts~time(Exportaciones_xts), na.action=NULL)
+plot(Exportaciones_xts, ylab="Total de exportaciones") 
+abline(fit, col='red')
+```
+
+```{r}
+acf(Exportaciones_xts, lag.max = 282)
+```
+
+```{r}
+Exportaciones |> timetk::plot_time_series(Mes, Total, 
+                   .interactive = TRUE,
+                   .plotly_slider = TRUE)
+```
+
+```{r}
+Exportaciones |> mutate(ajuste=smooth_vec(Total,span = 0.75, degree = 2))%>%
+  ggplot(aes(Mes, Total)) +
+    geom_line(lwd=0.8) +
+    geom_line(aes(y = ajuste), color = "red", lwd = 1.2)
+```
+
+### Descomposición
+
+```{r}
+# descom_exportaciones <- decompose(Exportaciones_xts)
+# plot(descom_exportaciones)
+
+```
+
+### Creando objeto ts y usando decompose
+
+```{r}
+serie_ts <- ts(Exportaciones$Total, start = c(1), frequency = 12)
+plot(serie_ts)
+dec <- decompose(serie_ts)
+plot(dec)
+```
+
+```{r}
+acf(serie_ts, lag.max = sqrt(length(serie_ts)))
+```
+
+### Estabilización de la varianza
+
+```{r}
+forecast::BoxCox.lambda(serie_ts, method ="loglik", lower = -1, upper = 3)
+lambda = 0.2
+lserie <- (1/lambda)*(serie_ts^lambda - 1)
+plot(lserie,
+main = expression("Serie con transformación de Box-Cox ("~lambda~"= 0.2 )"))
+forecast::BoxCox.lambda(lserie, method ="guerrero", lower = -1, upper = 3)
+```
+
+### Serie diferenciada
+
+```{r}
+dlserie <- diff(lserie)
+plot(dlserie, main="Serie diferenciada (primer orden)")
+acf(dlserie)
 ```
 
 ## Serie valor de cierre en bolsa diario del bitcoin (2017-2021)

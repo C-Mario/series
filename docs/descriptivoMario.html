@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Series de Tiempo - Análisis descriptivo de las series de tiempo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "Ninguna coincidencia",
+    "search-matching-documents-text": "coincidencias",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": ""
+  }
+}</script>
+<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./images/logo.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Series de Tiempo</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./DExportaciones.html" rel="" target="">
+ <span class="menu-text">Descriptiva-Serie-Exportaciones</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./DBitcoin.html" rel="" target="">
+ <span class="menu-text">Descriptiva-josé</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./redes.html" rel="" target="">
+ <span class="menu-text">Redes neuronales</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./ejemplo.html" rel="" target="">
+ <span class="menu-text">Descriptiva-josé</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/C-Mario/series" rel="" target="_blank"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text">GitHub</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenido</h2>
+   
+  <ul>
+  <li><a href="#exportaciones" id="toc-exportaciones" class="nav-link active" data-scroll-target="#exportaciones"><span class="header-section-number">1</span> <strong><em>Exportaciones</em></strong></a>
+  <ul class="collapse">
+  <li><a href="#gráfico-de-la-serie-de-tiempo" id="toc-gráfico-de-la-serie-de-tiempo" class="nav-link" data-scroll-target="#gráfico-de-la-serie-de-tiempo"><span class="header-section-number">1.1</span> Gráfico de la serie de tiempo</a></li>
+  <li><a href="#estabilización-de-la-varianza" id="toc-estabilización-de-la-varianza" class="nav-link" data-scroll-target="#estabilización-de-la-varianza"><span class="header-section-number">1.2</span> Estabilización de la varianza</a></li>
+  <li><a href="#análisis-de-tendencia" id="toc-análisis-de-tendencia" class="nav-link" data-scroll-target="#análisis-de-tendencia"><span class="header-section-number">1.3</span> Análisis de tendencia</a></li>
+  <li><a href="#detección-de-la-estacionalidad" id="toc-detección-de-la-estacionalidad" class="nav-link" data-scroll-target="#detección-de-la-estacionalidad"><span class="header-section-number">1.4</span> Detección de la estacionalidad</a></li>
+  <li><a href="#periodograma" id="toc-periodograma" class="nav-link" data-scroll-target="#periodograma"><span class="header-section-number">1.5</span> Periodograma</a></li>
+  </ul></li>
+  <li><a href="#bitcoin" id="toc-bitcoin" class="nav-link" data-scroll-target="#bitcoin"><span class="header-section-number">2</span> <strong><em>Bitcoin</em></strong></a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Análisis descriptivo de las series de tiempo</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Código</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="exportaciones" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="exportaciones"><span class="header-section-number">1</span> <strong><em>Exportaciones</em></strong></h2>
+<p>Esta serie de tiempo mide el total de las exportaciones colombianas mensualmente desde Enero del año 2000 hasta Junio del 2023. Los valores del total de exportaciones se miden en miles de dólares (FOB, Free onboard). Esta serie de tiempo incluye las exportaciones tradicionales (Café, Carbón, Petróleo y sus derivados, Ferroníquel) y las no tradicionales en conjunto.</p>
+<section id="gráfico-de-la-serie-de-tiempo" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="gráfico-de-la-serie-de-tiempo"><span class="header-section-number">1.1</span> Gráfico de la serie de tiempo</h3>
+<p>El gráfico de la serie de tiempo del total de exportaciones de colombia se muestra a continuación:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-75feedcdcb291b6664e0" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-75feedcdcb291b6664e0">{"x":{"visdat":{"32b471614b0a":["function () ","plotlyVisDat"]},"cur_data":"32b471614b0a","attrs":{"32b471614b0a":{"x":{},"y":{},"mode":"lines","line":{"width":2,"dash":null,"color":"black"},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"rangeslider":{"type":"date"},"title":"Año","showgrid":false},"yaxis":{"domain":[0,1],"automargin":true,"title":"Total de exportaciones (Miles de dólares)","showgrid":true},"title":"Serie de tiempo del total de exportaciones<br /> desde enero del 2000 hasta junio de 2023","hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[2000,2000.0833333333333,2000.1666666666667,2000.25,2000.3333333333333,2000.4166666666667,2000.5,2000.5833333333333,2000.6666666666667,2000.75,2000.8333333333333,2000.9166666666667,2001,2001.0833333333333,2001.1666666666667,2001.25,2001.3333333333333,2001.4166666666667,2001.5,2001.5833333333333,2001.6666666666667,2001.75,2001.8333333333333,2001.9166666666667,2002,2002.0833333333333,2002.1666666666667,2002.25,2002.3333333333333,2002.4166666666667,2002.5,2002.5833333333333,2002.6666666666667,2002.75,2002.8333333333333,2002.9166666666667,2003,2003.0833333333333,2003.1666666666667,2003.25,2003.3333333333333,2003.4166666666667,2003.5,2003.5833333333333,2003.6666666666667,2003.75,2003.8333333333333,2003.9166666666667,2004,2004.0833333333333,2004.1666666666667,2004.25,2004.3333333333333,2004.4166666666667,2004.5,2004.5833333333333,2004.6666666666667,2004.75,2004.8333333333333,2004.9166666666667,2005,2005.0833333333333,2005.1666666666667,2005.25,2005.3333333333333,2005.4166666666667,2005.5,2005.5833333333333,2005.6666666666667,2005.75,2005.8333333333333,2005.9166666666667,2006,2006.0833333333333,2006.1666666666667,2006.25,2006.3333333333333,2006.4166666666667,2006.5,2006.5833333333333,2006.6666666666667,2006.75,2006.8333333333333,2006.9166666666667,2007,2007.0833333333333,2007.1666666666667,2007.25,2007.3333333333333,2007.4166666666667,2007.5,2007.5833333333333,2007.6666666666667,2007.75,2007.8333333333333,2007.9166666666667,2008,2008.0833333333333,2008.1666666666667,2008.25,2008.3333333333333,2008.4166666666667,2008.5,2008.5833333333333,2008.6666666666667,2008.75,2008.8333333333333,2008.9166666666667,2009,2009.0833333333333,2009.1666666666667,2009.25,2009.3333333333333,2009.4166666666667,2009.5,2009.5833333333333,2009.6666666666667,2009.75,2009.8333333333333,2009.9166666666667,2010,2010.0833333333333,2010.1666666666667,2010.25,2010.3333333333333,2010.4166666666667,2010.5,2010.5833333333333,2010.6666666666667,2010.75,2010.8333333333333,2010.9166666666667,2011,2011.0833333333333,2011.1666666666667,2011.25,2011.3333333333335,2011.4166666666667,2011.5,2011.5833333333335,2011.6666666666667,2011.75,2011.8333333333335,2011.9166666666667,2012,2012.0833333333335,2012.1666666666667,2012.25,2012.3333333333335,2012.4166666666667,2012.5,2012.5833333333335,2012.6666666666667,2012.75,2012.8333333333335,2012.9166666666667,2013,2013.0833333333335,2013.1666666666667,2013.25,2013.3333333333335,2013.4166666666667,2013.5,2013.5833333333335,2013.6666666666667,2013.75,2013.8333333333335,2013.9166666666667,2014,2014.0833333333335,2014.1666666666667,2014.25,2014.3333333333335,2014.4166666666667,2014.5,2014.5833333333335,2014.6666666666667,2014.75,2014.8333333333335,2014.9166666666667,2015,2015.0833333333335,2015.1666666666667,2015.25,2015.3333333333335,2015.4166666666667,2015.5,2015.5833333333335,2015.6666666666667,2015.75,2015.8333333333335,2015.9166666666667,2016,2016.0833333333335,2016.1666666666667,2016.25,2016.3333333333335,2016.4166666666667,2016.5,2016.5833333333335,2016.6666666666667,2016.75,2016.8333333333335,2016.9166666666667,2017,2017.0833333333335,2017.1666666666667,2017.25,2017.3333333333335,2017.4166666666667,2017.5,2017.5833333333335,2017.6666666666667,2017.75,2017.8333333333335,2017.9166666666667,2018,2018.0833333333335,2018.1666666666667,2018.25,2018.3333333333335,2018.4166666666667,2018.5,2018.5833333333335,2018.6666666666667,2018.75,2018.8333333333335,2018.9166666666667,2019,2019.0833333333335,2019.1666666666667,2019.25,2019.3333333333335,2019.4166666666667,2019.5,2019.5833333333335,2019.6666666666667,2019.75,2019.8333333333335,2019.9166666666667,2020,2020.0833333333335,2020.1666666666667,2020.25,2020.3333333333335,2020.4166666666667,2020.5,2020.5833333333335,2020.6666666666667,2020.75,2020.8333333333335,2020.9166666666667,2021,2021.0833333333335,2021.1666666666667,2021.25,2021.3333333333335,2021.4166666666667,2021.5,2021.5833333333335,2021.6666666666667,2021.75,2021.8333333333335,2021.9166666666667,2022,2022.0833333333335,2022.1666666666667,2022.25,2022.3333333333335,2022.4166666666667,2022.5,2022.5833333333335,2022.6666666666667,2022.75,2022.8333333333335,2022.9166666666667,2023,2023.0833333333335,2023.1666666666667,2023.25,2023.3333333333335,2023.4166666666667],"y":[1011676,1054098,1053546,886359,1146258,1153956,1104408,1242391,1102913,981716,1192681,1228398,1017195,964437,1002450,1058457,1068023,996736,1005867,1189605,1078781,1013772,965973,968599,943702,945935,859303,1123902,1076509,921463,1040876,915457,1055414,1070342,966897,1055590,923427,1033043,1034233,1101056,1181888,995297,1267598,1092850,1079472,1169195,1082836,1167628,1183399,1031826,1206657,1271618,1335727,1433647,1541103,1516523,1519458,1529291,1585709,1633370,1378980,1529265,1722081,1682450,1737198,2097853,1653833,1882740,1908016,1788905,1826199,1938567,1668171,1862024,1929864,1872161,2211681,2039364,2141958,2129881,2104243,2271572,2146547,2134504,1843668,1914770,2384657,2497750,2727980,2114259,2648147,2621002,2523170,2623649,3152653,3227536,2842306,2822470,3007288,3365420,3392615,3675654,3801685,3294187,3133994,2981105,2245379,2224271,2525698,2340118,2711332,2427571,2742519,2738083,2898600,2673470,2795983,2948687,2861294,3182972,2913433,2869156,3337903,3490978,3513331,3060628,3157626,3291236,3271661,3535759,3426095,3845531,3760176,3958572,4893312,4823094,5153710,4708737,4866229,4941645,4582401,4772996,5147330,5306738,4785773,4999318,5712355,5010929,5403375,4563431,4976905,4570780,4910403,5432930,4807338,4951628,4849196,4667767,4617842,4949487,5332470,4870839,4652297,4977706,4849996,4837983,4948665,5272122,4808832,4271442,4408181,4316676,5495867,4704814,5048930,4813091,5077247,4322278,3794686,3794711,2916976,3160957,3461944,3219706,3381084,3217408,3043778,2868451,2898168,2815522,2444535,2588994,1919053,2328723,2334998,2463793,2751470,2780512,2266997,3044377,2797686,2770014,2833622,3477094,2785044,2716024,3300421,2697992,3505436,2895612,3125483,3191598,3389679,3277516,3122237,4014818,3324889,3027603,3365116,3786537,3719410,3331933,3632055,3684399,3512842,3768666,3343509,3407819,3066110,3183071,3344850,3862819,3748342,3096363,3255830,3264261,3067349,3326497,2943625,3330051,3419466,2943626,2439036,1864239,2221172,2289482,2551988,2584767,2544874,2644954,2523372,3028837,2610936,2938994,3383554,2976372,3096913,3182216,3444158,3465143,3792236,3799111,4155805,4544551,3801609,4209198,4780210,5460531,4662521,5497617,5913682,4388737,4778520,4213182,4562248,4642084,3696188,4202234,4431911,3739214,4497862,3985981],"mode":"lines","line":{"color":"black","width":2,"dash":[]},"type":"scatter","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>A simple vista, se puede evidenciar que:</p>
+<ul>
+<li><p>La serie presenta <strong><em>tendencia</em></strong>, pues los valores de la serie no oscilan al rededor de un valor fijo. El dinero total proveniente de las exportaciones es cambiante a lo largo del tiempo observado.</p></li>
+<li><p>La serie presenta <strong><em>varianza marginal no constante</em></strong>, pues en ciertos periodos de tiempo los cambios mes a mes son pequeños, mientras que en otros periodos de tiempo esos cambios son significativamente mucho más grandes.</p></li>
+<li><p>No se ve claramente la existencia de una <strong><em>componente estacional</em></strong>.</p></li>
+</ul>
+</section>
+<section id="estabilización-de-la-varianza" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="estabilización-de-la-varianza"><span class="header-section-number">1.2</span> Estabilización de la varianza</h3>
+<p>Dado que visualmente se observó que la serie presenta varianza marginal no constante, se usará la transformación de <strong><em>Box-Cox</em></strong> para obtener la serie estabilizada.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>(lambda <span class="ot">&lt;-</span> forecast<span class="sc">::</span><span class="fu">BoxCox.lambda</span>(Exportaciones_ts, <span class="at">method =</span><span class="st">"loglik"</span>, <span class="at">lower =</span> <span class="sc">-</span><span class="dv">2</span>, <span class="at">upper =</span> <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2</code></pre>
+</div>
+</div>
+<p>De esta manera se sugiere un valor de <span class="math inline">\(\lambda =\)</span> 0.2. El gráfico obtenido de la serie estabilizada es el siguiente:</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>No se ve un cambio significativo respecto a la serie original. Además, la librería <code>MASS</code> sugiere un valor diferente de <span class="math inline">\(\lambda\)</span>, como se muestra a continuación:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>lambda_loglik <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">boxcox</span>(<span class="fu">lm</span>(Exportaciones_ts <span class="sc">~</span> <span class="dv">1</span>),<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="at">length =</span> <span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>maximo <span class="ot">&lt;-</span> <span class="fu">which.max</span>(lambda_loglik<span class="sc">$</span>y)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>(lambda_loglik <span class="ot">&lt;-</span> lambda_loglik<span class="sc">$</span>x[maximo])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6262626</code></pre>
+</div>
+</div>
+<p>Se procede a realizar la transformación de la serie usando <span class="math inline">\(\lambda =\)</span> 0.6262626, obteniendo el siguiente gráfico para la serie estabilizada:</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Aunque visualmente no se ven cambios importantes en cuanto a la estabilización de la varianza, al aplicar nuevamente la transformación de <strong><em>Box-Cox</em></strong> a la serie estabilizada, se obtiene el siguiente resultado:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>lambda_loglik <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">boxcox</span>(<span class="fu">lm</span>(serie_estabilizada062 <span class="sc">~</span> <span class="dv">1</span>),<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="at">length =</span> <span class="dv">100</span>))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>El intervalo de confianza para <span class="math inline">\(\lambda\)</span> incluye al 1, indicando que ya no es necesario aplicar nuevamente una transformación.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>maximo <span class="ot">&lt;-</span> <span class="fu">which.max</span>(lambda_loglik<span class="sc">$</span>y)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>(lambda_loglik <span class="ot">&lt;-</span> lambda_loglik<span class="sc">$</span>x[maximo])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.030303</code></pre>
+</div>
+</div>
+<p>Exactamente, se sugiere un valor de <span class="math inline">\(\lambda =\)</span> 1.030303 <span class="math inline">\(\approx 1\)</span>. Se trabajará desde ahora con la serie estabilizada.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>serie <span class="ot">&lt;-</span> serie_estabilizada062</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="análisis-de-tendencia" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="análisis-de-tendencia"><span class="header-section-number">1.3</span> Análisis de tendencia</h3>
+<section id="ajuste-de-tendencia-usando-regresión-loess" class="level4" data-number="1.3.1">
+<h4 data-number="1.3.1" class="anchored" data-anchor-id="ajuste-de-tendencia-usando-regresión-loess"><span class="header-section-number">1.3.1</span> Ajuste de tendencia usando regresión <strong><em>LOESS</em></strong></h4>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>     Total    Fecha
+1 9202.399 Jan 2000
+2 9442.243 Feb 2000
+3 9439.146 Mar 2000
+4 8470.853 Apr 2000
+5 9951.207 May 2000
+6 9993.015 Jun 2000</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-9c94bb344ce1d3269b1c" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-9c94bb344ce1d3269b1c">{"x":{"data":[{"x":[2000,2000.0833333333333,2000.1666666666667,2000.25,2000.3333333333333,2000.4166666666667,2000.5,2000.5833333333333,2000.6666666666667,2000.75,2000.8333333333333,2000.9166666666667,2001,2001.0833333333333,2001.1666666666667,2001.25,2001.3333333333333,2001.4166666666667,2001.5,2001.5833333333333,2001.6666666666667,2001.75,2001.8333333333333,2001.9166666666667,2002,2002.0833333333333,2002.1666666666667,2002.25,2002.3333333333333,2002.4166666666667,2002.5,2002.5833333333333,2002.6666666666667,2002.75,2002.8333333333333,2002.9166666666667,2003,2003.0833333333333,2003.1666666666667,2003.25,2003.3333333333333,2003.4166666666667,2003.5,2003.5833333333333,2003.6666666666667,2003.75,2003.8333333333333,2003.9166666666667,2004,2004.0833333333333,2004.1666666666667,2004.25,2004.3333333333333,2004.4166666666667,2004.5,2004.5833333333333,2004.6666666666667,2004.75,2004.8333333333333,2004.9166666666667,2005,2005.0833333333333,2005.1666666666667,2005.25,2005.3333333333333,2005.4166666666667,2005.5,2005.5833333333333,2005.6666666666667,2005.75,2005.8333333333333,2005.9166666666667,2006,2006.0833333333333,2006.1666666666667,2006.25,2006.3333333333333,2006.4166666666667,2006.5,2006.5833333333333,2006.6666666666667,2006.75,2006.8333333333333,2006.9166666666667,2007,2007.0833333333333,2007.1666666666667,2007.25,2007.3333333333333,2007.4166666666667,2007.5,2007.5833333333333,2007.6666666666667,2007.75,2007.8333333333333,2007.9166666666667,2008,2008.0833333333333,2008.1666666666667,2008.25,2008.3333333333333,2008.4166666666667,2008.5,2008.5833333333333,2008.6666666666667,2008.75,2008.8333333333333,2008.9166666666667,2009,2009.0833333333333,2009.1666666666667,2009.25,2009.3333333333333,2009.4166666666667,2009.5,2009.5833333333333,2009.6666666666667,2009.75,2009.8333333333333,2009.9166666666667,2010,2010.0833333333333,2010.1666666666667,2010.25,2010.3333333333333,2010.4166666666667,2010.5,2010.5833333333333,2010.6666666666667,2010.75,2010.8333333333333,2010.9166666666667,2011,2011.0833333333333,2011.1666666666667,2011.25,2011.3333333333333,2011.4166666666667,2011.5,2011.5833333333333,2011.6666666666667,2011.75,2011.8333333333333,2011.9166666666667,2012,2012.0833333333333,2012.1666666666667,2012.25,2012.3333333333333,2012.4166666666667,2012.5,2012.5833333333333,2012.6666666666667,2012.75,2012.8333333333333,2012.9166666666667,2013,2013.0833333333333,2013.1666666666667,2013.25,2013.3333333333333,2013.4166666666667,2013.5,2013.5833333333333,2013.6666666666667,2013.75,2013.8333333333333,2013.9166666666667,2014,2014.0833333333333,2014.1666666666667,2014.25,2014.3333333333333,2014.4166666666667,2014.5,2014.5833333333333,2014.6666666666667,2014.75,2014.8333333333333,2014.9166666666667,2015,2015.0833333333333,2015.1666666666667,2015.25,2015.3333333333333,2015.4166666666667,2015.5,2015.5833333333333,2015.6666666666667,2015.75,2015.8333333333333,2015.9166666666667,2016,2016.0833333333333,2016.1666666666667,2016.25,2016.3333333333333,2016.4166666666667,2016.5,2016.5833333333333,2016.6666666666667,2016.75,2016.8333333333333,2016.9166666666667,2017,2017.0833333333333,2017.1666666666667,2017.25,2017.3333333333333,2017.4166666666667,2017.5,2017.5833333333333,2017.6666666666667,2017.75,2017.8333333333333,2017.9166666666667,2018,2018.0833333333333,2018.1666666666667,2018.25,2018.3333333333333,2018.4166666666667,2018.5,2018.5833333333333,2018.6666666666667,2018.75,2018.8333333333333,2018.9166666666667,2019,2019.0833333333333,2019.1666666666667,2019.25,2019.3333333333333,2019.4166666666667,2019.5,2019.5833333333333,2019.6666666666667,2019.75,2019.8333333333333,2019.9166666666667,2020,2020.0833333333333,2020.1666666666667,2020.25,2020.3333333333333,2020.4166666666667,2020.5,2020.5833333333333,2020.6666666666667,2020.75,2020.8333333333333,2020.9166666666667,2021,2021.0833333333333,2021.1666666666667,2021.25,2021.3333333333333,2021.4166666666667,2021.5,2021.5833333333333,2021.6666666666667,2021.75,2021.8333333333333,2021.9166666666667,2022,2022.0833333333333,2022.1666666666667,2022.25,2022.3333333333333,2022.4166666666667,2022.5,2022.5833333333333,2022.6666666666667,2022.75,2022.8333333333333,2022.9166666666667,2023,2023.0833333333333,2023.1666666666667,2023.25,2023.3333333333333,2023.4166666666667],"y":[9202.3986318697462,9442.2434570192418,9439.1459970426331,8470.8531770756817,9951.2074310448352,9993.0148896628471,9722.0582734643576,10466.062294641275,9713.8129522057825,9030.7410575017493,10201.768417165616,10392.071717299503,9233.8116715900906,8930.8498991243923,9149.7426822626803,9466.68203256569,9520.1820117726547,9117.0400874018505,9169.265707294182,10185.280285701125,9580.1350247484297,9214.3361676924414,8939.7565634259699,8954.9714620691666,8810.0919465040479,8823.1439627052696,8307.95181125618,9829.1939396333491,9567.4921283882068,8679.467295729808,9367.8826777889735,8643.9886452181127,9449.6255367880058,9533.1245254479527,8945.111928908118,9450.6125449402734,8691.0502723298578,9323.6632127238208,9330.3891457762111,9703.5652859332313,10143.844939521123,9108.7933099507609,10598.567936832977,9658.2037379783105,9583.9782273016426,10075.471030684072,9602.6749991597135,10067.010813226245,10151.965983667331,9316.7816788305026,10276.484059961685,10619.608459342509,10951.865579890498,11448.075109948781,11978.244687331709,11858.222991609417,11872.592328120516,11920.657867374226,12194.240117629135,12422.53425773355,11172.670601200092,11920.530927090338,12840.935003053835,12655.03811253753,12911.422001515768,14530.71828448672,12519.785489494525,13578.724430176469,13692.618281645529,13150.805655942006,13321.859986808649,13829.53140966152,12587.659623168518,13484.951250293074,13790.611915199393,13530.885910322533,15019.648042549217,14275.638268701412,14721.312961411086,14669.270627251499,14558.424050454743,15273.117245131618,14741.05915985854,14689.205102555625,13401.534553514228,13722.956198594728,15745.005622713586,16208.633095287485,17128.907798339264,14601.788243671521,16813.212122080662,16705.060960107112,16311.754622815173,16715.62550298643,18753.588535711082,19031.35110850511,17575.05699792162,17498.136203004058,18207.242203299706,19536.583286431531,19635.310413732586,20645.883236173613,21086.456106209786,19276.559118218782,18683.994601102793,18107.795141609276,15162.575058521861,15073.141986538509,16321.988706017401,15560.170678177949,17063.362145711639,15921.880204954852,17186.027811146669,17168.611925078068,17792.271129012875,16913.731110980505,17395.108136556682,17984.213107649262,17648.501656961431,18866.344307618765,17849.242021167222,17678.858135722912,19436.383234412708,19989.959017095898,20070.02966382978,18408.840325113033,18772.110719149259,19265.741898527405,19193.895552023801,20150.177840810829,19756.448975452153,21238.446003487847,20941.962458006317,21627.33985870604,24698.100650420951,24475.531807119132,25513.265691729233,24110.445912601175,24612.398433744806,24850.607804832864,23703.241754588471,24315.996139424009,25493.480014412158,25985.129372823318,24356.743346577252,25031.858317336981,27211.888834501115,25068.25382712849,26280.492094234894,23641.737637028007,24961.513689615374,23665.575720860779,24752.09267101757,26370.429258790333,24425.424319566253,24882.038001289231,24558.407402649362,23978.844549831192,23817.893439884734,24875.299333471416,26063.972005272804,24626.999013970795,23929.040565616491,24964.029716512799,24560.944819232122,24522.825856502979,24872.711848846782,25878.840468940325,24430.178193986703,22682.64971482367,23134.745563784305,22832.796203780432,26561.342347879239,24097.863266301298,25187.150919989679,24443.72720755804,25275.531471426057,22851.350066046769,21062.133935426995,21062.220842555278,17862.833996338777,18784.511096118484,19885.669693691922,19002.420986786765,19593.485202961827,18993.925394727336,18345.298800556659,17676.137284407563,17790.610263781153,17471.145242908875,15991.476323661187,16576.99527811127,13742.174046882012,15512.671307500961,15538.838986070232,16070.265362735496,17221.137718738071,17334.76091189151,15253.843872128393,18347.559885846262,17401.743338952045,17293.740221769443,17541.406624539493,19940.128683069448,17352.451703390128,17081.850432713494,19299.398641647833,17010.731964332947,20041.770804430209,17780.781583900829,18652.199049181116,18898.350786878978,19624.666011121633,19215.402024935382,18640.064060173045,21819.294026661737,19388.88673913588,18284.17892066987,19535.477981194501,21033.794273791678,20799.473816868151,19414.603455179531,20492.1625684315,20676.633992714836,20068.280058351676,20971.564617465338,19456.821816864263,19690.377200958483,18429.484797772384,18866.711827502371,19461.708990336429,21298.195747857433,20900.659033103744,18543.166382634303,19135.673276061378,19166.693424706413,18434.148792843302,19394.759127458299,17964.870307336434,19407.734511944956,19732.498936866275,17964.874129741012,15968.936081899279,13494.996234018345,15059.985095516182,15348.428625406585,16428.192402666704,16560.038712041602,16399.494499646738,16800.512139111837,16312.572518709232,18288.846084270252,16664.84969433166,17947.163542827609,19602.448861054312,18089.783698975676,18545.229263623041,18863.53765125373,19821.621402495366,19897.176394061007,21053.615998502242,21077.51316586569,22296.085002908287,23580.430367721459,21086.19208911727,22475.066247232746,24339.007353612702,26454.255336011865,23961.962545324761,26566.63908719545,27808.653721162445,23070.781518848471,24333.617757091521,22488.387083738704,23637.898978343521,23896.126999246026,20718.045476628049,22451.770209035236,23212.666376921108,20868.766878187969,23428.411284775317,21721.006679285423],"text":["Fecha: Jan 2000<br />.value:  9202.399","Fecha: Feb 2000<br />.value:  9442.243","Fecha: Mar 2000<br />.value:  9439.146","Fecha: Apr 2000<br />.value:  8470.853","Fecha: May 2000<br />.value:  9951.207","Fecha: Jun 2000<br />.value:  9993.015","Fecha: Jul 2000<br />.value:  9722.058","Fecha: Aug 2000<br />.value: 10466.062","Fecha: Sep 2000<br />.value:  9713.813","Fecha: Oct 2000<br />.value:  9030.741","Fecha: Nov 2000<br />.value: 10201.768","Fecha: Dec 2000<br />.value: 10392.072","Fecha: Jan 2001<br />.value:  9233.812","Fecha: Feb 2001<br />.value:  8930.850","Fecha: Mar 2001<br />.value:  9149.743","Fecha: Apr 2001<br />.value:  9466.682","Fecha: May 2001<br />.value:  9520.182","Fecha: Jun 2001<br />.value:  9117.040","Fecha: Jul 2001<br />.value:  9169.266","Fecha: Aug 2001<br />.value: 10185.280","Fecha: Sep 2001<br />.value:  9580.135","Fecha: Oct 2001<br />.value:  9214.336","Fecha: Nov 2001<br />.value:  8939.757","Fecha: Dec 2001<br />.value:  8954.971","Fecha: Jan 2002<br />.value:  8810.092","Fecha: Feb 2002<br />.value:  8823.144","Fecha: Mar 2002<br />.value:  8307.952","Fecha: Apr 2002<br />.value:  9829.194","Fecha: May 2002<br />.value:  9567.492","Fecha: Jun 2002<br />.value:  8679.467","Fecha: Jul 2002<br />.value:  9367.883","Fecha: Aug 2002<br />.value:  8643.989","Fecha: Sep 2002<br />.value:  9449.626","Fecha: Oct 2002<br />.value:  9533.125","Fecha: Nov 2002<br />.value:  8945.112","Fecha: Dec 2002<br />.value:  9450.613","Fecha: Jan 2003<br />.value:  8691.050","Fecha: Feb 2003<br />.value:  9323.663","Fecha: Mar 2003<br />.value:  9330.389","Fecha: Apr 2003<br />.value:  9703.565","Fecha: May 2003<br />.value: 10143.845","Fecha: Jun 2003<br />.value:  9108.793","Fecha: Jul 2003<br />.value: 10598.568","Fecha: Aug 2003<br />.value:  9658.204","Fecha: Sep 2003<br />.value:  9583.978","Fecha: Oct 2003<br />.value: 10075.471","Fecha: Nov 2003<br />.value:  9602.675","Fecha: Dec 2003<br />.value: 10067.011","Fecha: Jan 2004<br />.value: 10151.966","Fecha: Feb 2004<br />.value:  9316.782","Fecha: Mar 2004<br />.value: 10276.484","Fecha: Apr 2004<br />.value: 10619.608","Fecha: May 2004<br />.value: 10951.866","Fecha: Jun 2004<br />.value: 11448.075","Fecha: Jul 2004<br />.value: 11978.245","Fecha: Aug 2004<br />.value: 11858.223","Fecha: Sep 2004<br />.value: 11872.592","Fecha: Oct 2004<br />.value: 11920.658","Fecha: Nov 2004<br />.value: 12194.240","Fecha: Dec 2004<br />.value: 12422.534","Fecha: Jan 2005<br />.value: 11172.671","Fecha: Feb 2005<br />.value: 11920.531","Fecha: Mar 2005<br />.value: 12840.935","Fecha: Apr 2005<br />.value: 12655.038","Fecha: May 2005<br />.value: 12911.422","Fecha: Jun 2005<br />.value: 14530.718","Fecha: Jul 2005<br />.value: 12519.785","Fecha: Aug 2005<br />.value: 13578.724","Fecha: Sep 2005<br />.value: 13692.618","Fecha: Oct 2005<br />.value: 13150.806","Fecha: Nov 2005<br />.value: 13321.860","Fecha: Dec 2005<br />.value: 13829.531","Fecha: Jan 2006<br />.value: 12587.660","Fecha: Feb 2006<br />.value: 13484.951","Fecha: Mar 2006<br />.value: 13790.612","Fecha: Apr 2006<br />.value: 13530.886","Fecha: May 2006<br />.value: 15019.648","Fecha: Jun 2006<br />.value: 14275.638","Fecha: Jul 2006<br />.value: 14721.313","Fecha: Aug 2006<br />.value: 14669.271","Fecha: Sep 2006<br />.value: 14558.424","Fecha: Oct 2006<br />.value: 15273.117","Fecha: Nov 2006<br />.value: 14741.059","Fecha: Dec 2006<br />.value: 14689.205","Fecha: Jan 2007<br />.value: 13401.535","Fecha: Feb 2007<br />.value: 13722.956","Fecha: Mar 2007<br />.value: 15745.006","Fecha: Apr 2007<br />.value: 16208.633","Fecha: May 2007<br />.value: 17128.908","Fecha: Jun 2007<br />.value: 14601.788","Fecha: Jul 2007<br />.value: 16813.212","Fecha: Aug 2007<br />.value: 16705.061","Fecha: Sep 2007<br />.value: 16311.755","Fecha: Oct 2007<br />.value: 16715.626","Fecha: Nov 2007<br />.value: 18753.589","Fecha: Dec 2007<br />.value: 19031.351","Fecha: Jan 2008<br />.value: 17575.057","Fecha: Feb 2008<br />.value: 17498.136","Fecha: Mar 2008<br />.value: 18207.242","Fecha: Apr 2008<br />.value: 19536.583","Fecha: May 2008<br />.value: 19635.310","Fecha: Jun 2008<br />.value: 20645.883","Fecha: Jul 2008<br />.value: 21086.456","Fecha: Aug 2008<br />.value: 19276.559","Fecha: Sep 2008<br />.value: 18683.995","Fecha: Oct 2008<br />.value: 18107.795","Fecha: Nov 2008<br />.value: 15162.575","Fecha: Dec 2008<br />.value: 15073.142","Fecha: Jan 2009<br />.value: 16321.989","Fecha: Feb 2009<br />.value: 15560.171","Fecha: Mar 2009<br />.value: 17063.362","Fecha: Apr 2009<br />.value: 15921.880","Fecha: May 2009<br />.value: 17186.028","Fecha: Jun 2009<br />.value: 17168.612","Fecha: Jul 2009<br />.value: 17792.271","Fecha: Aug 2009<br />.value: 16913.731","Fecha: Sep 2009<br />.value: 17395.108","Fecha: Oct 2009<br />.value: 17984.213","Fecha: Nov 2009<br />.value: 17648.502","Fecha: Dec 2009<br />.value: 18866.344","Fecha: Jan 2010<br />.value: 17849.242","Fecha: Feb 2010<br />.value: 17678.858","Fecha: Mar 2010<br />.value: 19436.383","Fecha: Apr 2010<br />.value: 19989.959","Fecha: May 2010<br />.value: 20070.030","Fecha: Jun 2010<br />.value: 18408.840","Fecha: Jul 2010<br />.value: 18772.111","Fecha: Aug 2010<br />.value: 19265.742","Fecha: Sep 2010<br />.value: 19193.896","Fecha: Oct 2010<br />.value: 20150.178","Fecha: Nov 2010<br />.value: 19756.449","Fecha: Dec 2010<br />.value: 21238.446","Fecha: Jan 2011<br />.value: 20941.962","Fecha: Feb 2011<br />.value: 21627.340","Fecha: Mar 2011<br />.value: 24698.101","Fecha: Apr 2011<br />.value: 24475.532","Fecha: May 2011<br />.value: 25513.266","Fecha: Jun 2011<br />.value: 24110.446","Fecha: Jul 2011<br />.value: 24612.398","Fecha: Aug 2011<br />.value: 24850.608","Fecha: Sep 2011<br />.value: 23703.242","Fecha: Oct 2011<br />.value: 24315.996","Fecha: Nov 2011<br />.value: 25493.480","Fecha: Dec 2011<br />.value: 25985.129","Fecha: Jan 2012<br />.value: 24356.743","Fecha: Feb 2012<br />.value: 25031.858","Fecha: Mar 2012<br />.value: 27211.889","Fecha: Apr 2012<br />.value: 25068.254","Fecha: May 2012<br />.value: 26280.492","Fecha: Jun 2012<br />.value: 23641.738","Fecha: Jul 2012<br />.value: 24961.514","Fecha: Aug 2012<br />.value: 23665.576","Fecha: Sep 2012<br />.value: 24752.093","Fecha: Oct 2012<br />.value: 26370.429","Fecha: Nov 2012<br />.value: 24425.424","Fecha: Dec 2012<br />.value: 24882.038","Fecha: Jan 2013<br />.value: 24558.407","Fecha: Feb 2013<br />.value: 23978.845","Fecha: Mar 2013<br />.value: 23817.893","Fecha: Apr 2013<br />.value: 24875.299","Fecha: May 2013<br />.value: 26063.972","Fecha: Jun 2013<br />.value: 24626.999","Fecha: Jul 2013<br />.value: 23929.041","Fecha: Aug 2013<br />.value: 24964.030","Fecha: Sep 2013<br />.value: 24560.945","Fecha: Oct 2013<br />.value: 24522.826","Fecha: Nov 2013<br />.value: 24872.712","Fecha: Dec 2013<br />.value: 25878.840","Fecha: Jan 2014<br />.value: 24430.178","Fecha: Feb 2014<br />.value: 22682.650","Fecha: Mar 2014<br />.value: 23134.746","Fecha: Apr 2014<br />.value: 22832.796","Fecha: May 2014<br />.value: 26561.342","Fecha: Jun 2014<br />.value: 24097.863","Fecha: Jul 2014<br />.value: 25187.151","Fecha: Aug 2014<br />.value: 24443.727","Fecha: Sep 2014<br />.value: 25275.531","Fecha: Oct 2014<br />.value: 22851.350","Fecha: Nov 2014<br />.value: 21062.134","Fecha: Dec 2014<br />.value: 21062.221","Fecha: Jan 2015<br />.value: 17862.834","Fecha: Feb 2015<br />.value: 18784.511","Fecha: Mar 2015<br />.value: 19885.670","Fecha: Apr 2015<br />.value: 19002.421","Fecha: May 2015<br />.value: 19593.485","Fecha: Jun 2015<br />.value: 18993.925","Fecha: Jul 2015<br />.value: 18345.299","Fecha: Aug 2015<br />.value: 17676.137","Fecha: Sep 2015<br />.value: 17790.610","Fecha: Oct 2015<br />.value: 17471.145","Fecha: Nov 2015<br />.value: 15991.476","Fecha: Dec 2015<br />.value: 16576.995","Fecha: Jan 2016<br />.value: 13742.174","Fecha: Feb 2016<br />.value: 15512.671","Fecha: Mar 2016<br />.value: 15538.839","Fecha: Apr 2016<br />.value: 16070.265","Fecha: May 2016<br />.value: 17221.138","Fecha: Jun 2016<br />.value: 17334.761","Fecha: Jul 2016<br />.value: 15253.844","Fecha: Aug 2016<br />.value: 18347.560","Fecha: Sep 2016<br />.value: 17401.743","Fecha: Oct 2016<br />.value: 17293.740","Fecha: Nov 2016<br />.value: 17541.407","Fecha: Dec 2016<br />.value: 19940.129","Fecha: Jan 2017<br />.value: 17352.452","Fecha: Feb 2017<br />.value: 17081.850","Fecha: Mar 2017<br />.value: 19299.399","Fecha: Apr 2017<br />.value: 17010.732","Fecha: May 2017<br />.value: 20041.771","Fecha: Jun 2017<br />.value: 17780.782","Fecha: Jul 2017<br />.value: 18652.199","Fecha: Aug 2017<br />.value: 18898.351","Fecha: Sep 2017<br />.value: 19624.666","Fecha: Oct 2017<br />.value: 19215.402","Fecha: Nov 2017<br />.value: 18640.064","Fecha: Dec 2017<br />.value: 21819.294","Fecha: Jan 2018<br />.value: 19388.887","Fecha: Feb 2018<br />.value: 18284.179","Fecha: Mar 2018<br />.value: 19535.478","Fecha: Apr 2018<br />.value: 21033.794","Fecha: May 2018<br />.value: 20799.474","Fecha: Jun 2018<br />.value: 19414.603","Fecha: Jul 2018<br />.value: 20492.163","Fecha: Aug 2018<br />.value: 20676.634","Fecha: Sep 2018<br />.value: 20068.280","Fecha: Oct 2018<br />.value: 20971.565","Fecha: Nov 2018<br />.value: 19456.822","Fecha: Dec 2018<br />.value: 19690.377","Fecha: Jan 2019<br />.value: 18429.485","Fecha: Feb 2019<br />.value: 18866.712","Fecha: Mar 2019<br />.value: 19461.709","Fecha: Apr 2019<br />.value: 21298.196","Fecha: May 2019<br />.value: 20900.659","Fecha: Jun 2019<br />.value: 18543.166","Fecha: Jul 2019<br />.value: 19135.673","Fecha: Aug 2019<br />.value: 19166.693","Fecha: Sep 2019<br />.value: 18434.149","Fecha: Oct 2019<br />.value: 19394.759","Fecha: Nov 2019<br />.value: 17964.870","Fecha: Dec 2019<br />.value: 19407.735","Fecha: Jan 2020<br />.value: 19732.499","Fecha: Feb 2020<br />.value: 17964.874","Fecha: Mar 2020<br />.value: 15968.936","Fecha: Apr 2020<br />.value: 13494.996","Fecha: May 2020<br />.value: 15059.985","Fecha: Jun 2020<br />.value: 15348.429","Fecha: Jul 2020<br />.value: 16428.192","Fecha: Aug 2020<br />.value: 16560.039","Fecha: Sep 2020<br />.value: 16399.494","Fecha: Oct 2020<br />.value: 16800.512","Fecha: Nov 2020<br />.value: 16312.573","Fecha: Dec 2020<br />.value: 18288.846","Fecha: Jan 2021<br />.value: 16664.850","Fecha: Feb 2021<br />.value: 17947.164","Fecha: Mar 2021<br />.value: 19602.449","Fecha: Apr 2021<br />.value: 18089.784","Fecha: May 2021<br />.value: 18545.229","Fecha: Jun 2021<br />.value: 18863.538","Fecha: Jul 2021<br />.value: 19821.621","Fecha: Aug 2021<br />.value: 19897.176","Fecha: Sep 2021<br />.value: 21053.616","Fecha: Oct 2021<br />.value: 21077.513","Fecha: Nov 2021<br />.value: 22296.085","Fecha: Dec 2021<br />.value: 23580.430","Fecha: Jan 2022<br />.value: 21086.192","Fecha: Feb 2022<br />.value: 22475.066","Fecha: Mar 2022<br />.value: 24339.007","Fecha: Apr 2022<br />.value: 26454.255","Fecha: May 2022<br />.value: 23961.963","Fecha: Jun 2022<br />.value: 26566.639","Fecha: Jul 2022<br />.value: 27808.654","Fecha: Aug 2022<br />.value: 23070.782","Fecha: Sep 2022<br />.value: 24333.618","Fecha: Oct 2022<br />.value: 22488.387","Fecha: Nov 2022<br />.value: 23637.899","Fecha: Dec 2022<br />.value: 23896.127","Fecha: Jan 2023<br />.value: 20718.045","Fecha: Feb 2023<br />.value: 22451.770","Fecha: Mar 2023<br />.value: 23212.666","Fecha: Apr 2023<br />.value: 20868.767","Fecha: May 2023<br />.value: 23428.411","Fecha: Jun 2023<br />.value: 21721.007"],"type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(44,62,80,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2000,2000.0833333333333,2000.1666666666667,2000.25,2000.3333333333333,2000.4166666666667,2000.5,2000.5833333333333,2000.6666666666667,2000.75,2000.8333333333333,2000.9166666666667,2001,2001.0833333333333,2001.1666666666667,2001.25,2001.3333333333333,2001.4166666666667,2001.5,2001.5833333333333,2001.6666666666667,2001.75,2001.8333333333333,2001.9166666666667,2002,2002.0833333333333,2002.1666666666667,2002.25,2002.3333333333333,2002.4166666666667,2002.5,2002.5833333333333,2002.6666666666667,2002.75,2002.8333333333333,2002.9166666666667,2003,2003.0833333333333,2003.1666666666667,2003.25,2003.3333333333333,2003.4166666666667,2003.5,2003.5833333333333,2003.6666666666667,2003.75,2003.8333333333333,2003.9166666666667,2004,2004.0833333333333,2004.1666666666667,2004.25,2004.3333333333333,2004.4166666666667,2004.5,2004.5833333333333,2004.6666666666667,2004.75,2004.8333333333333,2004.9166666666667,2005,2005.0833333333333,2005.1666666666667,2005.25,2005.3333333333333,2005.4166666666667,2005.5,2005.5833333333333,2005.6666666666667,2005.75,2005.8333333333333,2005.9166666666667,2006,2006.0833333333333,2006.1666666666667,2006.25,2006.3333333333333,2006.4166666666667,2006.5,2006.5833333333333,2006.6666666666667,2006.75,2006.8333333333333,2006.9166666666667,2007,2007.0833333333333,2007.1666666666667,2007.25,2007.3333333333333,2007.4166666666667,2007.5,2007.5833333333333,2007.6666666666667,2007.75,2007.8333333333333,2007.9166666666667,2008,2008.0833333333333,2008.1666666666667,2008.25,2008.3333333333333,2008.4166666666667,2008.5,2008.5833333333333,2008.6666666666667,2008.75,2008.8333333333333,2008.9166666666667,2009,2009.0833333333333,2009.1666666666667,2009.25,2009.3333333333333,2009.4166666666667,2009.5,2009.5833333333333,2009.6666666666667,2009.75,2009.8333333333333,2009.9166666666667,2010,2010.0833333333333,2010.1666666666667,2010.25,2010.3333333333333,2010.4166666666667,2010.5,2010.5833333333333,2010.6666666666667,2010.75,2010.8333333333333,2010.9166666666667,2011,2011.0833333333333,2011.1666666666667,2011.25,2011.3333333333333,2011.4166666666667,2011.5,2011.5833333333333,2011.6666666666667,2011.75,2011.8333333333333,2011.9166666666667,2012,2012.0833333333333,2012.1666666666667,2012.25,2012.3333333333333,2012.4166666666667,2012.5,2012.5833333333333,2012.6666666666667,2012.75,2012.8333333333333,2012.9166666666667,2013,2013.0833333333333,2013.1666666666667,2013.25,2013.3333333333333,2013.4166666666667,2013.5,2013.5833333333333,2013.6666666666667,2013.75,2013.8333333333333,2013.9166666666667,2014,2014.0833333333333,2014.1666666666667,2014.25,2014.3333333333333,2014.4166666666667,2014.5,2014.5833333333333,2014.6666666666667,2014.75,2014.8333333333333,2014.9166666666667,2015,2015.0833333333333,2015.1666666666667,2015.25,2015.3333333333333,2015.4166666666667,2015.5,2015.5833333333333,2015.6666666666667,2015.75,2015.8333333333333,2015.9166666666667,2016,2016.0833333333333,2016.1666666666667,2016.25,2016.3333333333333,2016.4166666666667,2016.5,2016.5833333333333,2016.6666666666667,2016.75,2016.8333333333333,2016.9166666666667,2017,2017.0833333333333,2017.1666666666667,2017.25,2017.3333333333333,2017.4166666666667,2017.5,2017.5833333333333,2017.6666666666667,2017.75,2017.8333333333333,2017.9166666666667,2018,2018.0833333333333,2018.1666666666667,2018.25,2018.3333333333333,2018.4166666666667,2018.5,2018.5833333333333,2018.6666666666667,2018.75,2018.8333333333333,2018.9166666666667,2019,2019.0833333333333,2019.1666666666667,2019.25,2019.3333333333333,2019.4166666666667,2019.5,2019.5833333333333,2019.6666666666667,2019.75,2019.8333333333333,2019.9166666666667,2020,2020.0833333333333,2020.1666666666667,2020.25,2020.3333333333333,2020.4166666666667,2020.5,2020.5833333333333,2020.6666666666667,2020.75,2020.8333333333333,2020.9166666666667,2021,2021.0833333333333,2021.1666666666667,2021.25,2021.3333333333333,2021.4166666666667,2021.5,2021.5833333333333,2021.6666666666667,2021.75,2021.8333333333333,2021.9166666666667,2022,2022.0833333333333,2022.1666666666667,2022.25,2022.3333333333333,2022.4166666666667,2022.5,2022.5833333333333,2022.6666666666667,2022.75,2022.8333333333333,2022.9166666666667,2023,2023.0833333333333,2023.1666666666667,2023.25,2023.3333333333333,2023.4166666666667],"y":[8036.7599378217928,8092.9665927435899,8149.700563078869,8206.9761631892652,8264.8077074364192,8323.2095101819668,8382.195885787547,8441.7811486147948,8501.9796130253508,8562.8055933808537,8624.2734040429386,8686.3973593732426,8749.1917737334079,8812.6709614850679,8876.8492369898649,8941.7409146094324,9007.3603087054071,9073.7217336394333,9140.8395037731425,9208.7279334681789,9277.4013370861721,9346.8740289887683,9417.1603235375969,9488.2745350943023,9560.2309780205178,9633.0439666778893,9706.727815428043,9781.2968386326229,9856.7653506532697,9933.1476658516149,10010.458098589301,10088.710963227964,10167.920574129241,10248.101245654772,10329.267292166192,10411.43302802514,10494.72129736828,10579.219640044523,10664.88941398387,10751.691977116321,10839.588687371875,10928.540902680541,11018.50998097232,11109.457280177208,11201.344158225213,11294.131973046333,11387.782082570575,11482.255844727935,11577.514617448418,11673.519758662031,11770.232626298764,11867.614578288634,11965.626972561629,12064.231167047759,12163.388519677024,12263.060388379428,12363.208131084972,12463.793105723653,12564.776670225481,12666.120182520453,12767.785000538572,12869.732482209842,12971.923985464264,13074.32086823184,13176.884488442569,13279.576204026454,13382.357372913504,13485.189353033709,13588.033502317085,13690.851178693621,13793.603740093327,13898.328586339108,14006.943438248256,14119.230135242338,14234.970516742935,14353.94642217161,14475.939690949937,14600.732162499498,14728.105676241854,14857.842071598583,14989.72318799126,15123.530864841452,15259.046941570736,15396.053257600679,15534.331652352867,15673.663965248852,15813.832035710226,15954.617703158545,16095.802807015398,16237.169186702342,16378.498681640958,16519.573131252826,16660.174374959501,16800.084252182569,16939.084602343599,17076.957264864155,17213.484079165824,17348.446884670175,17481.627520798771,17612.807826973192,17741.769642615011,17868.294807145805,17992.165159987129,18113.162540560577,18231.06878828771,18345.665742590099,18460.550783187351,18579.232353083251,18701.358886625629,18826.578818162339,18954.54058204122,19084.892612610107,19217.283344216845,19351.361211209271,19486.774647935235,19623.172088742576,19760.201967979137,19897.512719992752,20034.752779131268,20171.570579742529,20307.614556174365,20442.533142774639,20575.974773891172,20707.587883871813,20837.020907064401,20963.922277816782,21087.9404304768,21208.723799392283,21325.920818911087,21439.179923381049,21548.149547150006,21652.478124565805,21751.814089976277,21845.805877729286,21934.101922172653,22016.350657654224,22092.200518521844,22161.29993912335,22223.297353806589,22277.841196919402,22324.579902809626,22364.277986325949,22398.092757455608,22426.26184325424,22449.022870777488,22466.61346708101,22479.271259220452,22487.233874251448,22490.738939229657,22490.024081210729,22485.326927250302,22476.885104404031,22464.936239727558,22449.717960276528,22431.467893106594,22410.423665273396,22386.822903832595,22360.903235839822,22332.902288350735,22303.057688420973,22271.607063106188,22238.788039462033,22204.838244544138,22169.995305408171,22134.496849109761,22098.580502704568,22062.483893248231,22026.444647796401,21990.700393404728,21955.488757128849,21921.047366024424,21887.613847147088,21855.425827552499,21824.720934296292,21795.736794434128,21768.711035021643,21743.881283114493,21717.447976253734,21685.687686281937,21648.952241707,21607.593471036831,21561.963202779334,21512.413265442403,21459.29548753396,21402.961697561888,21343.763724034099,21282.053395458501,21218.182540342994,21152.502987195479,21085.366564523858,21017.125100836041,20948.130424639923,20878.734364443422,20809.288748754414,20740.145406080832,20671.656164930562,20604.172853811513,20538.047301231589,20473.631335698683,20411.276785720715,20351.335479805581,20294.159246461179,20240.099914195423,20189.509311516202,20142.739266931439,20100.141608949019,20062.068166076853,20028.870766822845,20000.901239694893,19978.511413200908,19962.053115848787,19951.878176146438,19944.773162780861,19937.342586979055,19929.665191058924,19921.819717338374,19913.884908135307,19905.939505767616,19898.062252553224,19890.331890810008,19882.827162855894,19875.626811008777,19868.809577586559,19862.454204907142,19856.639435288434,19851.444011048334,19846.946674504739,19843.226167975565,19840.361233778702,19838.430614232064,19837.513051653546,19837.687288361059,19839.032066672498,19841.626128905769,19845.548217378775,19850.877074409418,19857.691442315605,19866.070063415234,19876.091680026209,19887.835034466443,19901.37886905382,19916.801926106255,19934.182947941656,19953.600676877904,19975.133855232933,19998.861225324625,20024.861529470883,20052.967840250363,20082.941174065858,20114.752188971514,20148.371543021476,20183.769894269877,20220.917900770874,20259.786220578593,20300.345511747182,20342.566432330786,20386.419640383549,20431.8757939596,20478.90555111309,20527.479569898165,20577.568508368957,20629.143024579625,20682.173776584284,20736.631422437102,20792.486620192209,20849.71002790374,20908.272303625847,20968.144105412677,21029.296091318356,21091.698919397037,21155.323247702861,21220.139734289962,21286.119037212502,21353.231814524595,21421.448724280406,21490.740424534062,21561.077573339717,21632.430828751505,21704.770848823562,21778.068291610041,21852.293815165089,21927.418077542832],"text":["Fecha: Jan 2000<br />.value_smooth:  8036.760","Fecha: Feb 2000<br />.value_smooth:  8092.967","Fecha: Mar 2000<br />.value_smooth:  8149.701","Fecha: Apr 2000<br />.value_smooth:  8206.976","Fecha: May 2000<br />.value_smooth:  8264.808","Fecha: Jun 2000<br />.value_smooth:  8323.210","Fecha: Jul 2000<br />.value_smooth:  8382.196","Fecha: Aug 2000<br />.value_smooth:  8441.781","Fecha: Sep 2000<br />.value_smooth:  8501.980","Fecha: Oct 2000<br />.value_smooth:  8562.806","Fecha: Nov 2000<br />.value_smooth:  8624.273","Fecha: Dec 2000<br />.value_smooth:  8686.397","Fecha: Jan 2001<br />.value_smooth:  8749.192","Fecha: Feb 2001<br />.value_smooth:  8812.671","Fecha: Mar 2001<br />.value_smooth:  8876.849","Fecha: Apr 2001<br />.value_smooth:  8941.741","Fecha: May 2001<br />.value_smooth:  9007.360","Fecha: Jun 2001<br />.value_smooth:  9073.722","Fecha: Jul 2001<br />.value_smooth:  9140.840","Fecha: Aug 2001<br />.value_smooth:  9208.728","Fecha: Sep 2001<br />.value_smooth:  9277.401","Fecha: Oct 2001<br />.value_smooth:  9346.874","Fecha: Nov 2001<br />.value_smooth:  9417.160","Fecha: Dec 2001<br />.value_smooth:  9488.275","Fecha: Jan 2002<br />.value_smooth:  9560.231","Fecha: Feb 2002<br />.value_smooth:  9633.044","Fecha: Mar 2002<br />.value_smooth:  9706.728","Fecha: Apr 2002<br />.value_smooth:  9781.297","Fecha: May 2002<br />.value_smooth:  9856.765","Fecha: Jun 2002<br />.value_smooth:  9933.148","Fecha: Jul 2002<br />.value_smooth: 10010.458","Fecha: Aug 2002<br />.value_smooth: 10088.711","Fecha: Sep 2002<br />.value_smooth: 10167.921","Fecha: Oct 2002<br />.value_smooth: 10248.101","Fecha: Nov 2002<br />.value_smooth: 10329.267","Fecha: Dec 2002<br />.value_smooth: 10411.433","Fecha: Jan 2003<br />.value_smooth: 10494.721","Fecha: Feb 2003<br />.value_smooth: 10579.220","Fecha: Mar 2003<br />.value_smooth: 10664.889","Fecha: Apr 2003<br />.value_smooth: 10751.692","Fecha: May 2003<br />.value_smooth: 10839.589","Fecha: Jun 2003<br />.value_smooth: 10928.541","Fecha: Jul 2003<br />.value_smooth: 11018.510","Fecha: Aug 2003<br />.value_smooth: 11109.457","Fecha: Sep 2003<br />.value_smooth: 11201.344","Fecha: Oct 2003<br />.value_smooth: 11294.132","Fecha: Nov 2003<br />.value_smooth: 11387.782","Fecha: Dec 2003<br />.value_smooth: 11482.256","Fecha: Jan 2004<br />.value_smooth: 11577.515","Fecha: Feb 2004<br />.value_smooth: 11673.520","Fecha: Mar 2004<br />.value_smooth: 11770.233","Fecha: Apr 2004<br />.value_smooth: 11867.615","Fecha: May 2004<br />.value_smooth: 11965.627","Fecha: Jun 2004<br />.value_smooth: 12064.231","Fecha: Jul 2004<br />.value_smooth: 12163.389","Fecha: Aug 2004<br />.value_smooth: 12263.060","Fecha: Sep 2004<br />.value_smooth: 12363.208","Fecha: Oct 2004<br />.value_smooth: 12463.793","Fecha: Nov 2004<br />.value_smooth: 12564.777","Fecha: Dec 2004<br />.value_smooth: 12666.120","Fecha: Jan 2005<br />.value_smooth: 12767.785","Fecha: Feb 2005<br />.value_smooth: 12869.732","Fecha: Mar 2005<br />.value_smooth: 12971.924","Fecha: Apr 2005<br />.value_smooth: 13074.321","Fecha: May 2005<br />.value_smooth: 13176.884","Fecha: Jun 2005<br />.value_smooth: 13279.576","Fecha: Jul 2005<br />.value_smooth: 13382.357","Fecha: Aug 2005<br />.value_smooth: 13485.189","Fecha: Sep 2005<br />.value_smooth: 13588.034","Fecha: Oct 2005<br />.value_smooth: 13690.851","Fecha: Nov 2005<br />.value_smooth: 13793.604","Fecha: Dec 2005<br />.value_smooth: 13898.329","Fecha: Jan 2006<br />.value_smooth: 14006.943","Fecha: Feb 2006<br />.value_smooth: 14119.230","Fecha: Mar 2006<br />.value_smooth: 14234.971","Fecha: Apr 2006<br />.value_smooth: 14353.946","Fecha: May 2006<br />.value_smooth: 14475.940","Fecha: Jun 2006<br />.value_smooth: 14600.732","Fecha: Jul 2006<br />.value_smooth: 14728.106","Fecha: Aug 2006<br />.value_smooth: 14857.842","Fecha: Sep 2006<br />.value_smooth: 14989.723","Fecha: Oct 2006<br />.value_smooth: 15123.531","Fecha: Nov 2006<br />.value_smooth: 15259.047","Fecha: Dec 2006<br />.value_smooth: 15396.053","Fecha: Jan 2007<br />.value_smooth: 15534.332","Fecha: Feb 2007<br />.value_smooth: 15673.664","Fecha: Mar 2007<br />.value_smooth: 15813.832","Fecha: Apr 2007<br />.value_smooth: 15954.618","Fecha: May 2007<br />.value_smooth: 16095.803","Fecha: Jun 2007<br />.value_smooth: 16237.169","Fecha: Jul 2007<br />.value_smooth: 16378.499","Fecha: Aug 2007<br />.value_smooth: 16519.573","Fecha: Sep 2007<br />.value_smooth: 16660.174","Fecha: Oct 2007<br />.value_smooth: 16800.084","Fecha: Nov 2007<br />.value_smooth: 16939.085","Fecha: Dec 2007<br />.value_smooth: 17076.957","Fecha: Jan 2008<br />.value_smooth: 17213.484","Fecha: Feb 2008<br />.value_smooth: 17348.447","Fecha: Mar 2008<br />.value_smooth: 17481.628","Fecha: Apr 2008<br />.value_smooth: 17612.808","Fecha: May 2008<br />.value_smooth: 17741.770","Fecha: Jun 2008<br />.value_smooth: 17868.295","Fecha: Jul 2008<br />.value_smooth: 17992.165","Fecha: Aug 2008<br />.value_smooth: 18113.163","Fecha: Sep 2008<br />.value_smooth: 18231.069","Fecha: Oct 2008<br />.value_smooth: 18345.666","Fecha: Nov 2008<br />.value_smooth: 18460.551","Fecha: Dec 2008<br />.value_smooth: 18579.232","Fecha: Jan 2009<br />.value_smooth: 18701.359","Fecha: Feb 2009<br />.value_smooth: 18826.579","Fecha: Mar 2009<br />.value_smooth: 18954.541","Fecha: Apr 2009<br />.value_smooth: 19084.893","Fecha: May 2009<br />.value_smooth: 19217.283","Fecha: Jun 2009<br />.value_smooth: 19351.361","Fecha: Jul 2009<br />.value_smooth: 19486.775","Fecha: Aug 2009<br />.value_smooth: 19623.172","Fecha: Sep 2009<br />.value_smooth: 19760.202","Fecha: Oct 2009<br />.value_smooth: 19897.513","Fecha: Nov 2009<br />.value_smooth: 20034.753","Fecha: Dec 2009<br />.value_smooth: 20171.571","Fecha: Jan 2010<br />.value_smooth: 20307.615","Fecha: Feb 2010<br />.value_smooth: 20442.533","Fecha: Mar 2010<br />.value_smooth: 20575.975","Fecha: Apr 2010<br />.value_smooth: 20707.588","Fecha: May 2010<br />.value_smooth: 20837.021","Fecha: Jun 2010<br />.value_smooth: 20963.922","Fecha: Jul 2010<br />.value_smooth: 21087.940","Fecha: Aug 2010<br />.value_smooth: 21208.724","Fecha: Sep 2010<br />.value_smooth: 21325.921","Fecha: Oct 2010<br />.value_smooth: 21439.180","Fecha: Nov 2010<br />.value_smooth: 21548.150","Fecha: Dec 2010<br />.value_smooth: 21652.478","Fecha: Jan 2011<br />.value_smooth: 21751.814","Fecha: Feb 2011<br />.value_smooth: 21845.806","Fecha: Mar 2011<br />.value_smooth: 21934.102","Fecha: Apr 2011<br />.value_smooth: 22016.351","Fecha: May 2011<br />.value_smooth: 22092.201","Fecha: Jun 2011<br />.value_smooth: 22161.300","Fecha: Jul 2011<br />.value_smooth: 22223.297","Fecha: Aug 2011<br />.value_smooth: 22277.841","Fecha: Sep 2011<br />.value_smooth: 22324.580","Fecha: Oct 2011<br />.value_smooth: 22364.278","Fecha: Nov 2011<br />.value_smooth: 22398.093","Fecha: Dec 2011<br />.value_smooth: 22426.262","Fecha: Jan 2012<br />.value_smooth: 22449.023","Fecha: Feb 2012<br />.value_smooth: 22466.613","Fecha: Mar 2012<br />.value_smooth: 22479.271","Fecha: Apr 2012<br />.value_smooth: 22487.234","Fecha: May 2012<br />.value_smooth: 22490.739","Fecha: Jun 2012<br />.value_smooth: 22490.024","Fecha: Jul 2012<br />.value_smooth: 22485.327","Fecha: Aug 2012<br />.value_smooth: 22476.885","Fecha: Sep 2012<br />.value_smooth: 22464.936","Fecha: Oct 2012<br />.value_smooth: 22449.718","Fecha: Nov 2012<br />.value_smooth: 22431.468","Fecha: Dec 2012<br />.value_smooth: 22410.424","Fecha: Jan 2013<br />.value_smooth: 22386.823","Fecha: Feb 2013<br />.value_smooth: 22360.903","Fecha: Mar 2013<br />.value_smooth: 22332.902","Fecha: Apr 2013<br />.value_smooth: 22303.058","Fecha: May 2013<br />.value_smooth: 22271.607","Fecha: Jun 2013<br />.value_smooth: 22238.788","Fecha: Jul 2013<br />.value_smooth: 22204.838","Fecha: Aug 2013<br />.value_smooth: 22169.995","Fecha: Sep 2013<br />.value_smooth: 22134.497","Fecha: Oct 2013<br />.value_smooth: 22098.581","Fecha: Nov 2013<br />.value_smooth: 22062.484","Fecha: Dec 2013<br />.value_smooth: 22026.445","Fecha: Jan 2014<br />.value_smooth: 21990.700","Fecha: Feb 2014<br />.value_smooth: 21955.489","Fecha: Mar 2014<br />.value_smooth: 21921.047","Fecha: Apr 2014<br />.value_smooth: 21887.614","Fecha: May 2014<br />.value_smooth: 21855.426","Fecha: Jun 2014<br />.value_smooth: 21824.721","Fecha: Jul 2014<br />.value_smooth: 21795.737","Fecha: Aug 2014<br />.value_smooth: 21768.711","Fecha: Sep 2014<br />.value_smooth: 21743.881","Fecha: Oct 2014<br />.value_smooth: 21717.448","Fecha: Nov 2014<br />.value_smooth: 21685.688","Fecha: Dec 2014<br />.value_smooth: 21648.952","Fecha: Jan 2015<br />.value_smooth: 21607.593","Fecha: Feb 2015<br />.value_smooth: 21561.963","Fecha: Mar 2015<br />.value_smooth: 21512.413","Fecha: Apr 2015<br />.value_smooth: 21459.295","Fecha: May 2015<br />.value_smooth: 21402.962","Fecha: Jun 2015<br />.value_smooth: 21343.764","Fecha: Jul 2015<br />.value_smooth: 21282.053","Fecha: Aug 2015<br />.value_smooth: 21218.183","Fecha: Sep 2015<br />.value_smooth: 21152.503","Fecha: Oct 2015<br />.value_smooth: 21085.367","Fecha: Nov 2015<br />.value_smooth: 21017.125","Fecha: Dec 2015<br />.value_smooth: 20948.130","Fecha: Jan 2016<br />.value_smooth: 20878.734","Fecha: Feb 2016<br />.value_smooth: 20809.289","Fecha: Mar 2016<br />.value_smooth: 20740.145","Fecha: Apr 2016<br />.value_smooth: 20671.656","Fecha: May 2016<br />.value_smooth: 20604.173","Fecha: Jun 2016<br />.value_smooth: 20538.047","Fecha: Jul 2016<br />.value_smooth: 20473.631","Fecha: Aug 2016<br />.value_smooth: 20411.277","Fecha: Sep 2016<br />.value_smooth: 20351.335","Fecha: Oct 2016<br />.value_smooth: 20294.159","Fecha: Nov 2016<br />.value_smooth: 20240.100","Fecha: Dec 2016<br />.value_smooth: 20189.509","Fecha: Jan 2017<br />.value_smooth: 20142.739","Fecha: Feb 2017<br />.value_smooth: 20100.142","Fecha: Mar 2017<br />.value_smooth: 20062.068","Fecha: Apr 2017<br />.value_smooth: 20028.871","Fecha: May 2017<br />.value_smooth: 20000.901","Fecha: Jun 2017<br />.value_smooth: 19978.511","Fecha: Jul 2017<br />.value_smooth: 19962.053","Fecha: Aug 2017<br />.value_smooth: 19951.878","Fecha: Sep 2017<br />.value_smooth: 19944.773","Fecha: Oct 2017<br />.value_smooth: 19937.343","Fecha: Nov 2017<br />.value_smooth: 19929.665","Fecha: Dec 2017<br />.value_smooth: 19921.820","Fecha: Jan 2018<br />.value_smooth: 19913.885","Fecha: Feb 2018<br />.value_smooth: 19905.940","Fecha: Mar 2018<br />.value_smooth: 19898.062","Fecha: Apr 2018<br />.value_smooth: 19890.332","Fecha: May 2018<br />.value_smooth: 19882.827","Fecha: Jun 2018<br />.value_smooth: 19875.627","Fecha: Jul 2018<br />.value_smooth: 19868.810","Fecha: Aug 2018<br />.value_smooth: 19862.454","Fecha: Sep 2018<br />.value_smooth: 19856.639","Fecha: Oct 2018<br />.value_smooth: 19851.444","Fecha: Nov 2018<br />.value_smooth: 19846.947","Fecha: Dec 2018<br />.value_smooth: 19843.226","Fecha: Jan 2019<br />.value_smooth: 19840.361","Fecha: Feb 2019<br />.value_smooth: 19838.431","Fecha: Mar 2019<br />.value_smooth: 19837.513","Fecha: Apr 2019<br />.value_smooth: 19837.687","Fecha: May 2019<br />.value_smooth: 19839.032","Fecha: Jun 2019<br />.value_smooth: 19841.626","Fecha: Jul 2019<br />.value_smooth: 19845.548","Fecha: Aug 2019<br />.value_smooth: 19850.877","Fecha: Sep 2019<br />.value_smooth: 19857.691","Fecha: Oct 2019<br />.value_smooth: 19866.070","Fecha: Nov 2019<br />.value_smooth: 19876.092","Fecha: Dec 2019<br />.value_smooth: 19887.835","Fecha: Jan 2020<br />.value_smooth: 19901.379","Fecha: Feb 2020<br />.value_smooth: 19916.802","Fecha: Mar 2020<br />.value_smooth: 19934.183","Fecha: Apr 2020<br />.value_smooth: 19953.601","Fecha: May 2020<br />.value_smooth: 19975.134","Fecha: Jun 2020<br />.value_smooth: 19998.861","Fecha: Jul 2020<br />.value_smooth: 20024.862","Fecha: Aug 2020<br />.value_smooth: 20052.968","Fecha: Sep 2020<br />.value_smooth: 20082.941","Fecha: Oct 2020<br />.value_smooth: 20114.752","Fecha: Nov 2020<br />.value_smooth: 20148.372","Fecha: Dec 2020<br />.value_smooth: 20183.770","Fecha: Jan 2021<br />.value_smooth: 20220.918","Fecha: Feb 2021<br />.value_smooth: 20259.786","Fecha: Mar 2021<br />.value_smooth: 20300.346","Fecha: Apr 2021<br />.value_smooth: 20342.566","Fecha: May 2021<br />.value_smooth: 20386.420","Fecha: Jun 2021<br />.value_smooth: 20431.876","Fecha: Jul 2021<br />.value_smooth: 20478.906","Fecha: Aug 2021<br />.value_smooth: 20527.480","Fecha: Sep 2021<br />.value_smooth: 20577.569","Fecha: Oct 2021<br />.value_smooth: 20629.143","Fecha: Nov 2021<br />.value_smooth: 20682.174","Fecha: Dec 2021<br />.value_smooth: 20736.631","Fecha: Jan 2022<br />.value_smooth: 20792.487","Fecha: Feb 2022<br />.value_smooth: 20849.710","Fecha: Mar 2022<br />.value_smooth: 20908.272","Fecha: Apr 2022<br />.value_smooth: 20968.144","Fecha: May 2022<br />.value_smooth: 21029.296","Fecha: Jun 2022<br />.value_smooth: 21091.699","Fecha: Jul 2022<br />.value_smooth: 21155.323","Fecha: Aug 2022<br />.value_smooth: 21220.140","Fecha: Sep 2022<br />.value_smooth: 21286.119","Fecha: Oct 2022<br />.value_smooth: 21353.232","Fecha: Nov 2022<br />.value_smooth: 21421.449","Fecha: Dec 2022<br />.value_smooth: 21490.740","Fecha: Jan 2023<br />.value_smooth: 21561.078","Fecha: Feb 2023<br />.value_smooth: 21632.431","Fecha: Mar 2023<br />.value_smooth: 21704.771","Fecha: Apr 2023<br />.value_smooth: 21778.068","Fecha: May 2023<br />.value_smooth: 21852.294","Fecha: Jun 2023<br />.value_smooth: 21927.418"],"type":"scatter","mode":"lines","line":{"width":3.7795275590551185,"color":"rgba(51,102,255,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":25.570776255707766,"l":40.182648401826491},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(44,62,80,1)","family":"","size":14.611872146118724},"title":{"text":"Time Series Plot","font":{"color":"rgba(44,62,80,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":true,"range":[1998.8291666666667,2024.5875000000001],"tickmode":"auto","ticktext":["Jan 2000","Jan 2005","Jan 2010","Jan 2015","Jan 2020"],"tickvals":[2000,2005,2010,2015,2020],"categoryorder":"array","categoryarray":["Jan 2000","Jan 2005","Jan 2010","Jan 2015","Jan 2020"],"nticks":null,"ticks":"outside","tickcolor":"rgba(204,204,204,1)","ticklen":3.6529680365296811,"tickwidth":0.22139200221392005,"showticklabels":true,"tickfont":{"color":"rgba(44,62,80,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(204,204,204,1)","gridwidth":0.22139200221392005,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(44,62,80,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":true,"range":[7048.16524865476,28797.248410329477],"tickmode":"auto","ticktext":["10000","15000","20000","25000"],"tickvals":[10000,15000,20000,25000],"categoryorder":"array","categoryarray":["10000","15000","20000","25000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(204,204,204,1)","ticklen":3.6529680365296811,"tickwidth":0.22139200221392005,"showticklabels":true,"tickfont":{"color":"rgba(44,62,80,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(204,204,204,1)","gridwidth":0.22139200221392005,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(44,62,80,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(44,62,80,1)","width":0.33208800332088001,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(44,62,80,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"32b47053c1f":{"x":{},"y":{},"type":"scatter"},"32b426e17398":{"x":{},"y":{}}},"cur_data":"32b47053c1f","visdat":{"32b47053c1f":["function (y) ","x"],"32b426e17398":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="descomposición-por-filtro-de-promedios-móviles" class="level4" data-number="1.3.2">
+<h4 data-number="1.3.2" class="anchored" data-anchor-id="descomposición-por-filtro-de-promedios-móviles"><span class="header-section-number">1.3.2</span> Descomposición por filtro de promedios móviles</h4>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="descomposición-stl" class="level4" data-number="1.3.3">
+<h4 data-number="1.3.3" class="anchored" data-anchor-id="descomposición-stl"><span class="header-section-number">1.3.3</span> Descomposición STL</h4>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="diferencia" class="level4" data-number="1.3.4">
+<h4 data-number="1.3.4" class="anchored" data-anchor-id="diferencia"><span class="header-section-number">1.3.4</span> Diferencia</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-102e5c89f13d8906dc44" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-102e5c89f13d8906dc44">{"x":{"visdat":{"32b440985c91":["function () ","plotlyVisDat"]},"cur_data":"32b440985c91","attrs":{"32b440985c91":{"x":{},"y":{},"mode":"lines","line":{"width":2,"dash":null,"color":"#00526d"},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"","showgrid":false},"yaxis":{"domain":[0,1],"automargin":true,"title":"","showgrid":false},"title":"Serie diferenciada","hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[2000.0833333333335,2000.1666666666667,2000.2500000000002,2000.3333333333335,2000.4166666666667,2000.5000000000002,2000.5833333333335,2000.6666666666667,2000.7500000000002,2000.8333333333335,2000.9166666666667,2001,2001.0833333333335,2001.1666666666667,2001.2500000000002,2001.3333333333335,2001.4166666666667,2001.5000000000002,2001.5833333333335,2001.6666666666667,2001.7500000000002,2001.8333333333335,2001.9166666666667,2002,2002.0833333333335,2002.1666666666667,2002.2500000000002,2002.3333333333335,2002.4166666666667,2002.5000000000002,2002.5833333333335,2002.6666666666667,2002.7500000000002,2002.8333333333335,2002.9166666666667,2003,2003.0833333333335,2003.1666666666667,2003.2500000000002,2003.3333333333335,2003.4166666666667,2003.5000000000002,2003.5833333333335,2003.6666666666667,2003.7500000000002,2003.8333333333335,2003.9166666666667,2004,2004.0833333333335,2004.1666666666667,2004.2500000000002,2004.3333333333335,2004.4166666666667,2004.5000000000002,2004.5833333333335,2004.6666666666667,2004.7500000000002,2004.8333333333335,2004.9166666666667,2005,2005.0833333333335,2005.1666666666667,2005.2500000000002,2005.3333333333335,2005.4166666666667,2005.5000000000002,2005.5833333333335,2005.6666666666667,2005.7500000000002,2005.8333333333335,2005.9166666666667,2006,2006.0833333333335,2006.1666666666667,2006.2500000000002,2006.3333333333335,2006.4166666666667,2006.5000000000002,2006.5833333333335,2006.6666666666667,2006.7500000000002,2006.8333333333335,2006.9166666666667,2007,2007.0833333333335,2007.1666666666667,2007.2500000000002,2007.3333333333335,2007.4166666666667,2007.5000000000002,2007.5833333333335,2007.6666666666667,2007.7500000000002,2007.8333333333335,2007.9166666666667,2008,2008.0833333333335,2008.1666666666667,2008.2500000000002,2008.3333333333335,2008.4166666666667,2008.5000000000002,2008.5833333333335,2008.6666666666667,2008.7500000000002,2008.8333333333335,2008.9166666666667,2009,2009.0833333333335,2009.1666666666667,2009.2500000000002,2009.3333333333335,2009.4166666666667,2009.5000000000002,2009.5833333333335,2009.6666666666667,2009.7500000000002,2009.8333333333335,2009.9166666666667,2010,2010.0833333333335,2010.1666666666667,2010.2500000000002,2010.3333333333335,2010.4166666666667,2010.5000000000002,2010.5833333333335,2010.6666666666667,2010.7500000000002,2010.8333333333335,2010.9166666666667,2011,2011.0833333333335,2011.1666666666667,2011.2500000000002,2011.3333333333335,2011.4166666666667,2011.5000000000002,2011.5833333333335,2011.6666666666667,2011.75,2011.8333333333335,2011.9166666666667,2012,2012.0833333333335,2012.1666666666667,2012.25,2012.3333333333335,2012.4166666666667,2012.5,2012.5833333333335,2012.6666666666667,2012.75,2012.8333333333335,2012.9166666666667,2013,2013.0833333333335,2013.1666666666667,2013.25,2013.3333333333335,2013.4166666666667,2013.5,2013.5833333333335,2013.6666666666667,2013.75,2013.8333333333335,2013.9166666666667,2014,2014.0833333333335,2014.1666666666667,2014.25,2014.3333333333335,2014.4166666666667,2014.5,2014.5833333333335,2014.6666666666667,2014.75,2014.8333333333335,2014.9166666666667,2015,2015.0833333333335,2015.1666666666667,2015.25,2015.3333333333335,2015.4166666666667,2015.5,2015.5833333333335,2015.6666666666667,2015.75,2015.8333333333335,2015.9166666666667,2016,2016.0833333333335,2016.1666666666667,2016.25,2016.3333333333335,2016.4166666666667,2016.5,2016.5833333333335,2016.6666666666667,2016.75,2016.8333333333335,2016.9166666666667,2017,2017.0833333333335,2017.1666666666667,2017.25,2017.3333333333335,2017.4166666666667,2017.5,2017.5833333333335,2017.6666666666667,2017.75,2017.8333333333335,2017.9166666666667,2018,2018.0833333333335,2018.1666666666667,2018.25,2018.3333333333335,2018.4166666666667,2018.5,2018.5833333333335,2018.6666666666667,2018.75,2018.8333333333335,2018.9166666666667,2019,2019.0833333333335,2019.1666666666667,2019.25,2019.3333333333335,2019.4166666666667,2019.5,2019.5833333333335,2019.6666666666667,2019.75,2019.8333333333335,2019.9166666666667,2020,2020.0833333333335,2020.1666666666667,2020.25,2020.3333333333335,2020.4166666666667,2020.5,2020.5833333333335,2020.6666666666667,2020.75,2020.8333333333335,2020.9166666666667,2021,2021.0833333333335,2021.1666666666667,2021.25,2021.3333333333335,2021.4166666666667,2021.5,2021.5833333333335,2021.6666666666667,2021.75,2021.8333333333335,2021.9166666666667,2022,2022.0833333333335,2022.1666666666667,2022.25,2022.3333333333335,2022.4166666666667,2022.5,2022.5833333333335,2022.6666666666667,2022.75,2022.8333333333335,2022.9166666666667,2023,2023.0833333333335,2023.1666666666667,2023.25,2023.3333333333335,2023.4166666666667],"y":[239.84482514949559,-3.0974599766086612,-968.29281996695136,1480.3542539691534,41.807458618011879,-270.95661619848943,744.00402117691738,-752.24934243549251,-683.07189470403318,1171.0273596638672,190.3033001338863,-1158.2600457094122,-302.96177246569823,218.892783138288,316.93935030300963,53.499979206964781,-403.14192437080419,52.225619892331451,1016.0145784069427,-605.14526095269503,-365.79885705598826,-274.57960426647151,15.214898643196648,-144.87951556511871,13.052016201221704,-515.19215144908958,1521.2421283771691,-261.70181124514238,-888.02483265839874,688.41538205916549,-723.89403257086087,805.63689156989312,83.498988659946917,-588.0125965398347,505.50061603215545,-759.56227261041568,632.61294039396307,6.7259330523902463,373.1761401570202,440.27965358789152,-1035.0516295703619,1489.7746268822157,-940.36419885466603,-74.225510676667909,491.49280338242897,-472.79603152435811,464.33581406653138,84.955170441086011,-835.18430483682823,959.70238113118285,343.12439938082389,332.25712054798896,496.20953005828233,530.16957738292876,-120.02169572229286,14.369336511099391,48.065539253710085,273.58225025490901,228.29414010441542,-1249.8636565334582,747.8603258902458,920.40407596349723,-185.89689051630558,256.38388897823825,1619.2962829709522,-2010.9327949921953,1058.9389406819446,113.89385146905988,-541.81262570352374,171.0543308666438,507.67142285287082,-1241.8717864930022,897.29162712455582,305.66066490631965,-259.72600487686032,1488.7621322266841,-744.00977384780526,445.67469270967376,-52.042334159586972,-110.84657679675547,714.69319467687455,-532.05808527307818,-51.854057302914953,-1287.670549041397,321.42164508049973,2022.049424118859,463.62747257389856,920.27470305177849,-2527.1195546677427,2211.4238784091413,-108.15116197355019,-393.30633729193869,403.87088017125643,2037.9630327246523,277.76257279402853,-1456.2941105834907,-76.920794917561579,709.10600029564739,1329.3410831318251,98.727127301055589,1010.5728224410268,440.57287003617239,-1809.8969879910037,-592.56451711598856,-576.19945949351677,-2945.2200830874153,-89.43307198335242,1248.8467194788918,-761.81802783945204,1503.1914675336902,-1141.4819407567866,1264.1476061918165,-17.41588606860023,623.65920393480701,-878.54001803237043,481.3770255761774,589.10497109257994,-335.71145068783153,1217.8426506573342,-1017.1022864515435,-170.38388544430927,1757.5250986897954,553.57578268319048,80.070646733882313,-1661.1893387167474,363.27039403622621,493.63117937814604,-71.846346503603854,956.28228878702794,-393.72886535867656,1481.9970280356938,-296.48354548152929,685.37740069972278,3070.7607917149107,-222.56884330181856,1037.7338846101011,-1402.8197791280581,501.95252114363029,238.20937108805811,-1147.3660502443927,612.75438483553808,1177.4838749881492,491.64935841115948,-1628.3860262460657,675.11497075972875,2180.0305171641339,-2143.6350073726244,1212.2382671064042,-2638.7544572068873,1319.7760525873673,-1295.9379687545952,1086.5169501567907,1618.3365877727629,-1945.0049392240799,456.61368172297807,-323.63059863986928,-579.56285281816963,-160.95110994645802,1057.4058935866815,1188.6726718013888,-1436.9729913020092,-697.95844835430398,1034.9891508963083,-403.08489728067798,-38.118962729142368,349.88599234380308,1006.1286200935428,-1448.6622749536218,-1747.5284791630329,452.09584896063461,-301.94936000387315,3728.5461440988074,-2463.4790815779415,1089.2876536883814,-743.42371243163871,831.80426386801628,-2424.1814053792878,-1789.216130619774,0.086907128283201018,-3199.386846216501,921.67709977970662,1101.1585975734379,-883.24870690515672,591.06421617506203,-599.55980823449136,-648.62659417067698,-669.16151614909541,114.47297937358962,-319.46502087227782,-1479.6689192476879,585.51895445008267,-2834.821231229258,1770.4972606189494,26.16767856927072,531.42637666526389,1150.8723560025755,113.62319315343848,-2080.9170397631169,3093.7160137178689,-945.81654689421703,-108.00311718260127,247.6664027700499,2398.7220585299547,-2587.6769796793196,-270.60127067663416,2217.5482089343386,-2288.6666773148863,3031.0388400972624,-2260.98922052938,871.41746528028671,246.1517376978627,726.31522424265495,-409.26398618625171,-575.33796476233692,3179.2299664886923,-2430.4072875258571,-1104.7078184660095,1251.2990605246305,1498.3162925971774,-234.32045692352767,-1384.8703616886196,1077.5591132519694,184.47142428333609,-608.35393436316008,903.28455911366109,-1514.7428006010741,233.55538409421933,-1260.8924031860988,437.22702972998741,594.99716283405724,1836.4867575210046,-397.53671475368901,-2357.4926504694413,592.50689342707483,31.020148645035079,-732.54463186311114,960.61033461499756,-1429.8888201218651,1442.8642046085224,324.76442492131901,-1767.624807125263,-1995.9380478417334,-2473.9398478809344,1564.9888614978372,288.44352989040271,1079.7637772601192,131.84630937489783,-160.54421239486328,401.01763946509891,-487.93962040260521,1976.2735655610195,-1623.9963899385912,1282.3138484959491,1655.2853182267027,-1512.6651620786361,455.44556464736525,318.30838763068823,958.08375124163649,75.554991565641103,1156.4396044412351,23.897167363447807,1218.5718370425966,1284.3453648131726,-2494.238278604189,1388.8741581154754,1863.9411063799562,2115.2479823991634,-2492.2927906871046,2604.6765418706891,1242.0146339669955,-4737.8722023139744,1262.8362382430496,-1845.2306733528167,1149.5118946048169,258.2280209025048,-3178.0815226179766,1733.7247324071868,760.89616788587227,-2343.8994987331389,2559.6444065873475,-1707.4046054898936],"mode":"lines","line":{"color":"#00526d","width":2,"dash":[]},"type":"scatter","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="acf-de-las-series-sin-tendencia" class="level4" data-number="1.3.5">
+<h4 data-number="1.3.5" class="anchored" data-anchor-id="acf-de-las-series-sin-tendencia"><span class="header-section-number">1.3.5</span> ACF de las series sin tendencia</h4>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-22-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="descriptivoMario_files/figure-html/unnamed-chunk-22-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="detección-de-la-estacionalidad" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="detección-de-la-estacionalidad"><span class="header-section-number">1.4</span> Detección de la estacionalidad</h3>
+<p>A partir de la serie sin tendencia, después de haberla estimado por el método <strong><em>STL</em></strong>, se hace el gráfico de subseries (por meses) para ver si se evidencia la existencia de algún tipo de estacionalidad.</p>
+<p>El gráfico de subseries muestra diferencias en las medias de varios meses. Especialmente los meses de enero y febrero, presentan una un valor medio más bajo que el resto de las meses en el total de las exportaciones.</p>
+<p>Aquí no se ve muy claro un patrón en las subseries anuales, pero se ve que en la mayoría de estas, los meses de enero y febrero tienen generalmente un valor menor que en el resto de los meses, aunque no siempre es así. En general no se ve de forma claro algún patrón que se repita a lo largo del tiempo.</p>
+<p>Los gráficos de dispersión de los retardos con el valor actual se presentan a continuación:</p>
+<p>No se ve que exista una relación lineal con ninguno de los retardos, indicando posiblemente la no existencia de una componente estacional en la serie.</p>
+</section>
+<section id="periodograma" class="level3" data-number="1.5">
+<h3 data-number="1.5" class="anchored" data-anchor-id="periodograma"><span class="header-section-number">1.5</span> Periodograma</h3>
+</section>
+</section>
+<section id="bitcoin" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="bitcoin"><span class="header-section-number">2</span> <strong><em>Bitcoin</em></strong></h2>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb11" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">---</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="an">title:</span><span class="co"> "Análisis descriptivo de las series de tiempo"</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="an">editor_options:</span><span class="co"> </span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">  chunk_output_type: console</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="an">echo:</span><span class="co"> false</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="an">output:</span><span class="co"> false</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="an">results:</span><span class="co"> false</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">---</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="in">```{r}</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="fu">library</span>(zoo)</span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="fu">library</span>(xts) </span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="fu">library</span>(TSstudio) </span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="fu">library</span>(lubridate) </span>
+<span id="cb11-17"><a href="#cb11-17"></a><span class="fu">library</span>(tidyverse) </span>
+<span id="cb11-18"><a href="#cb11-18"></a><span class="fu">library</span>(ggplot2) </span>
+<span id="cb11-19"><a href="#cb11-19"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb11-20"><a href="#cb11-20"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb11-21"><a href="#cb11-21"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb11-22"><a href="#cb11-22"></a><span class="fu">library</span>(timetk)</span>
+<span id="cb11-23"><a href="#cb11-23"></a><span class="fu">library</span>(feasts)</span>
+<span id="cb11-24"><a href="#cb11-24"></a><span class="fu">library</span>(fable)</span>
+<span id="cb11-25"><a href="#cb11-25"></a><span class="in">```</span></span>
+<span id="cb11-26"><a href="#cb11-26"></a></span>
+<span id="cb11-29"><a href="#cb11-29"></a><span class="in">```{r}</span></span>
+<span id="cb11-30"><a href="#cb11-30"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"_environment.RData"</span>) </span>
+<span id="cb11-31"><a href="#cb11-31"></a><span class="in">```</span></span>
+<span id="cb11-32"><a href="#cb11-32"></a></span>
+<span id="cb11-33"><a href="#cb11-33"></a><span class="fu">## ***Exportaciones***</span></span>
+<span id="cb11-34"><a href="#cb11-34"></a></span>
+<span id="cb11-35"><a href="#cb11-35"></a>Esta serie de tiempo mide el total de las exportaciones colombianas mensualmente desde Enero del año 2000 hasta Junio del 2023. Los valores del total de exportaciones se miden en miles de dólares (FOB, Free onboard). Esta serie de tiempo incluye las exportaciones tradicionales (Café, Carbón, Petróleo y sus derivados, Ferroníquel) y las no tradicionales en conjunto.</span>
+<span id="cb11-36"><a href="#cb11-36"></a></span>
+<span id="cb11-39"><a href="#cb11-39"></a><span class="in">```{r}</span></span>
+<span id="cb11-40"><a href="#cb11-40"></a>Exportaciones<span class="sc">$</span>Total <span class="ot">&lt;-</span> <span class="fu">round</span>(Exportaciones<span class="sc">$</span>Total)</span>
+<span id="cb11-41"><a href="#cb11-41"></a>Exportaciones<span class="sc">$</span>Mes <span class="ot">&lt;-</span> <span class="fu">as.yearmon</span>(Exportaciones<span class="sc">$</span>Mes)</span>
+<span id="cb11-42"><a href="#cb11-42"></a><span class="in">```</span></span>
+<span id="cb11-43"><a href="#cb11-43"></a></span>
+<span id="cb11-46"><a href="#cb11-46"></a><span class="in">```{r}</span></span>
+<span id="cb11-47"><a href="#cb11-47"></a>Exportaciones <span class="ot">&lt;-</span> Exportaciones[<span class="dv">97</span><span class="sc">:</span><span class="dv">378</span>,]</span>
+<span id="cb11-48"><a href="#cb11-48"></a>Exportaciones_ts <span class="ot">&lt;-</span>  <span class="fu">ts</span>(Exportaciones[,<span class="st">'Total'</span>], <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">2000</span>,<span class="dv">1</span>), <span class="at">end =</span> <span class="fu">c</span>(<span class="dv">2023</span>,<span class="dv">6</span>))</span>
+<span id="cb11-49"><a href="#cb11-49"></a><span class="in">```</span></span>
+<span id="cb11-50"><a href="#cb11-50"></a></span>
+<span id="cb11-51"><a href="#cb11-51"></a><span class="fu">### Gráfico de la serie de tiempo</span></span>
+<span id="cb11-52"><a href="#cb11-52"></a></span>
+<span id="cb11-53"><a href="#cb11-53"></a>El gráfico de la serie de tiempo del total de exportaciones de colombia se muestra a continuación:</span>
+<span id="cb11-54"><a href="#cb11-54"></a></span>
+<span id="cb11-57"><a href="#cb11-57"></a><span class="in">```{r}</span></span>
+<span id="cb11-58"><a href="#cb11-58"></a>serie_plot <span class="ot">&lt;-</span> <span class="fu">ts_plot</span>(Exportaciones_ts,</span>
+<span id="cb11-59"><a href="#cb11-59"></a>        <span class="at">title =</span> <span class="st">"Serie de tiempo del total de exportaciones</span><span class="sc">\n</span><span class="st"> desde enero del 2000 hasta junio de 2023"</span>,</span>
+<span id="cb11-60"><a href="#cb11-60"></a>        <span class="at">Ytitle =</span> <span class="st">"Total de exportaciones (Miles de dólares)"</span>,</span>
+<span id="cb11-61"><a href="#cb11-61"></a>        <span class="at">Xtitle =</span> <span class="st">"Año"</span>,</span>
+<span id="cb11-62"><a href="#cb11-62"></a>        <span class="at">line.mode =</span> <span class="st">"lines"</span>,</span>
+<span id="cb11-63"><a href="#cb11-63"></a>        <span class="at">slider =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-64"><a href="#cb11-64"></a>        <span class="at">Xgrid =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-65"><a href="#cb11-65"></a>        <span class="at">Ygrid =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb11-66"><a href="#cb11-66"></a>        <span class="at">color =</span> <span class="st">"black"</span>) </span>
+<span id="cb11-67"><a href="#cb11-67"></a><span class="in">```</span></span>
+<span id="cb11-68"><a href="#cb11-68"></a></span>
+<span id="cb11-71"><a href="#cb11-71"></a><span class="in">```{r}</span></span>
+<span id="cb11-72"><a href="#cb11-72"></a><span class="co">#| output: true</span></span>
+<span id="cb11-73"><a href="#cb11-73"></a></span>
+<span id="cb11-74"><a href="#cb11-74"></a>serie_plot</span>
+<span id="cb11-75"><a href="#cb11-75"></a><span class="in">```</span></span>
+<span id="cb11-76"><a href="#cb11-76"></a></span>
+<span id="cb11-77"><a href="#cb11-77"></a>A simple vista, se puede evidenciar que:</span>
+<span id="cb11-78"><a href="#cb11-78"></a></span>
+<span id="cb11-79"><a href="#cb11-79"></a><span class="ss">-   </span>La serie presenta ***tendencia***, pues los valores de la serie no oscilan al rededor de un valor fijo. El dinero total proveniente de las exportaciones es cambiante a lo largo del tiempo observado.</span>
+<span id="cb11-80"><a href="#cb11-80"></a></span>
+<span id="cb11-81"><a href="#cb11-81"></a><span class="ss">-   </span>La serie presenta ***varianza marginal no constante***, pues en ciertos periodos de tiempo los cambios mes a mes son pequeños, mientras que en otros periodos de tiempo esos cambios son significativamente mucho más grandes.</span>
+<span id="cb11-82"><a href="#cb11-82"></a></span>
+<span id="cb11-83"><a href="#cb11-83"></a><span class="ss">-   </span>No se ve claramente la existencia de una ***componente estacional***.</span>
+<span id="cb11-84"><a href="#cb11-84"></a></span>
+<span id="cb11-85"><a href="#cb11-85"></a><span class="fu">### Estabilización de la varianza</span></span>
+<span id="cb11-86"><a href="#cb11-86"></a></span>
+<span id="cb11-87"><a href="#cb11-87"></a>Dado que visualmente se observó que la serie presenta varianza marginal no constante, se usará la transformación de ***Box-Cox*** para obtener la serie estabilizada.</span>
+<span id="cb11-88"><a href="#cb11-88"></a></span>
+<span id="cb11-91"><a href="#cb11-91"></a><span class="in">```{r}</span></span>
+<span id="cb11-92"><a href="#cb11-92"></a><span class="co">#| echo: true</span></span>
+<span id="cb11-93"><a href="#cb11-93"></a><span class="co">#| output: true</span></span>
+<span id="cb11-94"><a href="#cb11-94"></a></span>
+<span id="cb11-95"><a href="#cb11-95"></a>(lambda <span class="ot">&lt;-</span> forecast<span class="sc">::</span><span class="fu">BoxCox.lambda</span>(Exportaciones_ts, <span class="at">method =</span><span class="st">"loglik"</span>, <span class="at">lower =</span> <span class="sc">-</span><span class="dv">2</span>, <span class="at">upper =</span> <span class="dv">3</span>))</span>
+<span id="cb11-96"><a href="#cb11-96"></a><span class="in">```</span></span>
+<span id="cb11-97"><a href="#cb11-97"></a></span>
+<span id="cb11-98"><a href="#cb11-98"></a>De esta manera se sugiere un valor de $\lambda =$ <span class="in">`r lambda`</span>. El gráfico obtenido de la serie estabilizada es el siguiente:</span>
+<span id="cb11-99"><a href="#cb11-99"></a></span>
+<span id="cb11-102"><a href="#cb11-102"></a><span class="in">```{r}</span></span>
+<span id="cb11-103"><a href="#cb11-103"></a><span class="co">#| output: true</span></span>
+<span id="cb11-104"><a href="#cb11-104"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-105"><a href="#cb11-105"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb11-106"><a href="#cb11-106"></a><span class="co">#| fig-width: 8</span></span>
+<span id="cb11-107"><a href="#cb11-107"></a></span>
+<span id="cb11-108"><a href="#cb11-108"></a>serie_estabilizada02 <span class="ot">&lt;-</span> Exportaciones_ts <span class="sc">|&gt;</span> <span class="fu">BoxCox</span>(<span class="at">lambda =</span> <span class="fl">0.2</span>)</span>
+<span id="cb11-109"><a href="#cb11-109"></a></span>
+<span id="cb11-110"><a href="#cb11-110"></a><span class="fu">autoplot</span>(serie_estabilizada02, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">'Año'</span>) <span class="sc">+</span> <span class="fu">theme_grey</span>(<span class="dv">16</span>) <span class="sc">+</span> </span>
+<span id="cb11-111"><a href="#cb11-111"></a><span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Serie con tranformación Box-Cox '</span>, lambda, <span class="st">'= 0.2'</span>))) </span>
+<span id="cb11-112"><a href="#cb11-112"></a><span class="in">```</span></span>
+<span id="cb11-113"><a href="#cb11-113"></a></span>
+<span id="cb11-114"><a href="#cb11-114"></a>No se ve un cambio significativo respecto a la serie original. Además, la librería <span class="in">`MASS`</span> sugiere un valor diferente de $\lambda$, como se muestra a continuación:</span>
+<span id="cb11-115"><a href="#cb11-115"></a></span>
+<span id="cb11-118"><a href="#cb11-118"></a><span class="in">```{r}</span></span>
+<span id="cb11-119"><a href="#cb11-119"></a><span class="co">#| echo: true</span></span>
+<span id="cb11-120"><a href="#cb11-120"></a><span class="co">#| output: true</span></span>
+<span id="cb11-121"><a href="#cb11-121"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-122"><a href="#cb11-122"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb11-123"><a href="#cb11-123"></a><span class="co">#| fig-width: 8</span></span>
+<span id="cb11-124"><a href="#cb11-124"></a></span>
+<span id="cb11-125"><a href="#cb11-125"></a>lambda_loglik <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">boxcox</span>(<span class="fu">lm</span>(Exportaciones_ts <span class="sc">~</span> <span class="dv">1</span>),<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="at">length =</span> <span class="dv">100</span>))</span>
+<span id="cb11-126"><a href="#cb11-126"></a><span class="in">```</span></span>
+<span id="cb11-127"><a href="#cb11-127"></a></span>
+<span id="cb11-130"><a href="#cb11-130"></a><span class="in">```{r}</span></span>
+<span id="cb11-131"><a href="#cb11-131"></a><span class="co">#| echo: true</span></span>
+<span id="cb11-132"><a href="#cb11-132"></a><span class="co">#| output: true</span></span>
+<span id="cb11-133"><a href="#cb11-133"></a></span>
+<span id="cb11-134"><a href="#cb11-134"></a>maximo <span class="ot">&lt;-</span> <span class="fu">which.max</span>(lambda_loglik<span class="sc">$</span>y)</span>
+<span id="cb11-135"><a href="#cb11-135"></a>(lambda_loglik <span class="ot">&lt;-</span> lambda_loglik<span class="sc">$</span>x[maximo])</span>
+<span id="cb11-136"><a href="#cb11-136"></a><span class="in">```</span></span>
+<span id="cb11-137"><a href="#cb11-137"></a></span>
+<span id="cb11-138"><a href="#cb11-138"></a>Se procede a realizar la transformación de la serie usando $\lambda =$ <span class="in">`r lambda_loglik`</span>, obteniendo el siguiente gráfico para la serie estabilizada:</span>
+<span id="cb11-139"><a href="#cb11-139"></a></span>
+<span id="cb11-142"><a href="#cb11-142"></a><span class="in">```{r}</span></span>
+<span id="cb11-143"><a href="#cb11-143"></a><span class="co">#| output: true</span></span>
+<span id="cb11-144"><a href="#cb11-144"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-145"><a href="#cb11-145"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb11-146"><a href="#cb11-146"></a><span class="co">#| fig-width: 8</span></span>
+<span id="cb11-147"><a href="#cb11-147"></a></span>
+<span id="cb11-148"><a href="#cb11-148"></a>serie_estabilizada062 <span class="ot">&lt;-</span> Exportaciones_ts <span class="sc">|&gt;</span> <span class="fu">BoxCox</span>(<span class="at">lambda =</span> <span class="fl">0.6262626</span>)</span>
+<span id="cb11-149"><a href="#cb11-149"></a></span>
+<span id="cb11-150"><a href="#cb11-150"></a><span class="fu">autoplot</span>(serie_estabilizada062, <span class="at">lwd =</span> <span class="fl">0.8</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">'Año'</span>) <span class="sc">+</span> <span class="fu">theme_grey</span>(<span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb11-151"><a href="#cb11-151"></a><span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Serie con tranformación Box-Cox '</span>, lambda, <span class="st">'= 0.6262626'</span>))) </span>
+<span id="cb11-152"><a href="#cb11-152"></a><span class="in">```</span></span>
+<span id="cb11-153"><a href="#cb11-153"></a></span>
+<span id="cb11-154"><a href="#cb11-154"></a>Aunque visualmente no se ven cambios importantes en cuanto a la estabilización de la varianza, al aplicar nuevamente la transformación de ***Box-Cox*** a la serie estabilizada, se obtiene el siguiente resultado:</span>
+<span id="cb11-155"><a href="#cb11-155"></a></span>
+<span id="cb11-158"><a href="#cb11-158"></a><span class="in">```{r}</span></span>
+<span id="cb11-159"><a href="#cb11-159"></a><span class="co">#| echo: true</span></span>
+<span id="cb11-160"><a href="#cb11-160"></a><span class="co">#| output: true</span></span>
+<span id="cb11-161"><a href="#cb11-161"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-162"><a href="#cb11-162"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb11-163"><a href="#cb11-163"></a><span class="co">#| fig-width: 8</span></span>
+<span id="cb11-164"><a href="#cb11-164"></a></span>
+<span id="cb11-165"><a href="#cb11-165"></a>lambda_loglik <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">boxcox</span>(<span class="fu">lm</span>(serie_estabilizada062 <span class="sc">~</span> <span class="dv">1</span>),<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="at">length =</span> <span class="dv">100</span>))  </span>
+<span id="cb11-166"><a href="#cb11-166"></a><span class="in">```</span></span>
+<span id="cb11-167"><a href="#cb11-167"></a></span>
+<span id="cb11-168"><a href="#cb11-168"></a>El intervalo de confianza para $\lambda$ incluye al 1, indicando que ya no es necesario aplicar nuevamente una transformación.</span>
+<span id="cb11-169"><a href="#cb11-169"></a></span>
+<span id="cb11-172"><a href="#cb11-172"></a><span class="in">```{r}</span></span>
+<span id="cb11-173"><a href="#cb11-173"></a><span class="co">#| echo: true</span></span>
+<span id="cb11-174"><a href="#cb11-174"></a><span class="co">#| output: true</span></span>
+<span id="cb11-175"><a href="#cb11-175"></a></span>
+<span id="cb11-176"><a href="#cb11-176"></a>maximo <span class="ot">&lt;-</span> <span class="fu">which.max</span>(lambda_loglik<span class="sc">$</span>y)</span>
+<span id="cb11-177"><a href="#cb11-177"></a>(lambda_loglik <span class="ot">&lt;-</span> lambda_loglik<span class="sc">$</span>x[maximo])</span>
+<span id="cb11-178"><a href="#cb11-178"></a><span class="in">```</span></span>
+<span id="cb11-179"><a href="#cb11-179"></a></span>
+<span id="cb11-180"><a href="#cb11-180"></a>Exactamente, se sugiere un valor de $\lambda =$ <span class="in">`r lambda_loglik`</span> $\approx 1$. Se trabajará desde ahora con la serie estabilizada.</span>
+<span id="cb11-181"><a href="#cb11-181"></a></span>
+<span id="cb11-184"><a href="#cb11-184"></a><span class="in">```{r}</span></span>
+<span id="cb11-185"><a href="#cb11-185"></a><span class="co">#| echo: true</span></span>
+<span id="cb11-186"><a href="#cb11-186"></a></span>
+<span id="cb11-187"><a href="#cb11-187"></a>serie <span class="ot">&lt;-</span> serie_estabilizada062</span>
+<span id="cb11-188"><a href="#cb11-188"></a><span class="in">```</span></span>
+<span id="cb11-189"><a href="#cb11-189"></a></span>
+<span id="cb11-190"><a href="#cb11-190"></a><span class="fu">### Análisis de tendencia</span></span>
+<span id="cb11-191"><a href="#cb11-191"></a></span>
+<span id="cb11-192"><a href="#cb11-192"></a><span class="fu">#### Ajuste de tendencia usando regresión ***LOESS***</span></span>
+<span id="cb11-193"><a href="#cb11-193"></a></span>
+<span id="cb11-196"><a href="#cb11-196"></a><span class="in">```{r}</span></span>
+<span id="cb11-197"><a href="#cb11-197"></a><span class="co">#| output: true</span></span>
+<span id="cb11-198"><a href="#cb11-198"></a></span>
+<span id="cb11-199"><a href="#cb11-199"></a>serie_data_frame <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Exportaciones =</span> serie, <span class="at">Fecha =</span> Exportaciones<span class="sc">$</span>Mes)</span>
+<span id="cb11-200"><a href="#cb11-200"></a><span class="fu">head</span>(serie_data_frame)</span>
+<span id="cb11-201"><a href="#cb11-201"></a>serie_data_frame <span class="sc">|&gt;</span> <span class="fu">plot_time_series</span>(<span class="at">.value =</span> Total,<span class="at">.date_var =</span> Fecha)</span>
+<span id="cb11-202"><a href="#cb11-202"></a><span class="in">```</span></span>
+<span id="cb11-203"><a href="#cb11-203"></a></span>
+<span id="cb11-206"><a href="#cb11-206"></a><span class="in">```{r}</span></span>
+<span id="cb11-207"><a href="#cb11-207"></a><span class="co">#| output: true</span></span>
+<span id="cb11-208"><a href="#cb11-208"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-209"><a href="#cb11-209"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb11-210"><a href="#cb11-210"></a><span class="co">#| fig-width: 8</span></span>
+<span id="cb11-211"><a href="#cb11-211"></a></span>
+<span id="cb11-212"><a href="#cb11-212"></a>serie_data_frame <span class="ot">&lt;-</span> serie_data_frame <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">ajus =</span> <span class="fu">smooth_vec</span>(Total, <span class="at">span =</span> <span class="fl">0.75</span>, <span class="at">degree =</span> <span class="dv">2</span>))  </span>
+<span id="cb11-213"><a href="#cb11-213"></a>serie_data_frame <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(Fecha, Total)) <span class="sc">+</span></span>
+<span id="cb11-214"><a href="#cb11-214"></a>    <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb11-215"><a href="#cb11-215"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> ajus), <span class="at">color =</span> <span class="st">"red"</span>)</span>
+<span id="cb11-216"><a href="#cb11-216"></a></span>
+<span id="cb11-217"><a href="#cb11-217"></a>serie_data_frame <span class="ot">&lt;-</span> serie_data_frame <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">sinTendencia =</span> Total <span class="sc">-</span> ajus)</span>
+<span id="cb11-218"><a href="#cb11-218"></a></span>
+<span id="cb11-219"><a href="#cb11-219"></a>sintendencia_loess <span class="ot">&lt;-</span> serie_data_frame <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(Fecha, sinTendencia)) <span class="sc">+</span></span>
+<span id="cb11-220"><a href="#cb11-220"></a>    <span class="fu">geom_line</span>() </span>
+<span id="cb11-221"><a href="#cb11-221"></a>sintendencia_loess</span>
+<span id="cb11-222"><a href="#cb11-222"></a><span class="in">```</span></span>
+<span id="cb11-223"><a href="#cb11-223"></a></span>
+<span id="cb11-224"><a href="#cb11-224"></a><span class="fu">#### Descomposición por filtro de promedios móviles</span></span>
+<span id="cb11-225"><a href="#cb11-225"></a></span>
+<span id="cb11-228"><a href="#cb11-228"></a><span class="in">```{r}</span></span>
+<span id="cb11-229"><a href="#cb11-229"></a><span class="co">#| output: true</span></span>
+<span id="cb11-230"><a href="#cb11-230"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-231"><a href="#cb11-231"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb11-232"><a href="#cb11-232"></a><span class="co">#| fig-width: 8</span></span>
+<span id="cb11-233"><a href="#cb11-233"></a></span>
+<span id="cb11-234"><a href="#cb11-234"></a><span class="do">## descomposición por filtro de promedio móviles</span></span>
+<span id="cb11-235"><a href="#cb11-235"></a>descomposicion <span class="ot">&lt;-</span> <span class="fu">decompose</span>(serie)</span>
+<span id="cb11-236"><a href="#cb11-236"></a><span class="fu">plot</span>(descomposicion)</span>
+<span id="cb11-237"><a href="#cb11-237"></a><span class="in">```</span></span>
+<span id="cb11-238"><a href="#cb11-238"></a></span>
+<span id="cb11-239"><a href="#cb11-239"></a><span class="fu">#### Descomposición STL</span></span>
+<span id="cb11-240"><a href="#cb11-240"></a></span>
+<span id="cb11-243"><a href="#cb11-243"></a><span class="in">```{r}</span></span>
+<span id="cb11-244"><a href="#cb11-244"></a><span class="co">#| output: true</span></span>
+<span id="cb11-245"><a href="#cb11-245"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-246"><a href="#cb11-246"></a></span>
+<span id="cb11-247"><a href="#cb11-247"></a>serie_tsibble <span class="ot">&lt;-</span> <span class="fu">as_tsibble</span>(serie)</span>
+<span id="cb11-248"><a href="#cb11-248"></a></span>
+<span id="cb11-249"><a href="#cb11-249"></a>stl <span class="ot">&lt;-</span> serie_tsibble <span class="sc">%&gt;%</span></span>
+<span id="cb11-250"><a href="#cb11-250"></a>  <span class="fu">model</span>(</span>
+<span id="cb11-251"><a href="#cb11-251"></a>    <span class="fu">STL</span>(value <span class="sc">~</span> <span class="fu">trend</span>() <span class="sc">+</span></span>
+<span id="cb11-252"><a href="#cb11-252"></a>                   <span class="fu">season</span>(<span class="at">window =</span> <span class="st">"periodic"</span>),</span>
+<span id="cb11-253"><a href="#cb11-253"></a>    <span class="at">robust =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-254"><a href="#cb11-254"></a>  <span class="fu">components</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-255"><a href="#cb11-255"></a>  <span class="fu">autoplot</span>()</span>
+<span id="cb11-256"><a href="#cb11-256"></a>stl</span>
+<span id="cb11-257"><a href="#cb11-257"></a><span class="in">```</span></span>
+<span id="cb11-258"><a href="#cb11-258"></a></span>
+<span id="cb11-261"><a href="#cb11-261"></a><span class="in">```{r}</span></span>
+<span id="cb11-262"><a href="#cb11-262"></a>tendencia_stl <span class="ot">&lt;-</span> stl<span class="sc">$</span>data[stl<span class="sc">$</span>data<span class="sc">$</span>.var <span class="sc">==</span> <span class="st">'trend'</span>,]</span>
+<span id="cb11-263"><a href="#cb11-263"></a>serie_tsibble[<span class="st">'tendencia_stl'</span>] <span class="ot">&lt;-</span> tendencia_stl<span class="sc">$</span>.val</span>
+<span id="cb11-264"><a href="#cb11-264"></a>serie_tsibble <span class="ot">&lt;-</span> serie_tsibble <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">sinTend =</span> value <span class="sc">-</span> tendencia_stl)</span>
+<span id="cb11-265"><a href="#cb11-265"></a></span>
+<span id="cb11-266"><a href="#cb11-266"></a>sintendencia_stl <span class="ot">&lt;-</span> serie_tsibble <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="fu">as.Date</span>(index), sinTend)) <span class="sc">+</span></span>
+<span id="cb11-267"><a href="#cb11-267"></a>    <span class="fu">geom_line</span>() </span>
+<span id="cb11-268"><a href="#cb11-268"></a><span class="in">```</span></span>
+<span id="cb11-269"><a href="#cb11-269"></a></span>
+<span id="cb11-272"><a href="#cb11-272"></a><span class="in">```{r}</span></span>
+<span id="cb11-273"><a href="#cb11-273"></a><span class="co">#| output: true</span></span>
+<span id="cb11-274"><a href="#cb11-274"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb11-275"><a href="#cb11-275"></a></span>
+<span id="cb11-276"><a href="#cb11-276"></a>sintendencia_stl</span>
+<span id="cb11-277"><a href="#cb11-277"></a><span class="in">```</span></span>
+<span id="cb11-278"><a href="#cb11-278"></a></span>
+<span id="cb11-279"><a href="#cb11-279"></a></span>
+<span id="cb11-280"><a href="#cb11-280"></a><span class="fu">#### Diferencia</span></span>
+<span id="cb11-281"><a href="#cb11-281"></a></span>
+<span id="cb11-284"><a href="#cb11-284"></a><span class="in">```{r}</span></span>
+<span id="cb11-285"><a href="#cb11-285"></a><span class="co">#| output: true</span></span>
+<span id="cb11-286"><a href="#cb11-286"></a></span>
+<span id="cb11-287"><a href="#cb11-287"></a>dserie <span class="ot">&lt;-</span> <span class="fu">diff</span>(serie)</span>
+<span id="cb11-288"><a href="#cb11-288"></a>sintendencia_diff <span class="ot">&lt;-</span> <span class="fu">ts_plot</span>(dserie, <span class="at">title =</span> <span class="st">"Serie diferenciada"</span>)</span>
+<span id="cb11-289"><a href="#cb11-289"></a>sintendencia_diff</span>
+<span id="cb11-290"><a href="#cb11-290"></a><span class="in">```</span></span>
+<span id="cb11-291"><a href="#cb11-291"></a></span>
+<span id="cb11-292"><a href="#cb11-292"></a><span class="fu">#### ACF de las series sin tendencia</span></span>
+<span id="cb11-293"><a href="#cb11-293"></a></span>
+<span id="cb11-296"><a href="#cb11-296"></a><span class="in">```{r}</span></span>
+<span id="cb11-297"><a href="#cb11-297"></a><span class="co">#| output: true</span></span>
+<span id="cb11-298"><a href="#cb11-298"></a><span class="co">#| layout-ncol: 3</span></span>
+<span id="cb11-299"><a href="#cb11-299"></a>sintendencia_loess_ts <span class="ot">&lt;-</span>  <span class="fu">ts</span>(serie_data_frame[,<span class="st">'sinTendencia'</span>], <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">2000</span>,<span class="dv">1</span>), <span class="at">end =</span> <span class="fu">c</span>(<span class="dv">2023</span>,<span class="dv">6</span>))</span>
+<span id="cb11-300"><a href="#cb11-300"></a>sintendencia_stl_ts <span class="ot">&lt;-</span>  <span class="fu">ts</span>(serie_tsibble[,<span class="st">'sinTend'</span>], <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">2000</span>,<span class="dv">1</span>), <span class="at">end =</span> <span class="fu">c</span>(<span class="dv">2023</span>,<span class="dv">6</span>))</span>
+<span id="cb11-301"><a href="#cb11-301"></a></span>
+<span id="cb11-302"><a href="#cb11-302"></a><span class="fu">acf</span>(sintendencia_loess_ts)</span>
+<span id="cb11-303"><a href="#cb11-303"></a><span class="fu">acf</span>(sintendencia_stl_ts)</span>
+<span id="cb11-304"><a href="#cb11-304"></a><span class="fu">acf</span>(dserie)</span>
+<span id="cb11-305"><a href="#cb11-305"></a><span class="in">```</span></span>
+<span id="cb11-306"><a href="#cb11-306"></a></span>
+<span id="cb11-307"><a href="#cb11-307"></a><span class="fu">### Detección de la estacionalidad</span></span>
+<span id="cb11-308"><a href="#cb11-308"></a></span>
+<span id="cb11-309"><a href="#cb11-309"></a>A partir de la serie sin tendencia, después de haberla estimado por el método ***STL***, se hace el gráfico de subseries (por meses) para ver si se evidencia la existencia de algún tipo de estacionalidad.</span>
+<span id="cb11-310"><a href="#cb11-310"></a></span>
+<span id="cb11-313"><a href="#cb11-313"></a><span class="in">```{r}</span></span>
+<span id="cb11-314"><a href="#cb11-314"></a>sinTend_stl <span class="ot">&lt;-</span> serie_tsibble[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>)]</span>
+<span id="cb11-315"><a href="#cb11-315"></a><span class="fu">names</span>(sinTend_stl) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'Fecha'</span>, <span class="st">'Valor'</span>) </span>
+<span id="cb11-316"><a href="#cb11-316"></a></span>
+<span id="cb11-317"><a href="#cb11-317"></a>sinTend_stl <span class="sc">|&gt;</span> <span class="fu">gg_subseries</span>(Valor, <span class="at">period=</span><span class="dv">12</span>)</span>
+<span id="cb11-318"><a href="#cb11-318"></a><span class="in">```</span></span>
+<span id="cb11-319"><a href="#cb11-319"></a></span>
+<span id="cb11-320"><a href="#cb11-320"></a>El gráfico de subseries muestra diferencias en las medias de varios meses. Especialmente los meses de enero y febrero, presentan una un valor medio más bajo que el resto de las meses en el total de las exportaciones.</span>
+<span id="cb11-321"><a href="#cb11-321"></a></span>
+<span id="cb11-324"><a href="#cb11-324"></a><span class="in">```{r}</span></span>
+<span id="cb11-325"><a href="#cb11-325"></a><span class="fu">ggseasonplot</span>(<span class="fu">as.ts</span>(sinTend_stl), <span class="at">col =</span> <span class="fu">hcl.colors</span>(<span class="dv">23</span>, <span class="at">palette =</span> <span class="st">"Dark 3"</span>)</span>
+<span id="cb11-326"><a href="#cb11-326"></a>)</span>
+<span id="cb11-327"><a href="#cb11-327"></a><span class="in">```</span></span>
+<span id="cb11-328"><a href="#cb11-328"></a></span>
+<span id="cb11-329"><a href="#cb11-329"></a>Aquí no se ve muy claro un patrón en las subseries anuales, pero se ve que en la mayoría de estas, los meses de enero y febrero tienen generalmente un valor menor que en el resto de los meses, aunque no siempre es así. En general no se ve de forma claro algún patrón que se repita a lo largo del tiempo.</span>
+<span id="cb11-330"><a href="#cb11-330"></a></span>
+<span id="cb11-331"><a href="#cb11-331"></a>Los gráficos de dispersión de los retardos con el valor actual se presentan a continuación:</span>
+<span id="cb11-332"><a href="#cb11-332"></a></span>
+<span id="cb11-335"><a href="#cb11-335"></a><span class="in">```{r}</span></span>
+<span id="cb11-336"><a href="#cb11-336"></a><span class="fu">ts_lags</span>(<span class="fu">as.ts</span>(sinTend_stl))</span>
+<span id="cb11-337"><a href="#cb11-337"></a><span class="in">```</span></span>
+<span id="cb11-338"><a href="#cb11-338"></a></span>
+<span id="cb11-339"><a href="#cb11-339"></a>No se ve que exista una relación lineal con ninguno de los retardos, indicando posiblemente la no existencia de una componente estacional en la serie.</span>
+<span id="cb11-340"><a href="#cb11-340"></a></span>
+<span id="cb11-341"><a href="#cb11-341"></a><span class="fu">### Periodograma</span></span>
+<span id="cb11-342"><a href="#cb11-342"></a></span>
+<span id="cb11-345"><a href="#cb11-345"></a><span class="in">```{r}</span></span>
+<span id="cb11-346"><a href="#cb11-346"></a><span class="fu">spectrum</span>(<span class="fu">as.numeric</span>(<span class="fu">as.ts</span>(sinTend_stl)), <span class="at">log=</span><span class="st">'no'</span>)</span>
+<span id="cb11-347"><a href="#cb11-347"></a></span>
+<span id="cb11-348"><a href="#cb11-348"></a>Periodograma <span class="ot">&lt;-</span> <span class="fu">spectrum</span>(<span class="fu">as.numeric</span>(<span class="fu">as.ts</span>(sinTend_stl)),<span class="at">log=</span><span class="st">'no'</span>)</span>
+<span id="cb11-349"><a href="#cb11-349"></a></span>
+<span id="cb11-350"><a href="#cb11-350"></a>ubicacion <span class="ot">&lt;-</span> <span class="fu">which.max</span>(Periodograma<span class="sc">$</span>spec)</span>
+<span id="cb11-351"><a href="#cb11-351"></a><span class="fu">sprintf</span>(<span class="st">"El valor de la frecuencia donde se máximiza el periodograma para la serie es: %s"</span>,Periodograma<span class="sc">$</span>freq[ubicacion])</span>
+<span id="cb11-352"><a href="#cb11-352"></a></span>
+<span id="cb11-353"><a href="#cb11-353"></a><span class="fu">sprintf</span>(<span class="st">"El periodo correspondiente es aproximadamente: %s"</span>,<span class="dv">1</span><span class="sc">/</span>Periodograma<span class="sc">$</span>freq[ubicacion])</span>
+<span id="cb11-354"><a href="#cb11-354"></a><span class="in">```</span></span>
+<span id="cb11-355"><a href="#cb11-355"></a></span>
+<span id="cb11-356"><a href="#cb11-356"></a></span>
+<span id="cb11-357"><a href="#cb11-357"></a></span>
+<span id="cb11-358"><a href="#cb11-358"></a></span>
+<span id="cb11-359"><a href="#cb11-359"></a></span>
+<span id="cb11-360"><a href="#cb11-360"></a></span>
+<span id="cb11-361"><a href="#cb11-361"></a></span>
+<span id="cb11-362"><a href="#cb11-362"></a></span>
+<span id="cb11-363"><a href="#cb11-363"></a><span class="fu">## ***Bitcoin***</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

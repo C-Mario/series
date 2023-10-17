@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Series de Tiempo - Redes neuronales para la serie de tiempo de Exportaciones</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "Ninguna coincidencia",
+    "search-matching-documents-text": "coincidencias",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": ""
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./images/logo.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Series de Tiempo</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./DExportaciones.html" rel="" target="">
+ <span class="menu-text">Descriptiva-Serie-Exportaciones</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./DBitcoin.html" rel="" target="">
+ <span class="menu-text">Descriptiva-josé</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./redes.html" rel="" target="">
+ <span class="menu-text">Redes neuronales</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./ejemplo.html" rel="" target="">
+ <span class="menu-text">Descriptiva-josé</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/C-Mario/series" rel="" target="_blank"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text">GitHub</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenido</h2>
+   
+  <ul>
+  <li><a href="#datos-serie-de-tiempo-del-total-de-exportaciones-de-colombia-2000---2023" id="toc-datos-serie-de-tiempo-del-total-de-exportaciones-de-colombia-2000---2023" class="nav-link active" data-scroll-target="#datos-serie-de-tiempo-del-total-de-exportaciones-de-colombia-2000---2023"><span class="header-section-number">0.1</span> Datos: Serie de tiempo del total de exportaciones de Colombia 2000 - 2023</a></li>
+  <li><a href="#predicción-univariada" id="toc-predicción-univariada" class="nav-link" data-scroll-target="#predicción-univariada"><span class="header-section-number">0.2</span> Predicción Univariada</a></li>
+  <li><a href="#separación-entrenamiento-validación-prueba-y-normalización." id="toc-separación-entrenamiento-validación-prueba-y-normalización." class="nav-link" data-scroll-target="#separación-entrenamiento-validación-prueba-y-normalización."><span class="header-section-number">0.3</span> Separación (Entrenamiento-Validación-Prueba) y Normalización.</a></li>
+  <li><a href="#split" id="toc-split" class="nav-link" data-scroll-target="#split"><span class="header-section-number">0.4</span> Split</a></li>
+  <li><a href="#transforma-nuestros-objetos-a-tipo-tensorflow" id="toc-transforma-nuestros-objetos-a-tipo-tensorflow" class="nav-link" data-scroll-target="#transforma-nuestros-objetos-a-tipo-tensorflow"><span class="header-section-number">0.5</span> Transforma nuestros objetos a tipo tensorflow</a></li>
+  <li><a href="#definir-las-gráficas-para-visualizar-lo-que-se-desea-predecir-en-términos-de-las-entradas" id="toc-definir-las-gráficas-para-visualizar-lo-que-se-desea-predecir-en-términos-de-las-entradas" class="nav-link" data-scroll-target="#definir-las-gráficas-para-visualizar-lo-que-se-desea-predecir-en-términos-de-las-entradas"><span class="header-section-number">1</span> Definir las gráficas para visualizar lo que se desea predecir en términos de las entradas</a></li>
+  <li><a href="#configuración-para-el-ajuste-de-los-modelos" id="toc-configuración-para-el-ajuste-de-los-modelos" class="nav-link" data-scroll-target="#configuración-para-el-ajuste-de-los-modelos"><span class="header-section-number">2</span> Configuración para el ajuste de los modelos</a></li>
+  <li><a href="#modelos-para-predecir-1-paso-adelante" id="toc-modelos-para-predecir-1-paso-adelante" class="nav-link" data-scroll-target="#modelos-para-predecir-1-paso-adelante"><span class="header-section-number">3</span> Modelos para predecir (1 paso adelante)</a>
+  <ul class="collapse">
+  <li><a href="#modelo-base-naive" id="toc-modelo-base-naive" class="nav-link" data-scroll-target="#modelo-base-naive"><span class="header-section-number">3.1</span> 1. Modelo base (Naive)</a></li>
+  <li><a href="#modelo-lineal" id="toc-modelo-lineal" class="nav-link" data-scroll-target="#modelo-lineal"><span class="header-section-number">3.2</span> 2. Modelo lineal</a></li>
+  <li><a href="#modelo-perceptrón-multicapa-mlp-con-dos-capas-ocultas-y-usando-función-de-activación-relu" id="toc-modelo-perceptrón-multicapa-mlp-con-dos-capas-ocultas-y-usando-función-de-activación-relu" class="nav-link" data-scroll-target="#modelo-perceptrón-multicapa-mlp-con-dos-capas-ocultas-y-usando-función-de-activación-relu"><span class="header-section-number">3.3</span> 3. Modelo perceptrón multicapa (MLP) con dos capas ocultas y usando función de activación RELU</a></li>
+  <li><a href="#modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos" id="toc-modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos" class="nav-link" data-scroll-target="#modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos"><span class="header-section-number">3.4</span> 4. Modelo perceptrón multicapa (MLP) con múltiples retardos incluídos</a></li>
+  <li><a href="#modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos-a-través-de-una-convolución" id="toc-modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos-a-través-de-una-convolución" class="nav-link" data-scroll-target="#modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos-a-través-de-una-convolución"><span class="header-section-number">3.5</span> 5. Modelo perceptrón multicapa (MLP) con múltiples retardos incluídos a través de una convolución</a></li>
+  <li><a href="#red-neuronal-recurrente-lstm-con-múltiples-retardos-incluídos" id="toc-red-neuronal-recurrente-lstm-con-múltiples-retardos-incluídos" class="nav-link" data-scroll-target="#red-neuronal-recurrente-lstm-con-múltiples-retardos-incluídos"><span class="header-section-number">3.6</span> Red neuronal recurrente (LSTM) con múltiples retardos incluídos</a></li>
+  <li><a href="#evaluación-de-los-modelos" id="toc-evaluación-de-los-modelos" class="nav-link" data-scroll-target="#evaluación-de-los-modelos"><span class="header-section-number">3.7</span> Evaluación de los modelos</a></li>
+  </ul></li>
+  <li><a href="#ejemplo-de-los-datos-que-conforman-los-dos-primeros-lotes-para-los-datos-de-entrenamiento-y-prueba" id="toc-ejemplo-de-los-datos-que-conforman-los-dos-primeros-lotes-para-los-datos-de-entrenamiento-y-prueba" class="nav-link" data-scroll-target="#ejemplo-de-los-datos-que-conforman-los-dos-primeros-lotes-para-los-datos-de-entrenamiento-y-prueba"><span class="header-section-number">4</span> Ejemplo de los datos que conforman los dos primeros lotes para los datos de entrenamiento y prueba</a></li>
+  <li><a href="#tamaño-del-conjunto-de-datos-de-entrenamiento-validación-y-prueba" id="toc-tamaño-del-conjunto-de-datos-de-entrenamiento-validación-y-prueba" class="nav-link" data-scroll-target="#tamaño-del-conjunto-de-datos-de-entrenamiento-validación-y-prueba"><span class="header-section-number">5</span> Tamaño del conjunto de datos de entrenamiento, validación y prueba</a></li>
+  <li><a href="#crear-objeto-tensorflow" id="toc-crear-objeto-tensorflow" class="nav-link" data-scroll-target="#crear-objeto-tensorflow"><span class="header-section-number">6</span> Crear objeto tensorflow</a>
+  <ul class="collapse">
+  <li><a href="#modelo-base" id="toc-modelo-base" class="nav-link" data-scroll-target="#modelo-base"><span class="header-section-number">6.1</span> Modelo base</a>
+  <ul class="collapse">
+  <li><a href="#se-entrena-el-modelo-usando-el-conjunto-de-datos-unpaso_con6meses" id="toc-se-entrena-el-modelo-usando-el-conjunto-de-datos-unpaso_con6meses" class="nav-link" data-scroll-target="#se-entrena-el-modelo-usando-el-conjunto-de-datos-unpaso_con6meses"><span class="header-section-number">6.1.1</span> se entrena el modelo usando el conjunto de datos (unpaso_con6meses)</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#evaluación-del-modelo-base-en-una-ventana-grande." id="toc-evaluación-del-modelo-base-en-una-ventana-grande." class="nav-link" data-scroll-target="#evaluación-del-modelo-base-en-una-ventana-grande."><span class="header-section-number">7</span> Evaluación del modelo base en una ventana grande.</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Redes neuronales para la serie de tiempo de Exportaciones</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">from</span> tensorflow.keras.callbacks <span class="im">import</span> CSVLogger, EarlyStopping</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> matplotlib <span class="im">as</span> mpl</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="im">import</span> os</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="im">import</span> time</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="im">import</span> gc</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="im">import</span> sys</span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf</span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_pacf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="bu">print</span>(<span class="ss">f"Tensorflow Version: </span><span class="sc">{</span>tf<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="bu">print</span>(<span class="ss">f"Pandas Version: </span><span class="sc">{</span>pd<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="bu">print</span>(<span class="ss">f"Numpy Version: </span><span class="sc">{</span>np<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="bu">print</span>(<span class="ss">f"System Version: </span><span class="sc">{</span>sys<span class="sc">.</span>version<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a>mpl.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> (<span class="dv">17</span>, <span class="dv">5</span>)</span>
+<span id="cb2-7"><a href="#cb2-7"></a>mpl.rcParams[<span class="st">'axes.grid'</span>] <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a></span>
+<span id="cb2-10"><a href="#cb2-10"></a>notebookstart<span class="op">=</span> time.time()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tensorflow Version: 2.14.0
+Pandas Version: 1.5.3
+Numpy Version: 1.23.5
+System Version: 3.10.9 | packaged by Anaconda, Inc. | (main, Mar  1 2023, 18:18:15) [MSC v.1916 64 bit (AMD64)]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">import</span> IPython</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="im">import</span> IPython.display</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="datos-serie-de-tiempo-del-total-de-exportaciones-de-colombia-2000---2023" class="level2" data-number="0.1">
+<h2 data-number="0.1" class="anchored" data-anchor-id="datos-serie-de-tiempo-del-total-de-exportaciones-de-colombia-2000---2023"><span class="header-section-number">0.1</span> Datos: Serie de tiempo del total de exportaciones de Colombia 2000 - 2023</h2>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Lectura de la serie</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>Exportaciones <span class="op">=</span> pd.read_excel(<span class="st">"C:/Users/dofca/Desktop/series/datos/Exportaciones.xlsx"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3"></a>                   header <span class="op">=</span> <span class="dv">0</span>, usecols <span class="op">=</span> [<span class="st">'Mes'</span>,<span class="st">'Total'</span>]).iloc[<span class="dv">96</span>:].reset_index(drop <span class="op">=</span> <span class="va">True</span>).<span class="bu">round</span>()</span>
+<span id="cb5-4"><a href="#cb5-4"></a>Exportaciones[<span class="st">'Total'</span>] <span class="op">=</span> Exportaciones[<span class="st">'Total'</span>].astype(<span class="bu">int</span>) </span>
+<span id="cb5-5"><a href="#cb5-5"></a>Exportaciones</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Mes</th>
+<th data-quarto-table-cell-role="th">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2000-01-01</td>
+<td>1011676</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2000-02-01</td>
+<td>1054098</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2000-03-01</td>
+<td>1053546</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2000-04-01</td>
+<td>886359</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2000-05-01</td>
+<td>1146258</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">277</td>
+<td>2023-02-01</td>
+<td>4202234</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">278</td>
+<td>2023-03-01</td>
+<td>4431911</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">279</td>
+<td>2023-04-01</td>
+<td>3739214</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">280</td>
+<td>2023-05-01</td>
+<td>4497862</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">281</td>
+<td>2023-06-01</td>
+<td>3985981</td>
+</tr>
+</tbody>
+</table>
+
+<p>282 rows × 2 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="predicción-univariada" class="level2" data-number="0.2">
+<h2 data-number="0.2" class="anchored" data-anchor-id="predicción-univariada"><span class="header-section-number">0.2</span> Predicción Univariada</h2>
+<p>Se desea predecir la variable total de exportaciones <strong>(Total)</strong> usando los retardos de ella misma.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>features_considered <span class="op">=</span> [<span class="st">'Total'</span>] <span class="co"># la variable a usar en la predicción es ella misma</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>features <span class="op">=</span> Exportaciones[features_considered] <span class="co"># solo se usará la variable Total en la predicción</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>features.index <span class="op">=</span> Exportaciones[<span class="st">'Mes'</span>] <span class="co"># variable que indica el tiempo (la serie es mensual)</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>features.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Total</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Mes</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2000-01-01</td>
+<td>1011676</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2000-02-01</td>
+<td>1054098</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2000-03-01</td>
+<td>1053546</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2000-04-01</td>
+<td>886359</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2000-05-01</td>
+<td>1146258</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>features.plot(subplots <span class="op">=</span> <span class="va">True</span>) <span class="co"># gráfico de la serie de tiempo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>array([&lt;Axes: xlabel='Mes'&gt;], dtype=object)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="REDNEURONAL_SERIES_files/figure-html/cell-8-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="separación-entrenamiento-validación-prueba-y-normalización." class="level2" data-number="0.3">
+<h2 data-number="0.3" class="anchored" data-anchor-id="separación-entrenamiento-validación-prueba-y-normalización."><span class="header-section-number">0.3</span> Separación (Entrenamiento-Validación-Prueba) y Normalización.</h2>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># partición del conjuntos de datos en entrenamiento, validación y prueba</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span> <span class="bu">enumerate</span>(features.columns)} <span class="co"># índice = 0</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a></span>
+<span id="cb10-4"><a href="#cb10-4"></a>n <span class="op">=</span> <span class="bu">len</span>(features) <span class="co"># longitud de la serie (282)</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a>train_df <span class="op">=</span> features[<span class="dv">0</span>:<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>)] <span class="co"># 2000-01 hasta 2016-05</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>val_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>):<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>)] <span class="co"># 2016-06 hasta 2021-01</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>test_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>):] <span class="co"># 2021-02 hasta 2023-06</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a></span>
+<span id="cb10-9"><a href="#cb10-9"></a>num_features <span class="op">=</span> features.shape[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="bu">print</span>(<span class="st">"longitud dataframe entrenamiento:"</span>, train_df.shape)</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="bu">print</span>(<span class="st">"longitud dataframe validación:"</span>, val_df.shape)</span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="bu">print</span>(<span class="st">"longitud dataframe prueba:"</span>, test_df.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>longitud dataframe entrenamiento: (197, 1)
+longitud dataframe validación: (56, 1)
+longitud dataframe prueba: (29, 1)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Normalización de las observaciones</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="co"># StandardScalar de sklearn</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a>train_mean <span class="op">=</span> train_df.mean()</span>
+<span id="cb13-4"><a href="#cb13-4"></a>train_std <span class="op">=</span> train_df.std()</span>
+<span id="cb13-5"><a href="#cb13-5"></a></span>
+<span id="cb13-6"><a href="#cb13-6"></a>train_df <span class="op">=</span> (train_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb13-7"><a href="#cb13-7"></a>val_df <span class="op">=</span> (val_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb13-8"><a href="#cb13-8"></a>test_df <span class="op">=</span> (test_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># todo el dataframe normalizado por train_mean y train_std</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a>df_std <span class="op">=</span> (features <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb14-3"><a href="#cb14-3"></a>df_std <span class="op">=</span> df_std.melt(var_name<span class="op">=</span><span class="st">'Column'</span>, value_name<span class="op">=</span><span class="st">'Normalized'</span>)</span>
+<span id="cb14-4"><a href="#cb14-4"></a>df_std</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Column</th>
+<th data-quarto-table-cell-role="th">Normalized</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Total</td>
+<td>-1.172383</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Total</td>
+<td>-1.142863</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Total</td>
+<td>-1.143247</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Total</td>
+<td>-1.259587</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Total</td>
+<td>-1.078732</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">277</td>
+<td>Total</td>
+<td>1.047816</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">278</td>
+<td>Total</td>
+<td>1.207640</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">279</td>
+<td>Total</td>
+<td>0.725616</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">280</td>
+<td>Total</td>
+<td>1.253533</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">281</td>
+<td>Total</td>
+<td>0.897333</td>
+</tr>
+</tbody>
+</table>
+
+<p>282 rows × 2 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">5</span>))</span>
+<span id="cb15-2"><a href="#cb15-2"></a>ax <span class="op">=</span> sns.violinplot(x <span class="op">=</span> <span class="st">'Column'</span>, y <span class="op">=</span> <span class="st">'Normalized'</span>, data <span class="op">=</span> df_std)</span>
+<span id="cb15-3"><a href="#cb15-3"></a>_ <span class="op">=</span> ax.set_xticklabels(features.keys(), rotation<span class="op">=</span><span class="dv">90</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="REDNEURONAL_SERIES_files/figure-html/cell-13-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">class</span> WindowGenerator():</span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_width, label_width, shift,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>               train_df<span class="op">=</span>train_df, val_df<span class="op">=</span>val_df, test_df<span class="op">=</span>test_df,</span>
+<span id="cb16-4"><a href="#cb16-4"></a>               label_columns<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb16-5"><a href="#cb16-5"></a>    <span class="co"># Store the raw data.</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a>    <span class="va">self</span>.train_df <span class="op">=</span> train_df</span>
+<span id="cb16-7"><a href="#cb16-7"></a>    <span class="va">self</span>.val_df <span class="op">=</span> val_df</span>
+<span id="cb16-8"><a href="#cb16-8"></a>    <span class="va">self</span>.test_df <span class="op">=</span> test_df</span>
+<span id="cb16-9"><a href="#cb16-9"></a></span>
+<span id="cb16-10"><a href="#cb16-10"></a>    <span class="co"># Work out the label column indices.</span></span>
+<span id="cb16-11"><a href="#cb16-11"></a>    <span class="va">self</span>.label_columns <span class="op">=</span> label_columns</span>
+<span id="cb16-12"><a href="#cb16-12"></a>    <span class="cf">if</span> label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb16-13"><a href="#cb16-13"></a>      <span class="va">self</span>.label_columns_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
+<span id="cb16-14"><a href="#cb16-14"></a>                                    <span class="bu">enumerate</span>(label_columns)}</span>
+<span id="cb16-15"><a href="#cb16-15"></a>    <span class="va">self</span>.column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
+<span id="cb16-16"><a href="#cb16-16"></a>                           <span class="bu">enumerate</span>(train_df.columns)}</span>
+<span id="cb16-17"><a href="#cb16-17"></a></span>
+<span id="cb16-18"><a href="#cb16-18"></a>    <span class="co"># Work out the window parameters.</span></span>
+<span id="cb16-19"><a href="#cb16-19"></a>    <span class="va">self</span>.input_width <span class="op">=</span> input_width</span>
+<span id="cb16-20"><a href="#cb16-20"></a>    <span class="va">self</span>.label_width <span class="op">=</span> label_width</span>
+<span id="cb16-21"><a href="#cb16-21"></a>    <span class="va">self</span>.shift <span class="op">=</span> shift</span>
+<span id="cb16-22"><a href="#cb16-22"></a></span>
+<span id="cb16-23"><a href="#cb16-23"></a>    <span class="va">self</span>.total_window_size <span class="op">=</span> input_width <span class="op">+</span> shift</span>
+<span id="cb16-24"><a href="#cb16-24"></a></span>
+<span id="cb16-25"><a href="#cb16-25"></a>    <span class="va">self</span>.input_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="dv">0</span>, input_width)</span>
+<span id="cb16-26"><a href="#cb16-26"></a>    <span class="va">self</span>.input_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.input_slice]</span>
+<span id="cb16-27"><a href="#cb16-27"></a></span>
+<span id="cb16-28"><a href="#cb16-28"></a>    <span class="va">self</span>.label_start <span class="op">=</span> <span class="va">self</span>.total_window_size <span class="op">-</span> <span class="va">self</span>.label_width</span>
+<span id="cb16-29"><a href="#cb16-29"></a>    <span class="va">self</span>.labels_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="va">self</span>.label_start, <span class="va">None</span>)</span>
+<span id="cb16-30"><a href="#cb16-30"></a>    <span class="va">self</span>.label_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.labels_slice]</span>
+<span id="cb16-31"><a href="#cb16-31"></a></span>
+<span id="cb16-32"><a href="#cb16-32"></a>  <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
+<span id="cb16-33"><a href="#cb16-33"></a>    <span class="cf">return</span> <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>.join([</span>
+<span id="cb16-34"><a href="#cb16-34"></a>        <span class="ss">f'Total window size: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>total_window_size<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb16-35"><a href="#cb16-35"></a>        <span class="ss">f'Input indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>input_indices<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb16-36"><a href="#cb16-36"></a>        <span class="ss">f'Label indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_indices<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb16-37"><a href="#cb16-37"></a>        <span class="ss">f'Label column name(s): </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_columns<span class="sc">}</span><span class="ss">'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="split" class="level2" data-number="0.4">
+<h2 data-number="0.4" class="anchored" data-anchor-id="split"><span class="header-section-number">0.4</span> Split</h2>
+<p>Dada una lista de entradas consecutivas, el método split_window las convertirá en una ventana de entradas y una ventana de etiquetas.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">def</span> split_window(<span class="va">self</span>, features):</span>
+<span id="cb17-2"><a href="#cb17-2"></a>  inputs <span class="op">=</span> features[:, <span class="va">self</span>.input_slice, :]</span>
+<span id="cb17-3"><a href="#cb17-3"></a>  labels <span class="op">=</span> features[:, <span class="va">self</span>.labels_slice, :]</span>
+<span id="cb17-4"><a href="#cb17-4"></a>  <span class="cf">if</span> <span class="va">self</span>.label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb17-5"><a href="#cb17-5"></a>    labels <span class="op">=</span> tf.stack(</span>
+<span id="cb17-6"><a href="#cb17-6"></a>        [labels[:, :, <span class="va">self</span>.column_indices[name]] <span class="cf">for</span> name <span class="kw">in</span> <span class="va">self</span>.label_columns],</span>
+<span id="cb17-7"><a href="#cb17-7"></a>        axis<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb17-8"><a href="#cb17-8"></a></span>
+<span id="cb17-9"><a href="#cb17-9"></a>  <span class="co"># Slicing doesn't preserve static shape information, so set the shapes</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a>  <span class="co"># manually. This way the `tf.data.Datasets` are easier to inspect.</span></span>
+<span id="cb17-11"><a href="#cb17-11"></a>  inputs.set_shape([<span class="va">None</span>, <span class="va">self</span>.input_width, <span class="va">None</span>])</span>
+<span id="cb17-12"><a href="#cb17-12"></a>  labels.set_shape([<span class="va">None</span>, <span class="va">self</span>.label_width, <span class="va">None</span>])</span>
+<span id="cb17-13"><a href="#cb17-13"></a></span>
+<span id="cb17-14"><a href="#cb17-14"></a>  <span class="cf">return</span> inputs, labels</span>
+<span id="cb17-15"><a href="#cb17-15"></a></span>
+<span id="cb17-16"><a href="#cb17-16"></a>WindowGenerator.split_window <span class="op">=</span> split_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="transforma-nuestros-objetos-a-tipo-tensorflow" class="level2" data-number="0.5">
+<h2 data-number="0.5" class="anchored" data-anchor-id="transforma-nuestros-objetos-a-tipo-tensorflow"><span class="header-section-number">0.5</span> Transforma nuestros objetos a tipo tensorflow</h2>
+<p>Tamaño del lote batch size = 32</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">def</span> make_dataset(<span class="va">self</span>, data):</span>
+<span id="cb18-2"><a href="#cb18-2"></a>  data <span class="op">=</span> np.array(data, dtype<span class="op">=</span>np.float32)</span>
+<span id="cb18-3"><a href="#cb18-3"></a>  ds <span class="op">=</span> tf.keras.utils.timeseries_dataset_from_array(</span>
+<span id="cb18-4"><a href="#cb18-4"></a>      data<span class="op">=</span>data,</span>
+<span id="cb18-5"><a href="#cb18-5"></a>      targets<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb18-6"><a href="#cb18-6"></a>      sequence_length<span class="op">=</span><span class="va">self</span>.total_window_size,</span>
+<span id="cb18-7"><a href="#cb18-7"></a>      sequence_stride<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb18-8"><a href="#cb18-8"></a>      shuffle<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb18-9"><a href="#cb18-9"></a>      batch_size<span class="op">=</span><span class="dv">32</span>,) </span>
+<span id="cb18-10"><a href="#cb18-10"></a></span>
+<span id="cb18-11"><a href="#cb18-11"></a>  ds <span class="op">=</span> ds.<span class="bu">map</span>(<span class="va">self</span>.split_window)</span>
+<span id="cb18-12"><a href="#cb18-12"></a></span>
+<span id="cb18-13"><a href="#cb18-13"></a>  <span class="cf">return</span> ds</span>
+<span id="cb18-14"><a href="#cb18-14"></a></span>
+<span id="cb18-15"><a href="#cb18-15"></a>WindowGenerator.make_dataset <span class="op">=</span> make_dataset</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a><span class="at">@property</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="kw">def</span> train(<span class="va">self</span>):</span>
+<span id="cb19-3"><a href="#cb19-3"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.train_df)</span>
+<span id="cb19-4"><a href="#cb19-4"></a></span>
+<span id="cb19-5"><a href="#cb19-5"></a><span class="at">@property</span></span>
+<span id="cb19-6"><a href="#cb19-6"></a><span class="kw">def</span> val(<span class="va">self</span>):</span>
+<span id="cb19-7"><a href="#cb19-7"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.val_df)</span>
+<span id="cb19-8"><a href="#cb19-8"></a></span>
+<span id="cb19-9"><a href="#cb19-9"></a><span class="at">@property</span></span>
+<span id="cb19-10"><a href="#cb19-10"></a><span class="kw">def</span> test(<span class="va">self</span>):</span>
+<span id="cb19-11"><a href="#cb19-11"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.test_df)</span>
+<span id="cb19-12"><a href="#cb19-12"></a></span>
+<span id="cb19-13"><a href="#cb19-13"></a><span class="at">@property</span></span>
+<span id="cb19-14"><a href="#cb19-14"></a><span class="kw">def</span> example(<span class="va">self</span>):</span>
+<span id="cb19-15"><a href="#cb19-15"></a>  <span class="co">"""Get and cache an example batch of `inputs, labels` for plotting."""</span></span>
+<span id="cb19-16"><a href="#cb19-16"></a>  result <span class="op">=</span> <span class="bu">getattr</span>(<span class="va">self</span>, <span class="st">'_example'</span>, <span class="va">None</span>)</span>
+<span id="cb19-17"><a href="#cb19-17"></a>  <span class="cf">if</span> result <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb19-18"><a href="#cb19-18"></a>    <span class="co"># No example batch was found, so get one from the `.train` dataset</span></span>
+<span id="cb19-19"><a href="#cb19-19"></a>    result <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(<span class="va">self</span>.train))</span>
+<span id="cb19-20"><a href="#cb19-20"></a>    <span class="co"># And cache it for next time</span></span>
+<span id="cb19-21"><a href="#cb19-21"></a>    <span class="va">self</span>._example <span class="op">=</span> result</span>
+<span id="cb19-22"><a href="#cb19-22"></a>  <span class="cf">return</span> result</span>
+<span id="cb19-23"><a href="#cb19-23"></a></span>
+<span id="cb19-24"><a href="#cb19-24"></a>WindowGenerator.train <span class="op">=</span> train</span>
+<span id="cb19-25"><a href="#cb19-25"></a>WindowGenerator.val <span class="op">=</span> val</span>
+<span id="cb19-26"><a href="#cb19-26"></a>WindowGenerator.test <span class="op">=</span> test</span>
+<span id="cb19-27"><a href="#cb19-27"></a>WindowGenerator.example <span class="op">=</span> example</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="definir-las-gráficas-para-visualizar-lo-que-se-desea-predecir-en-términos-de-las-entradas" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Definir las gráficas para visualizar lo que se desea predecir en términos de las entradas</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">def</span> plot(<span class="va">self</span>, model<span class="op">=</span><span class="va">None</span>, plot_col<span class="op">=</span><span class="st">'Total'</span>, max_subplots<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb20-2"><a href="#cb20-2"></a>  inputs, labels <span class="op">=</span> <span class="va">self</span>.example</span>
+<span id="cb20-3"><a href="#cb20-3"></a>  plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb20-4"><a href="#cb20-4"></a>  plot_col_index <span class="op">=</span> <span class="va">self</span>.column_indices[plot_col]</span>
+<span id="cb20-5"><a href="#cb20-5"></a>  max_n <span class="op">=</span> <span class="bu">min</span>(max_subplots, <span class="bu">len</span>(inputs))</span>
+<span id="cb20-6"><a href="#cb20-6"></a>  <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(max_n):</span>
+<span id="cb20-7"><a href="#cb20-7"></a>    plt.subplot(max_n, <span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb20-8"><a href="#cb20-8"></a>    plt.ylabel(<span class="ss">f'</span><span class="sc">{</span>plot_col<span class="sc">}</span><span class="ss"> [normed]'</span>)</span>
+<span id="cb20-9"><a href="#cb20-9"></a>    plt.plot(<span class="va">self</span>.input_indices, inputs[n, :, plot_col_index],</span>
+<span id="cb20-10"><a href="#cb20-10"></a>             label<span class="op">=</span><span class="st">'Inputs'</span>, marker<span class="op">=</span><span class="st">'.'</span>, zorder<span class="op">=-</span><span class="dv">10</span>)</span>
+<span id="cb20-11"><a href="#cb20-11"></a></span>
+<span id="cb20-12"><a href="#cb20-12"></a>    <span class="cf">if</span> <span class="va">self</span>.label_columns:</span>
+<span id="cb20-13"><a href="#cb20-13"></a>      label_col_index <span class="op">=</span> <span class="va">self</span>.label_columns_indices.get(plot_col, <span class="va">None</span>)</span>
+<span id="cb20-14"><a href="#cb20-14"></a>    <span class="cf">else</span>:</span>
+<span id="cb20-15"><a href="#cb20-15"></a>      label_col_index <span class="op">=</span> plot_col_index</span>
+<span id="cb20-16"><a href="#cb20-16"></a></span>
+<span id="cb20-17"><a href="#cb20-17"></a>    <span class="cf">if</span> label_col_index <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb20-18"><a href="#cb20-18"></a>      <span class="cf">continue</span></span>
+<span id="cb20-19"><a href="#cb20-19"></a></span>
+<span id="cb20-20"><a href="#cb20-20"></a>    plt.scatter(<span class="va">self</span>.label_indices, labels[n, :, label_col_index],</span>
+<span id="cb20-21"><a href="#cb20-21"></a>                edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Labels'</span>, c<span class="op">=</span><span class="st">'#2ca02c'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
+<span id="cb20-22"><a href="#cb20-22"></a>    <span class="cf">if</span> model <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb20-23"><a href="#cb20-23"></a>      predictions <span class="op">=</span> model(inputs)</span>
+<span id="cb20-24"><a href="#cb20-24"></a>      plt.scatter(<span class="va">self</span>.label_indices, predictions[n, :, label_col_index],</span>
+<span id="cb20-25"><a href="#cb20-25"></a>                  marker<span class="op">=</span><span class="st">'X'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Predictions'</span>,</span>
+<span id="cb20-26"><a href="#cb20-26"></a>                  c<span class="op">=</span><span class="st">'#ff7f0e'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
+<span id="cb20-27"><a href="#cb20-27"></a></span>
+<span id="cb20-28"><a href="#cb20-28"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb20-29"><a href="#cb20-29"></a>      plt.legend()</span>
+<span id="cb20-30"><a href="#cb20-30"></a></span>
+<span id="cb20-31"><a href="#cb20-31"></a>  plt.xlabel(<span class="st">'Time [h]'</span>)</span>
+<span id="cb20-32"><a href="#cb20-32"></a></span>
+<span id="cb20-33"><a href="#cb20-33"></a>WindowGenerator.plot <span class="op">=</span> plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="configuración-para-el-ajuste-de-los-modelos" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Configuración para el ajuste de los modelos</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Definimos número de épocas necesarias y funciones de pérdida</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>MAX_EPOCHS <span class="op">=</span> <span class="dv">200</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a></span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="kw">def</span> compile_and_fit(model, window, patience<span class="op">=</span><span class="dv">2</span>): <span class="co">#patiences como el número de épocas que espera antes de parar</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>  <span class="co"># Para evitar sobreajuste</span></span>
+<span id="cb21-6"><a href="#cb21-6"></a>  early_stopping <span class="op">=</span> tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">'val_loss'</span>,</span>
+<span id="cb21-7"><a href="#cb21-7"></a>                                                    patience<span class="op">=</span>patience,</span>
+<span id="cb21-8"><a href="#cb21-8"></a>                                                    mode<span class="op">=</span><span class="st">'min'</span>)</span>
+<span id="cb21-9"><a href="#cb21-9"></a></span>
+<span id="cb21-10"><a href="#cb21-10"></a>  model.<span class="bu">compile</span>(loss<span class="op">=</span>tf.losses.MeanSquaredError(),</span>
+<span id="cb21-11"><a href="#cb21-11"></a>                optimizer<span class="op">=</span>tf.optimizers.Adam(),</span>
+<span id="cb21-12"><a href="#cb21-12"></a>                metrics<span class="op">=</span>[tf.metrics.MeanAbsoluteError()])</span>
+<span id="cb21-13"><a href="#cb21-13"></a></span>
+<span id="cb21-14"><a href="#cb21-14"></a>  history <span class="op">=</span> model.fit(window.train, epochs<span class="op">=</span>MAX_EPOCHS,</span>
+<span id="cb21-15"><a href="#cb21-15"></a>                      validation_data<span class="op">=</span>window.val,</span>
+<span id="cb21-16"><a href="#cb21-16"></a>                      callbacks<span class="op">=</span>[early_stopping])</span>
+<span id="cb21-17"><a href="#cb21-17"></a>  <span class="cf">return</span> history</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<hr>
+</section>
+<section id="modelos-para-predecir-1-paso-adelante" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Modelos para predecir (1 paso adelante)</h1>
+<section id="modelo-base-naive" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="modelo-base-naive"><span class="header-section-number">3.1</span> 1. Modelo base (Naive)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a><span class="co"># configuración del modelo base</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a>single_step_window <span class="op">=</span> WindowGenerator(</span>
+<span id="cb22-3"><a href="#cb22-3"></a>    input_width<span class="op">=</span><span class="dv">1</span>, label_width<span class="op">=</span><span class="dv">1</span>, shift<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb22-4"><a href="#cb22-4"></a>    label_columns<span class="op">=</span>[<span class="st">'Total'</span>])</span>
+<span id="cb22-5"><a href="#cb22-5"></a>single_step_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># Ejemplo de cómo se itera sobre los lotes en los tres datasets</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="cf">for</span> example_inputs, example_labels <span class="kw">in</span> single_step_window.train.take(<span class="dv">1</span>):</span>
+<span id="cb23-3"><a href="#cb23-3"></a>    <span class="bu">print</span>(<span class="ss">f'Inputs shape (batch, time, features): </span><span class="sc">{</span>example_inputs<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb23-4"><a href="#cb23-4"></a>    <span class="bu">print</span>(<span class="ss">f'Labels shape (batch, time, features): </span><span class="sc">{</span>example_labels<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># modelo base. Retorna como predicción del siguiente paso, la predicción actual.</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="kw">class</span> Baseline(tf.keras.Model):</span>
+<span id="cb24-3"><a href="#cb24-3"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, label_index<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb24-4"><a href="#cb24-4"></a>    <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb24-5"><a href="#cb24-5"></a>    <span class="va">self</span>.label_index <span class="op">=</span> label_index</span>
+<span id="cb24-6"><a href="#cb24-6"></a></span>
+<span id="cb24-7"><a href="#cb24-7"></a>  <span class="kw">def</span> call(<span class="va">self</span>, inputs):</span>
+<span id="cb24-8"><a href="#cb24-8"></a>    <span class="cf">if</span> <span class="va">self</span>.label_index <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb24-9"><a href="#cb24-9"></a>      <span class="cf">return</span> inputs</span>
+<span id="cb24-10"><a href="#cb24-10"></a>    result <span class="op">=</span> inputs[:, :, <span class="va">self</span>.label_index]</span>
+<span id="cb24-11"><a href="#cb24-11"></a>    <span class="cf">return</span> result[:, :, tf.newaxis]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Se entrena el modelo usando el conjunto de datos <strong>single_step_window</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1"></a>baseline <span class="op">=</span> Baseline(label_index<span class="op">=</span>column_indices[<span class="st">'Total'</span>])</span>
+<span id="cb25-2"><a href="#cb25-2"></a></span>
+<span id="cb25-3"><a href="#cb25-3"></a>baseline.<span class="bu">compile</span>(loss<span class="op">=</span>tf.losses.MeanSquaredError(),</span>
+<span id="cb25-4"><a href="#cb25-4"></a>                 metrics<span class="op">=</span>[tf.metrics.MeanAbsoluteError()])</span>
+<span id="cb25-5"><a href="#cb25-5"></a></span>
+<span id="cb25-6"><a href="#cb25-6"></a>val_performance <span class="op">=</span> {}</span>
+<span id="cb25-7"><a href="#cb25-7"></a>performance <span class="op">=</span> {}</span>
+<span id="cb25-8"><a href="#cb25-8"></a>val_performance[<span class="st">'Baseline'</span>] <span class="op">=</span> baseline.evaluate(single_step_window.val)</span>
+<span id="cb25-9"><a href="#cb25-9"></a>performance[<span class="st">'Baseline'</span>] <span class="op">=</span> baseline.evaluate(single_step_window.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Se crea una ventana amplia para visualizar el comportamiento del modelo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>wide_window <span class="op">=</span> WindowGenerator(</span>
+<span id="cb26-2"><a href="#cb26-2"></a>    input_width<span class="op">=</span><span class="dv">12</span>, label_width<span class="op">=</span><span class="dv">12</span>, shift<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb26-3"><a href="#cb26-3"></a>    label_columns<span class="op">=</span>[<span class="st">'Total'</span>])</span>
+<span id="cb26-4"><a href="#cb26-4"></a>wide_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a><span class="bu">print</span>(<span class="st">'Input shape:'</span>, wide_window.example[<span class="dv">0</span>].shape)</span>
+<span id="cb27-2"><a href="#cb27-2"></a><span class="bu">print</span>(<span class="st">'Output shape:'</span>, baseline(wide_window.example[<span class="dv">0</span>]).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>wide_window.plot(baseline)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a>val_performance <span class="op">=</span> {}</span>
+<span id="cb29-2"><a href="#cb29-2"></a>performance <span class="op">=</span> {}</span>
+<span id="cb29-3"><a href="#cb29-3"></a>val_performance[<span class="st">'Baseline'</span>] <span class="op">=</span> baseline.evaluate(wide_window.val)</span>
+<span id="cb29-4"><a href="#cb29-4"></a>performance[<span class="st">'Baseline'</span>] <span class="op">=</span> baseline.evaluate(wide_window.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modelo-lineal" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="modelo-lineal"><span class="header-section-number">3.2</span> 2. Modelo lineal</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a>linear <span class="op">=</span> tf.keras.Sequential([</span>
+<span id="cb30-2"><a href="#cb30-2"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb30-3"><a href="#cb30-3"></a>])</span>
+<span id="cb30-4"><a href="#cb30-4"></a><span class="bu">print</span>(<span class="st">'Input shape:'</span>, single_step_window.example[<span class="dv">0</span>].shape)</span>
+<span id="cb30-5"><a href="#cb30-5"></a><span class="bu">print</span>(<span class="st">'Output shape:'</span>, linear(single_step_window.example[<span class="dv">0</span>]).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a>history <span class="op">=</span> compile_and_fit(linear, single_step_window)</span>
+<span id="cb31-2"><a href="#cb31-2"></a>val_performance[<span class="st">'Linear'</span>] <span class="op">=</span> linear.evaluate(single_step_window.val)</span>
+<span id="cb31-3"><a href="#cb31-3"></a>performance[<span class="st">'Linear'</span>] <span class="op">=</span> linear.evaluate(single_step_window.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>wide_window.plot(linear)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modelo-perceptrón-multicapa-mlp-con-dos-capas-ocultas-y-usando-función-de-activación-relu" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="modelo-perceptrón-multicapa-mlp-con-dos-capas-ocultas-y-usando-función-de-activación-relu"><span class="header-section-number">3.3</span> 3. Modelo perceptrón multicapa (MLP) con dos capas ocultas y usando función de activación RELU</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a>single_step_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>dense <span class="op">=</span> tf.keras.Sequential([</span>
+<span id="cb34-2"><a href="#cb34-2"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">64</span>, activation<span class="op">=</span><span class="st">'relu'</span>),</span>
+<span id="cb34-3"><a href="#cb34-3"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">64</span>, activation<span class="op">=</span><span class="st">'relu'</span>),</span>
+<span id="cb34-4"><a href="#cb34-4"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb34-5"><a href="#cb34-5"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>history <span class="op">=</span> compile_and_fit(dense, single_step_window)</span>
+<span id="cb35-2"><a href="#cb35-2"></a>val_performance[<span class="st">'Dense'</span>] <span class="op">=</span> dense.evaluate(single_step_window.val)</span>
+<span id="cb35-3"><a href="#cb35-3"></a>performance[<span class="st">'Dense'</span>] <span class="op">=</span> dense.evaluate(single_step_window.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>dense.evaluate(single_step_window.test,verbose<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>pd.DataFrame(history.history).plot(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a>single_step_window.plot(dense)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos"><span class="header-section-number">3.4</span> 4. Modelo perceptrón multicapa (MLP) con múltiples retardos incluídos</h2>
+<p>Se usarán 6 retardos para predecir el valor de la serie un paso adelante.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a>CONV_WIDTH <span class="op">=</span> <span class="dv">6</span></span>
+<span id="cb39-2"><a href="#cb39-2"></a>conv_window <span class="op">=</span> WindowGenerator(</span>
+<span id="cb39-3"><a href="#cb39-3"></a>    input_width<span class="op">=</span>CONV_WIDTH,</span>
+<span id="cb39-4"><a href="#cb39-4"></a>    label_width<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb39-5"><a href="#cb39-5"></a>    shift<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb39-6"><a href="#cb39-6"></a>    label_columns<span class="op">=</span>[<span class="st">'Total'</span>])</span>
+<span id="cb39-7"><a href="#cb39-7"></a>conv_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a>conv_window.plot()</span>
+<span id="cb40-2"><a href="#cb40-2"></a>plt.title(<span class="st">"A partir de los 6 meses pasados, predecir el siguiente el valor para el siguiente mes"</span>)</span>
+<span id="cb40-3"><a href="#cb40-3"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1"></a>multi_step_dense <span class="op">=</span> tf.keras.Sequential([</span>
+<span id="cb41-2"><a href="#cb41-2"></a>    <span class="co"># Shape: (time, features) =&gt; (time*features)</span></span>
+<span id="cb41-3"><a href="#cb41-3"></a>    tf.keras.layers.Flatten(),</span>
+<span id="cb41-4"><a href="#cb41-4"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">32</span>, activation<span class="op">=</span><span class="st">'relu'</span>),</span>
+<span id="cb41-5"><a href="#cb41-5"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">32</span>, activation<span class="op">=</span><span class="st">'relu'</span>),</span>
+<span id="cb41-6"><a href="#cb41-6"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb41-7"><a href="#cb41-7"></a>    <span class="co"># Add back the time dimension.</span></span>
+<span id="cb41-8"><a href="#cb41-8"></a>    <span class="co"># Shape: (outputs) =&gt; (1, outputs)</span></span>
+<span id="cb41-9"><a href="#cb41-9"></a>    tf.keras.layers.Reshape([<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>]),</span>
+<span id="cb41-10"><a href="#cb41-10"></a>])</span>
+<span id="cb41-11"><a href="#cb41-11"></a><span class="bu">print</span>(<span class="st">'Input shape:'</span>, conv_window.example[<span class="dv">0</span>].shape)</span>
+<span id="cb41-12"><a href="#cb41-12"></a><span class="bu">print</span>(<span class="st">'Output shape:'</span>, multi_step_dense(conv_window.example[<span class="dv">0</span>]).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Ejemplo de cómo se itera sobre los lotes:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>conv_window.example[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>history <span class="op">=</span> compile_and_fit(multi_step_dense, conv_window)</span>
+<span id="cb43-2"><a href="#cb43-2"></a>val_performance[<span class="st">'Multi step dense'</span>] <span class="op">=</span> multi_step_dense.evaluate(conv_window.val)</span>
+<span id="cb43-3"><a href="#cb43-3"></a>performance[<span class="st">'Multi step dense'</span>] <span class="op">=</span> multi_step_dense.evaluate(conv_window.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>conv_window.plot(multi_step_dense)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos-a-través-de-una-convolución" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="modelo-perceptrón-multicapa-mlp-con-múltiples-retardos-incluídos-a-través-de-una-convolución"><span class="header-section-number">3.5</span> 5. Modelo perceptrón multicapa (MLP) con múltiples retardos incluídos a través de una convolución</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a>conv_model <span class="op">=</span> tf.keras.Sequential([</span>
+<span id="cb45-2"><a href="#cb45-2"></a>    tf.keras.layers.Conv1D(filters<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb45-3"><a href="#cb45-3"></a>                           kernel_size<span class="op">=</span>(CONV_WIDTH,),</span>
+<span id="cb45-4"><a href="#cb45-4"></a>                           activation<span class="op">=</span><span class="st">'relu'</span>),</span>
+<span id="cb45-5"><a href="#cb45-5"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">32</span>, activation<span class="op">=</span><span class="st">'relu'</span>),</span>
+<span id="cb45-6"><a href="#cb45-6"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb45-7"><a href="#cb45-7"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a><span class="bu">print</span>(<span class="st">"Conv model on `conv_window`"</span>)</span>
+<span id="cb46-2"><a href="#cb46-2"></a><span class="bu">print</span>(<span class="st">'Input shape:'</span>, conv_window.example[<span class="dv">0</span>].shape)</span>
+<span id="cb46-3"><a href="#cb46-3"></a><span class="bu">print</span>(<span class="st">'Output shape:'</span>, conv_model(conv_window.example[<span class="dv">0</span>]).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1"></a>history <span class="op">=</span> compile_and_fit(conv_model, conv_window)</span>
+<span id="cb47-2"><a href="#cb47-2"></a>IPython.display.clear_output()</span>
+<span id="cb47-3"><a href="#cb47-3"></a>val_performance[<span class="st">'Conv'</span>] <span class="op">=</span> conv_model.evaluate(conv_window.val)</span>
+<span id="cb47-4"><a href="#cb47-4"></a>performance[<span class="st">'Conv'</span>] <span class="op">=</span> conv_model.evaluate(conv_window.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a><span class="bu">print</span>(<span class="st">"Wide window"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2"></a><span class="bu">print</span>(<span class="st">'Input shape:'</span>, wide_window.example[<span class="dv">0</span>].shape)</span>
+<span id="cb48-3"><a href="#cb48-3"></a><span class="bu">print</span>(<span class="st">'Labels shape:'</span>, wide_window.example[<span class="dv">1</span>].shape)</span>
+<span id="cb48-4"><a href="#cb48-4"></a><span class="bu">print</span>(<span class="st">'Output shape:'</span>, conv_model(wide_window.example[<span class="dv">0</span>]).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1"></a>LABEL_WIDTH <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb49-2"><a href="#cb49-2"></a>INPUT_WIDTH <span class="op">=</span> LABEL_WIDTH <span class="op">+</span> (CONV_WIDTH <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb49-3"><a href="#cb49-3"></a>wide_conv_window <span class="op">=</span> WindowGenerator(</span>
+<span id="cb49-4"><a href="#cb49-4"></a>    input_width<span class="op">=</span>INPUT_WIDTH,</span>
+<span id="cb49-5"><a href="#cb49-5"></a>    label_width<span class="op">=</span>LABEL_WIDTH,</span>
+<span id="cb49-6"><a href="#cb49-6"></a>    shift<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb49-7"><a href="#cb49-7"></a>    label_columns<span class="op">=</span>[<span class="st">'Total'</span>])</span>
+<span id="cb49-8"><a href="#cb49-8"></a>wide_conv_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a><span class="bu">print</span>(<span class="st">"Wide conv window"</span>)</span>
+<span id="cb50-2"><a href="#cb50-2"></a><span class="bu">print</span>(<span class="st">'Input shape:'</span>, wide_conv_window.example[<span class="dv">0</span>].shape)</span>
+<span id="cb50-3"><a href="#cb50-3"></a><span class="bu">print</span>(<span class="st">'Labels shape:'</span>, wide_conv_window.example[<span class="dv">1</span>].shape)</span>
+<span id="cb50-4"><a href="#cb50-4"></a><span class="bu">print</span>(<span class="st">'Output shape:'</span>, conv_model(wide_conv_window.example[<span class="dv">0</span>]).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>wide_conv_window.plot(conv_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="red-neuronal-recurrente-lstm-con-múltiples-retardos-incluídos" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="red-neuronal-recurrente-lstm-con-múltiples-retardos-incluídos"><span class="header-section-number">3.6</span> Red neuronal recurrente (LSTM) con múltiples retardos incluídos</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>lstm_model <span class="op">=</span> tf.keras.models.Sequential([</span>
+<span id="cb52-2"><a href="#cb52-2"></a>    <span class="co"># Shape [batch, time, features] =&gt; [batch, time, lstm_units]</span></span>
+<span id="cb52-3"><a href="#cb52-3"></a>    tf.keras.layers.LSTM(<span class="dv">32</span>, return_sequences<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb52-4"><a href="#cb52-4"></a>    <span class="co"># Shape =&gt; [batch, time, features]</span></span>
+<span id="cb52-5"><a href="#cb52-5"></a>    tf.keras.layers.Dense(units<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb52-6"><a href="#cb52-6"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a><span class="bu">print</span>(<span class="st">'Input shape:'</span>, wide_window.example[<span class="dv">0</span>].shape)</span>
+<span id="cb53-2"><a href="#cb53-2"></a><span class="bu">print</span>(<span class="st">'Output shape:'</span>, lstm_model(wide_window.example[<span class="dv">0</span>]).shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a>history <span class="op">=</span> compile_and_fit(lstm_model, wide_window)</span>
+<span id="cb54-2"><a href="#cb54-2"></a>IPython.display.clear_output()</span>
+<span id="cb54-3"><a href="#cb54-3"></a>val_performance[<span class="st">'LSTM'</span>] <span class="op">=</span> lstm_model.evaluate(wide_window.val)</span>
+<span id="cb54-4"><a href="#cb54-4"></a>performance[<span class="st">'LSTM'</span>] <span class="op">=</span> lstm_model.evaluate(wide_window.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1"></a>wide_window.plot(lstm_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="evaluación-de-los-modelos" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="evaluación-de-los-modelos"><span class="header-section-number">3.7</span> Evaluación de los modelos</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>x <span class="op">=</span> np.arange(<span class="bu">len</span>(performance))</span>
+<span id="cb56-2"><a href="#cb56-2"></a>width <span class="op">=</span> <span class="fl">0.3</span></span>
+<span id="cb56-3"><a href="#cb56-3"></a>metric_name <span class="op">=</span> <span class="st">'mean_absolute_error'</span></span>
+<span id="cb56-4"><a href="#cb56-4"></a>metric_index <span class="op">=</span> lstm_model.metrics_names.index(<span class="st">'mean_absolute_error'</span>)</span>
+<span id="cb56-5"><a href="#cb56-5"></a>val_mae <span class="op">=</span> [v[metric_index] <span class="cf">for</span> v <span class="kw">in</span> val_performance.values()]</span>
+<span id="cb56-6"><a href="#cb56-6"></a>test_mae <span class="op">=</span> [v[metric_index] <span class="cf">for</span> v <span class="kw">in</span> performance.values()]</span>
+<span id="cb56-7"><a href="#cb56-7"></a>plt.ylabel(<span class="st">'mean_absolute_error [T (degC), normalized]'</span>)</span>
+<span id="cb56-8"><a href="#cb56-8"></a>plt.bar(x <span class="op">-</span> <span class="fl">0.17</span>, val_mae, width, label<span class="op">=</span><span class="st">'Validation'</span>)</span>
+<span id="cb56-9"><a href="#cb56-9"></a>plt.bar(x <span class="op">+</span> <span class="fl">0.17</span>, test_mae, width, label<span class="op">=</span><span class="st">'Test'</span>)</span>
+<span id="cb56-10"><a href="#cb56-10"></a>plt.xticks(ticks<span class="op">=</span>x, labels<span class="op">=</span>performance.keys(),</span>
+<span id="cb56-11"><a href="#cb56-11"></a>           rotation<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb56-12"><a href="#cb56-12"></a>_ <span class="op">=</span> plt.legend() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1"></a><span class="cf">for</span> name, value <span class="kw">in</span> performance.items():</span>
+<span id="cb57-2"><a href="#cb57-2"></a>  <span class="bu">print</span>(<span class="ss">f'</span><span class="sc">{</span>name<span class="sc">:12s}</span><span class="ss">: </span><span class="sc">{</span>value[<span class="dv">1</span>]<span class="sc">:0.4f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a>dense.evaluate(single_step_window.test,verbose<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1"></a>conv_model.evaluate(conv_window.test,verbose<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>unpaso_con6meses <span class="op">=</span> WindowGenerator(</span>
+<span id="cb60-2"><a href="#cb60-2"></a>    input_width<span class="op">=</span><span class="dv">6</span>, label_width<span class="op">=</span><span class="dv">1</span>, shift<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb60-3"><a href="#cb60-3"></a>    label_columns<span class="op">=</span>[<span class="st">'Total'</span>])<span class="co"># La variable a predecir es T Total</span></span>
+<span id="cb60-4"><a href="#cb60-4"></a>unpaso_con6meses</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1"></a><span class="cf">for</span> example_inputs, example_labels <span class="kw">in</span> unpaso_con6meses.train.take(<span class="dv">1</span>):</span>
+<span id="cb61-2"><a href="#cb61-2"></a>  <span class="bu">print</span>(<span class="ss">f'Forma(dimensión) de las entradas (batch, time, features): </span><span class="sc">{</span>example_inputs<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb61-3"><a href="#cb61-3"></a>  <span class="bu">print</span>(<span class="ss">f'Forma(dimensión) de las etiquetas, salidas o respuestas (batch, time, features): </span><span class="sc">{</span>example_labels<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>unpaso_con6meses.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="ejemplo-de-los-datos-que-conforman-los-dos-primeros-lotes-para-los-datos-de-entrenamiento-y-prueba" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Ejemplo de los datos que conforman los dos primeros lotes para los datos de entrenamiento y prueba</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a>i<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb63-2"><a href="#cb63-2"></a><span class="cf">for</span> batch <span class="kw">in</span> unpaso_con6meses.train.take(<span class="dv">7</span>):</span>
+<span id="cb63-3"><a href="#cb63-3"></a>    inputs, targets <span class="op">=</span> batch</span>
+<span id="cb63-4"><a href="#cb63-4"></a>    <span class="bu">print</span>(<span class="st">"Covariable o input del lote"</span>,i,inputs)</span>
+<span id="cb63-5"><a href="#cb63-5"></a>    <span class="bu">print</span>(<span class="st">"Respuesta o etiqueta del lote "</span>,i,targets)</span>
+<span id="cb63-6"><a href="#cb63-6"></a>    <span class="bu">print</span>(<span class="st">"tipo de objeto inputs del lote"</span>,i,<span class="bu">type</span>(inputs))</span>
+<span id="cb63-7"><a href="#cb63-7"></a>    i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1"></a>i<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb64-2"><a href="#cb64-2"></a><span class="cf">for</span> batch <span class="kw">in</span> unpaso_con6meses.val.take(<span class="dv">2</span>):</span>
+<span id="cb64-3"><a href="#cb64-3"></a>    inputs, targets <span class="op">=</span> batch</span>
+<span id="cb64-4"><a href="#cb64-4"></a>    <span class="bu">print</span>(<span class="st">"Covariable o input del lote"</span>,i,inputs)</span>
+<span id="cb64-5"><a href="#cb64-5"></a>    <span class="bu">print</span>(<span class="st">"Respuesta o etiqueta del lote "</span>,i,targets)</span>
+<span id="cb64-6"><a href="#cb64-6"></a>    <span class="bu">print</span>(<span class="st">"tipo de objeto inputs del lote"</span>,i,<span class="bu">type</span>(inputs))</span>
+<span id="cb64-7"><a href="#cb64-7"></a>    i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a>i<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb65-2"><a href="#cb65-2"></a><span class="cf">for</span> batch <span class="kw">in</span> unpaso_con6meses.test.take(<span class="dv">2</span>):</span>
+<span id="cb65-3"><a href="#cb65-3"></a>    inputs, targets <span class="op">=</span> batch</span>
+<span id="cb65-4"><a href="#cb65-4"></a>    <span class="bu">print</span>(<span class="st">"Covariable o input del lote"</span>,i,inputs)</span>
+<span id="cb65-5"><a href="#cb65-5"></a>    <span class="bu">print</span>(<span class="st">"Respuesta o etiqueta del lote "</span>,i,targets)</span>
+<span id="cb65-6"><a href="#cb65-6"></a>    <span class="bu">print</span>(<span class="st">"tipo de objeto inputs del lote"</span>,i,<span class="bu">type</span>(inputs))</span>
+<span id="cb65-7"><a href="#cb65-7"></a>    i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tamaño-del-conjunto-de-datos-de-entrenamiento-validación-y-prueba" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Tamaño del conjunto de datos de entrenamiento, validación y prueba</h1>
+<div class="cell" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1"></a>dataset_train_len <span class="op">=</span> <span class="bu">len</span>(<span class="bu">list</span>(unpaso_con6meses.train.unbatch().<span class="bu">map</span>(<span class="kw">lambda</span> x, y: (x, y))))</span>
+<span id="cb66-2"><a href="#cb66-2"></a>dataset_val_len <span class="op">=</span> <span class="bu">len</span>(<span class="bu">list</span>(unpaso_con6meses.val.unbatch().<span class="bu">map</span>(<span class="kw">lambda</span> x, y: (x, y))))</span>
+<span id="cb66-3"><a href="#cb66-3"></a>dataset_test_len <span class="op">=</span> <span class="bu">len</span>(<span class="bu">list</span>(unpaso_con6meses.test.unbatch().<span class="bu">map</span>(<span class="kw">lambda</span> x, y: (x, y))))</span>
+<span id="cb66-4"><a href="#cb66-4"></a><span class="bu">print</span>(<span class="st">"longitud datos de entrenamiento:"</span>,dataset_train_len)</span>
+<span id="cb66-5"><a href="#cb66-5"></a><span class="bu">print</span>(<span class="st">"longitud datos de validación:"</span>,dataset_val_len)</span>
+<span id="cb66-6"><a href="#cb66-6"></a><span class="bu">print</span>(<span class="st">"longitud datos de prueba:"</span>,dataset_test_len)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="crear-objeto-tensorflow" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Crear objeto tensorflow</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1"></a>unpaso_con6meses.train.element_spec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1"></a><span class="cf">for</span> example_inputs, example_labels <span class="kw">in</span> unpaso_con6meses.train.take(<span class="dv">1</span>):</span>
+<span id="cb68-2"><a href="#cb68-2"></a>  <span class="bu">print</span>(<span class="ss">f'Inputs shape (batch, time, features): </span><span class="sc">{</span>example_inputs<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb68-3"><a href="#cb68-3"></a>  <span class="bu">print</span>(<span class="ss">f'Labels shape (batch, time, features): </span><span class="sc">{</span>example_labels<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="modelo-base" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="modelo-base"><span class="header-section-number">6.1</span> Modelo base</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1"></a><span class="kw">class</span> Baseline(tf.keras.Model):</span>
+<span id="cb69-2"><a href="#cb69-2"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, label_index<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb69-3"><a href="#cb69-3"></a>    <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb69-4"><a href="#cb69-4"></a>    <span class="va">self</span>.label_index <span class="op">=</span> label_index</span>
+<span id="cb69-5"><a href="#cb69-5"></a></span>
+<span id="cb69-6"><a href="#cb69-6"></a>  <span class="kw">def</span> call(<span class="va">self</span>, inputs):</span>
+<span id="cb69-7"><a href="#cb69-7"></a>    <span class="cf">if</span> <span class="va">self</span>.label_index <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb69-8"><a href="#cb69-8"></a>      <span class="cf">return</span> inputs</span>
+<span id="cb69-9"><a href="#cb69-9"></a>    result <span class="op">=</span> inputs[:, :, <span class="va">self</span>.label_index]</span>
+<span id="cb69-10"><a href="#cb69-10"></a>    <span class="cf">return</span> result[:, :, tf.newaxis]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="se-entrena-el-modelo-usando-el-conjunto-de-datos-unpaso_con6meses" class="level3" data-number="6.1.1">
+<h3 data-number="6.1.1" class="anchored" data-anchor-id="se-entrena-el-modelo-usando-el-conjunto-de-datos-unpaso_con6meses"><span class="header-section-number">6.1.1</span> se entrena el modelo usando el conjunto de datos (unpaso_con6meses)</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a>baseline <span class="op">=</span> Baseline(label_index<span class="op">=</span>column_indices[<span class="st">'Total'</span>])</span>
+<span id="cb70-2"><a href="#cb70-2"></a></span>
+<span id="cb70-3"><a href="#cb70-3"></a>baseline.<span class="bu">compile</span>(loss<span class="op">=</span>tf.losses.MeanSquaredError(),</span>
+<span id="cb70-4"><a href="#cb70-4"></a>                 metrics<span class="op">=</span>[tf.metrics.MeanAbsoluteError()])</span>
+<span id="cb70-5"><a href="#cb70-5"></a></span>
+<span id="cb70-6"><a href="#cb70-6"></a>val_performance <span class="op">=</span> {}</span>
+<span id="cb70-7"><a href="#cb70-7"></a>performance <span class="op">=</span> {}</span>
+<span id="cb70-8"><a href="#cb70-8"></a>val_performance[<span class="st">'Baseline'</span>] <span class="op">=</span> baseline.evaluate(unpaso_con6meses.val)</span>
+<span id="cb70-9"><a href="#cb70-9"></a>performance[<span class="st">'Baseline'</span>] <span class="op">=</span> baseline.evaluate(unpaso_con6meses.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="evaluación-del-modelo-base-en-una-ventana-grande." class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Evaluación del modelo base en una ventana grande.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1"></a>wide_window <span class="op">=</span> WindowGenerator(</span>
+<span id="cb71-2"><a href="#cb71-2"></a>    input_width<span class="op">=</span><span class="dv">6</span>, label_width<span class="op">=</span><span class="dv">6</span>, shift<span class="op">=</span><span class="dv">1</span>, label_columns<span class="op">=</span>[<span class="st">'Total'</span>])</span>
+<span id="cb71-3"><a href="#cb71-3"></a></span>
+<span id="cb71-4"><a href="#cb71-4"></a>wide_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1"></a>wide_window.plot(baseline)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1"></a>x <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]</span>
+<span id="cb73-2"><a href="#cb73-2"></a><span class="cf">for</span> i <span class="kw">in</span> x:</span>
+<span id="cb73-3"><a href="#cb73-3"></a>    <span class="bu">print</span>(i)</span>
+<span id="cb73-4"><a href="#cb73-4"></a>    <span class="cf">if</span> i <span class="op">==</span> <span class="dv">4</span>:</span>
+<span id="cb73-5"><a href="#cb73-5"></a>        <span class="cf">break</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1
+2
+3
+4</code></pre>
+</div>
+</div>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
