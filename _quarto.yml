@@ -8,26 +8,40 @@ website:
     left:
       - href: index.qmd
         text: Inicio
-      - Descriptiva.qmd
+      # - Descriptiva.qmd
+      # - descriptivoMario.qmd
+      - DExportaciones.qmd
+      - DBitcoin.qmd
+      - redes.qmd
+      - ejemplo.qmd
     right: 
       - text: GitHub
         icon: github
         href: https://github.com/C-Mario/series
         target: _blank
-    logo: images/logo2.png
+    logo: images/logo.svg
   back-to-top-navigation: true
   
-
+  
 format:
   html:
-    theme: celula.scss
+    theme: celula2.scss
     toc: true
     code-line-numbers: true
     code-copy: hover
     grid: 
-      body-width: 1200px
+      body-width: 1500px
       content-mode: slim
       margin-width: 300px
-      
+    number-sections: true
+    code-block-bg: true
+    code-block-border-left: "#31BAE9" 
+    highlight-style: atom-one
+    code-fold: false
+    code-overflow: scroll
+    code-tools: 
+      caption: Código
+
+    
 editor: visual
 
