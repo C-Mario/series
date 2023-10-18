@@ -1,0 +1,373 @@
+---
+title: "Descriptiva-josé"
+author: "Jose Valdes"
+lag: es
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| include: false
+library(tidyverse)
+library(lubridate)
+library(timetk)
+library(tibble)
+library(zoo)
+library(fable)
+library(tsibble)
+library(feasts)
+```
+
+# Trabajo con la serie Bitcoin
+
+```{r}
+#datos
+BTC_Daily <- read.csv("D:/jose/series/datos/BTC-Daily.csv")
+Data <- data.frame(BTC_Daily$date,BTC_Daily$close)
+Data <- data.frame(BTC_Daily$date,BTC_Daily$close)
+colnames(Data) <- c("FechaTiempo", "Valor")
+# limpiando datos faltantes
+str(Data)
+Data$FechaTiempo <- strftime(Data$FechaTiempo, format="%Y-%m-%d")
+str(Data)
+Data$FechaTiempo <- as.Date(Data$FechaTiempo)
+# procesamiento de los datos
+
+Bitcoin <- Data %>%
+      filter(FechaTiempo >= as.Date("2017-01-01"),
+             FechaTiempo <= as.Date("2021-12-31"))
+str(Bitcoin)
+```
+
+### Probando xts
+
+```{r}
+# objeto serie de tiempo
+Data_xts <- xts::xts(Bitcoin$Valor, order.by = Bitcoin$FechaTiempo)
+head(Data_xts)
+TSstudio::ts_info(Data_xts)
+#class(Data_xts)
+#frequency(Data_xts)
+#xts::periodicity(Data_xts)
+#xts::tclass(Data_xts)
+#plot(Data_xts)
+```
+
+Vista de los datos para inspección visual
+
+```{r}
+TSstudio::ts_plot(Data_xts,
+         title = "Valor de cierre bitcoin en bolsa",
+         Ytitle = "Valor en dolares",
+          Xtitle = "Fecha",
+          Xgrid = TRUE,
+       Ygrid = TRUE)
+```
+
+-   **Varianza marginal:** Se notan periodos donde el rango de valores que puede tomar la variable se va fluctuando a medida que pasa el tiempo.
+
+-   **Componente Estacional:** No se evidencia un comportamiento cíclico en la serie.
+
+-   **Tendencia:** Se muestra la serie **no** oscila sobre un valor fijo y tiene cambios abruptos de crecimiento y decrecimiento en algunos momentos.
+
+### Análisis de varianza
+
+Usaremos la transformación de **Box-Cox** para estabilizar la varianza; primero miramos el lambda
+
+```{r}
+#Valor de lambda
+forecast::BoxCox.lambda(Data_xts, method ="loglik", lower = -1, upper = 3)
+MASS::boxcox(lm(Data_xts ~ 1),seq(-1/2, 1/2, length = 50))
+```
+
+Vemos que se sugiere el valor $\lambda = 0$ lo cual dada de transformación de Box-Cox se usa la función logaritmo natural para la estabilización de la variabilidad así tenemos que:
+
+```{r}
+#trasnformación
+lData_xts <- log(Data_xts)
+#plot(lData_xts)
+```
+
+```{r}
+TSstudio::ts_plot(lData_xts,
+          title = "Valor de Serie Trasnformada",
+           Ytitle = "Valor de la trasnformación",
+          Xtitle = "Fecha",
+          Xgrid = TRUE,
+           Ygrid = TRUE)
+```
+
+Ahora miramos si es necesario aplicar otra transformación a la serie
+
+```{r}
+#Valor de lambda
+(forecast::BoxCox.lambda(lData_xts, method ="loglik", lower = -1, upper = 3))
+MASS::boxcox(lm(lData_xts ~ 1),seq(-1, 2, length = 50))
+```
+
+Vemos que la sugerencia es $\lambda = 0.9$ lo cual es cercano a $1$, además el IC de confianza captura al $1$, por ende la transformación logarítmica parece haber estabilizado la varianza.
+
+```{r}
+#Gráfico de ellas juntas
+par(mfrow=c(2,1))
+plot(Data_xts, main = "Series original")
+plot(lData_xts, main = "Series transformada")
+```
+
+Se puede ver cómo la transformación aplicada logra estabilizar la varianza en gran medida.
+
+### Análisis de tendencia
+
+Trabajaremos con la serie a la cuál se le realizo la transformación para estabilizar la varianza, realizaremos el gráfico de los valores de la función de auto-correlación
+
+```{r}
+#ACf
+acf(lData_xts, 180, main = "Serie Bitcoin Trasnformada")
+```
+
+Notamos que los valores van teniendo un decaimiento leve lo cual nos da un indicio más claro de que existe tendencia en la serie, analizaremos el gráfico de retardos de la serie trasnformada para ver si podemos tener indicios de una relación *no-lineal o lineal* en la serie.
+
+```{r}
+#serie transformada
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(lData_xts, 16,corr=T)
+```
+
+Vemos que se nota un fuerte relación linea hasta para el retraso número 16, por lo tanto con lo mostrado por el *acf* y *el gráfico de retardos* tenemos indicios fuertes de tendencia en la serie así usaremos los métodos: *lineal determinista, Descomposición de* *promedios móviles y descomposición STL* para estimar dicha componente.
+
+#### Lineal determinista
+
+ajustaremos el modelo eliminaremos la tendencia y analizaremos los resultados
+
+```{r}
+#pasar a ts para Graficarlo
+ldata_ts <- TSstudio::xts_to_ts(lData_xts,frequency = 365,
+                                start = as.Date("2017-01-01"))
+#modelo lineal
+summary(fit <- lm(ldata_ts~time(ldata_ts), na.action=NULL))
+# Gráfico
+plot(ldata_ts, ylab= "Valor en escala logarítmica")
+abline(fit,col = "red")# Se añade la recta ajusta
+```
+
+ahora eliminaremos la tendencia de la serie
+
+```{r}
+###Eliminamos la tendencia con la predicción la recta
+ElimTenldata_ts <- ldata_ts - predict(fit)
+plot(ElimTenldata_ts, main="Serie Sin tendencia", 
+     ylab= "Valor en escala logarítmica")
+```
+
+Observamos que en la serie obtenida después de eliminar la tendencia lineal parece tener un comportamiento de alta variabilidad similar una *caminata aleatoria.*
+
+```{r}
+acf(ElimTenldata_ts,lag.max =length(ElimTenldata_ts), 
+    main="Serie Sin tendencia")
+# Series trasnfromada sin tendencia Retardos
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(ElimTenldata_ts, 16,corr=F)
+```
+
+Notamos que en la gráfica del **acf** se sigue teniendo un decaimiento lento de los valores de la función de auto-correlación para los primeros rezagos, además en el **gráfico de retardos** se sigue manteniendo una alta relación lineal entre el valor actual y sus regazos. Por ende todo esto nos da los argumentos necesarios para **descartar** *la estimación linealcómo una buena estimación de la tendencia.*
+
+#### Descomposición por promedio móviles
+
+```{r}
+# descomposición de promedios moviles
+descom_ldata <- decompose(ldata_ts)
+plot(descom_ldata)
+```
+
+Podemos observar que usando **un filtro de promedio móvil** la tendencia estimada no se aproxima mucho a una lineal, cómo se puede apreciar en el siguiente gráfico; además la componente estacional no parece ser estimada de buena manera ya que no se ve un patrón de comportamiento claramente, además el residual presenta un comportamiento no estacionario aparentemente.
+
+```{r}
+# Gráfico
+plot(ldata_ts, ylab= "Valor en escala logarítmica")
+abline(fit,col = "red")# Se añade la recta ajusta
+points(time(ldata_ts), descom_ldata$trend, col ="green", cex=0.3)
+
+```
+
+Eliminaremos la tendencia del promedio móvil centrado y de la frecuencia
+
+```{r}
+###Eliminamos la tendencia con la predicción promedio movil
+ElimTenldata_ts <- ldata_ts - descom_ldata$trend
+plot(ElimTenldata_ts, main="Serie Sin tendencia", 
+     ylab= "Valor en escala logarítmica")
+```
+
+Podemos ver que la serie cómo en el caso *lineal* parece mostrar un comportamiento de *caminata aleatoria*.
+
+```{r}
+acf(ElimTenldata_ts[183:1644],lag.max = 730, 
+    main="Serie Sin tendencia")
+# Series trasnfromada sin tendencia Retardos
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(ElimTenldata_ts[183:1644], 16,corr=F)
+```
+
+Notamos que tanto en el **acf** cómo en **la gráfica de retardos** se ve un comportamiento similar al anterior lo cuál nos hace descartar *la descompsición de promedios moviles* para la estimación de la tendencia.
+
+***Filtro promedio móvil con solo retrasos***
+
+Intentaremos ajustar un promedio móvil que tenga en cuenta solo los retrasos y sea de los periodos de un año, seis meses, tres meses y mes.
+
+```{r}
+#gráfico
+filter_1=stats::filter(ldata_ts, filter = rep(1/365, 365), sides = 1)
+filter_2=stats::filter(ldata_ts, filter = rep(1/182, 182), sides = 1)
+filter_3=stats::filter(ldata_ts, filter = rep(1/90, 90), sides = 1)
+filter_4=stats::filter(ldata_ts, filter = rep(1/30, 30), sides = 1)
+plot(ldata_ts, ylab= "Valor en escala logarítmica")
+points(time(ldata_ts), filter_1, col ="green", cex=0.33)
+points(time(ldata_ts), filter_2, col ="blue", cex=0.33)
+points(time(ldata_ts), filter_3, col ="red", cex=0.35)
+points(time(ldata_ts), filter_4, col ="cyan", cex=0.31)
+#legend(locator(1), c("365 días","182 días","90 días","30 días"), col=c("green","blue","red","cyan"),lty=c(1,1,1,1),lwd=c(2,2,2,2))
+```
+
+Notamos que para *3 meses* y *6 meses* los filtros de promedios móviles muestra una mejor estimación, por ende tomaremos para *3 meses* cómo estimación de la tendencia de la serie
+
+```{r}
+###Eliminamos la tendencia con la predicción promedio movil
+ElimTenldata_ts <- ldata_ts - filter_3
+plot(ElimTenldata_ts, main="Serie Sin tendencia", 
+     ylab= "Valor en escala logarítmica")
+#
+acf(ElimTenldata_ts[90:1826],lag.max =1095, 
+    main="Serie Sin tendencia")
+# Series trasnfromada sin tendencia Retardos
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(ElimTenldata_ts[90:1826], 16,corr=F)
+```
+
+El comportamiento de los gráficos es similar a los anteriores con eso tenemos indicios de que la estimación de la tendencia de manera determinista potencialmente no es buena idea.
+
+#### Descomposición STL
+
+Usando la descomposición **STL** obtenemos la estimación de la tendencia
+
+```{r}
+indice_ldata <- sort(Bitcoin$FechaTiempo)
+#  as.Date(as.yearmon(tk_index(ldata_ts)))
+## Otra forma de extraer el indice estimetk::tk_index(lAirPass)
+logdata <- as.matrix(ldata_ts)
+df_ldata <- data.frame(Fecha=indice_ldata,logdata=as.matrix(ldata_ts))
+str(df_ldata)
+colnames(df_ldata) <- c("Fecha", "logdata")
+str(df_ldata)
+tibble_ldata <- tibble(df_ldata)
+####Primera aproximación del ajuste STL
+tibble_ldata%>%timetk::plot_time_series(Fecha, logdata, 
+                   .interactive = TRUE,
+                   .plotly_slider = TRUE)
+```
+
+```{r}
+#####Ajuste STL
+#Note que obtenemos un objeto adicional en tibble_logpasajeros con Logpasa_ajus con parámetros que se pueden mover.
+logdata_ajus <- smooth_vec(logdata,span = 0.75, degree = 2)
+tibble_ldata%>%dplyr::mutate(logdata_ajus)
+###Ajuste STL moviendo los parámetros
+tibble_ldata%>%mutate(logdata_ajus=smooth_vec(logdata,span = 0.75, degree = 2))%>%
+  ggplot(aes(Fecha, logdata)) +
+    geom_line() +
+    geom_line(aes(y = logdata_ajus), color = "red")
+```
+
+Se puede evidenciar que la Estimación de la tendencia via *STL* parece mejorar aspectos que la *descomposición movil* intentada con información de un año no se tenia.
+
+```{r}
+###Eliminamos la tendencia con la predicción la STL
+ElimTenldata_xts <- lData_xts - logdata_ajus
+plot(ElimTenldata_xts, main="Serie Sin tendencia", 
+     ylab= "Valor en escala logarítmica")
+acf(ElimTenldata_xts,lag.max =1094, 
+    main="Serie Sin tendencia")
+# Series trasnfromada sin tendencia Retardos
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(ElimTenldata_xts, 16,corr=F)
+```
+
+Vemos que a diferencia de los promedio móviles si tenemos una estimación para todos los valores de la serie, además notamos que la **acf** y **el gráfico de retardos** tiene un comportamiento similar a los métodos anteriores.
+
+## Serie Diferenciada
+
+```{r}
+###Diferenciando con base en el objeto ts
+dldata<-diff(ldata_ts)
+#plot(dldata)
+#abline(h=0, col = "red")
+#acf(dldata,lag.max =90, main="Serie Diferenciada")
+```
+
+```{r}
+###Diferenciando con base en el objeto xts
+dldata_xts<-diff(lData_xts)
+dldata_xts <- dldata_xts[-1]
+plot(dldata_xts, main = "Serie diferenciada")
+```
+
+Vemos que la serie al ser diferenciada muestra un comportamiento estacionario pues los valores oscilan sobre un valor fijo, además de un valor que muestra un comportamiento extremo pues varia demasiado con respecto a los demás.
+
+```{r}
+# función de autocorrelación
+acf(dldata_xts,lag.max =30, main="Serie Diferenciada")
+# Series trasnfromada sin tendencia Retardos
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(dldata_xts, 16,corr=T)
+```
+
+El gráfico de **acf** muestra que la tendencia parce a ver desparecido, además no parece destacar ningún valor para algún retraso de manera clara. Para el **gráfico de retardos** vemos claramente que ya no hay una relación lineal ni no lineal del valor actual con sus retardos.
+
+Tomando en cuenta todo lo anterior trabajaremos con la serie aplicada la transformación de Box-Cox sugerida y diferenciada, además se tiene sospecha de que la serie presenta comportamiento de una camina aleatoria con tendencia no determinista.
+
+## Análisis de Estacionalidad
+
+### Mapas de calor
+
+```{r}
+#Serie diferenciada
+TSstudio::ts_heatmap(dldata_xts, title = "Mapa de calor - Cierre Bitcoin en bolsa dias año")
+```
+
+Para la serie diferenciada no se evidencia ninguno tipo de patrón lo cual nos da indicios de que no se tiene un componente estacional.
+
+### Periodograma
+
+```{r}
+# periodograma
+Periodograma <- spectrum(as.numeric(dldata_xts),log="no",span=c(5,5))
+#
+ubicacionDif <- which.max(Periodograma$spec)
+sprintf("El valor de la frecuencia donde se máximiza el periodograma para la serie es: %s",Periodograma$freq[ubicacionDif])
+#
+sprintf("El periodo correspondiente es aproximadamente: %s",1/Periodograma$freq[ubicacionDif])
+```
+
+Para la serie diferenciada el periodograma no es claro, a pesar del suviazamiento usado la curva sigue mostrando varios picos en su recorrido el máximo lo encontramos de tal manera que $\omega = \frac{251}{625}=0.416$ lo cual se corresponde con un $s \approx 2.5$ .
+
+```{r}
+# intentando sacar el segundo más alto
+n_dld <- length(Periodograma$spec)
+valor_seg <- sort(Periodograma$spec,partial=n_dld-1)[n_dld-1]
+ubica_segundo <- which(Periodograma$spec==valor_seg)
+
+sprintf("El valor de la frecuencia donde se alcanza el segundo máximo para el periodograma para REC es: %s",Periodograma$freq[ubica_segundo])
+#
+sprintf("El periodo correspondiente es aproximadamente: %s",1/Periodograma$freq[ubica_segundo])
+```
+
+vemos que el segundo valor es bastante parecido al segundo.
+
+```{r}
+# valor de frecuencia 
+tail(sort(Periodograma$spec))
+```
+
+Cómo se puede observar los primeros seis valores son bastante cercanos entre ellos, por lo tanto sus valores de periodo serán similiares.
+
+Con esto **descartamos** la estimación de una componente estacional pues no tenemos evidencia clara de su existencia.

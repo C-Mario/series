@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Grupo 4">
+<meta name="dcterms.date" content="2023-09-29">
+
+<title>Series de Tiempo - Descriptiva Serie Exportaciones</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "Ninguna coincidencia",
+    "search-matching-documents-text": "coincidencias",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<link href="site_libs/dygraphs-1.1.1/dygraph.css" rel="stylesheet">
+<script src="site_libs/dygraphs-1.1.1/dygraph-combined.js"></script>
+<script src="site_libs/dygraphs-1.1.1/shapes.js"></script>
+<script src="site_libs/moment-2.8.4/moment.js"></script>
+<script src="site_libs/moment-timezone-0.2.5/moment-timezone-with-data.js"></script>
+<script src="site_libs/moment-fquarter-1.0.0/moment-fquarter.min.js"></script>
+<script src="site_libs/dygraphs-binding-1.1.1.6/dygraphs.js"></script>
+
+
+</head>
+
+<body class="nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./images/logo2.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Series de Tiempo</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./Descriptiva.html" rel="" target="">
+ <span class="menu-text">Descriptiva</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/C-Mario/series" rel="" target="_blank"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text">GitHub</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Descriptiva Serie Exportaciones</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autores</div>
+    <div class="quarto-title-meta-contents">
+             <p>Grupo 4 </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de Publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 29, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Graficar objeto de tipo ts</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">plot</span>(exportaciones_ts, <span class="at">main =</span> <span class="st">"Serie original"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Serie-Exportaciones_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">#Graficar dinámico</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>TSstudio<span class="sc">::</span><span class="fu">ts_plot</span>(exportaciones_ts,<span class="at">title=</span><span class="st">"Serie Exportaciones Original"</span>,<span class="at">slider=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-75feedcdcb291b6664e0" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-75feedcdcb291b6664e0">{"x":{"visdat":{"2aec6b9f1cfc":["function () ","plotlyVisDat"]},"cur_data":"2aec6b9f1cfc","attrs":{"2aec6b9f1cfc":{"x":{},"y":{},"mode":"lines","line":{"width":2,"dash":null,"color":"#00526d"},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"rangeslider":{"type":"date"},"title":"","showgrid":false},"yaxis":{"domain":[0,1],"automargin":true,"title":"","showgrid":false},"title":"Serie Exportaciones Original","hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[2000,2000.0833333333333,2000.1666666666667,2000.25,2000.3333333333333,2000.4166666666667,2000.5,2000.5833333333333,2000.6666666666667,2000.75,2000.8333333333333,2000.9166666666667,2001,2001.0833333333333,2001.1666666666667,2001.25,2001.3333333333333,2001.4166666666667,2001.5,2001.5833333333333,2001.6666666666667,2001.75,2001.8333333333333,2001.9166666666667,2002,2002.0833333333333,2002.1666666666667,2002.25,2002.3333333333333,2002.4166666666667,2002.5,2002.5833333333333,2002.6666666666667,2002.75,2002.8333333333333,2002.9166666666667,2003,2003.0833333333333,2003.1666666666667,2003.25,2003.3333333333333,2003.4166666666667,2003.5,2003.5833333333333,2003.6666666666667,2003.75,2003.8333333333333,2003.9166666666667,2004,2004.0833333333333,2004.1666666666667,2004.25,2004.3333333333333,2004.4166666666667,2004.5,2004.5833333333333,2004.6666666666667,2004.75,2004.8333333333333,2004.9166666666667,2005,2005.0833333333333,2005.1666666666667,2005.25,2005.3333333333333,2005.4166666666667,2005.5,2005.5833333333333,2005.6666666666667,2005.75,2005.8333333333333,2005.9166666666667,2006,2006.0833333333333,2006.1666666666667,2006.25,2006.3333333333333,2006.4166666666667,2006.5,2006.5833333333333,2006.6666666666667,2006.75,2006.8333333333333,2006.9166666666667,2007,2007.0833333333333,2007.1666666666667,2007.25,2007.3333333333333,2007.4166666666667,2007.5,2007.5833333333333,2007.6666666666667,2007.75,2007.8333333333333,2007.9166666666667,2008,2008.0833333333333,2008.1666666666667,2008.25,2008.3333333333333,2008.4166666666667,2008.5,2008.5833333333333,2008.6666666666667,2008.75,2008.8333333333333,2008.9166666666667,2009,2009.0833333333333,2009.1666666666667,2009.25,2009.3333333333333,2009.4166666666667,2009.5,2009.5833333333333,2009.6666666666667,2009.75,2009.8333333333333,2009.9166666666667,2010,2010.0833333333333,2010.1666666666667,2010.25,2010.3333333333333,2010.4166666666667,2010.5,2010.5833333333333,2010.6666666666667,2010.75,2010.8333333333333,2010.9166666666667,2011,2011.0833333333333,2011.1666666666667,2011.25,2011.3333333333335,2011.4166666666667,2011.5,2011.5833333333335,2011.6666666666667,2011.75,2011.8333333333335,2011.9166666666667,2012,2012.0833333333335,2012.1666666666667,2012.25,2012.3333333333335,2012.4166666666667,2012.5,2012.5833333333335,2012.6666666666667,2012.75,2012.8333333333335,2012.9166666666667,2013,2013.0833333333335,2013.1666666666667,2013.25,2013.3333333333335,2013.4166666666667,2013.5,2013.5833333333335,2013.6666666666667,2013.75,2013.8333333333335,2013.9166666666667,2014,2014.0833333333335,2014.1666666666667,2014.25,2014.3333333333335,2014.4166666666667,2014.5,2014.5833333333335,2014.6666666666667,2014.75,2014.8333333333335,2014.9166666666667,2015,2015.0833333333335,2015.1666666666667,2015.25,2015.3333333333335,2015.4166666666667,2015.5,2015.5833333333335,2015.6666666666667,2015.75,2015.8333333333335,2015.9166666666667,2016,2016.0833333333335,2016.1666666666667,2016.25,2016.3333333333335,2016.4166666666667,2016.5,2016.5833333333335,2016.6666666666667,2016.75,2016.8333333333335,2016.9166666666667,2017,2017.0833333333335,2017.1666666666667,2017.25,2017.3333333333335,2017.4166666666667,2017.5,2017.5833333333335,2017.6666666666667,2017.75,2017.8333333333335,2017.9166666666667,2018,2018.0833333333335,2018.1666666666667,2018.25,2018.3333333333335,2018.4166666666667,2018.5,2018.5833333333335,2018.6666666666667,2018.75,2018.8333333333335,2018.9166666666667,2019,2019.0833333333335,2019.1666666666667,2019.25,2019.3333333333335,2019.4166666666667,2019.5,2019.5833333333335,2019.6666666666667,2019.75,2019.8333333333335,2019.9166666666667,2020,2020.0833333333335,2020.1666666666667,2020.25,2020.3333333333335,2020.4166666666667,2020.5,2020.5833333333335,2020.6666666666667,2020.75,2020.8333333333335,2020.9166666666667,2021,2021.0833333333335,2021.1666666666667,2021.25,2021.3333333333335,2021.4166666666667,2021.5,2021.5833333333335,2021.6666666666667,2021.75,2021.8333333333335,2021.9166666666667,2022,2022.0833333333335,2022.1666666666667,2022.25,2022.3333333333335,2022.4166666666667,2022.5,2022.5833333333335,2022.6666666666667,2022.75,2022.8333333333335,2022.9166666666667,2023,2023.0833333333335,2023.1666666666667,2023.25,2023.3333333333335,2023.4166666666667],"y":[1011676,1054098,1053546,886359,1146258,1153956,1104408,1242391,1102913,981716,1192681,1228398,1017195,964437,1002450,1058457,1068023,996736,1005867,1189605,1078781,1013772,965973,968599,943702,945935,859303,1123902,1076509,921463,1040876,915457,1055414,1070342,966897,1055590,923427,1033043,1034233,1101056,1181888,995297,1267598,1092850,1079472,1169195,1082836,1167628,1183399,1031826,1206657,1271618,1335727,1433647,1541103,1516523,1519458,1529291,1585709,1633370,1378980,1529265,1722081,1682450,1737198,2097853,1653833,1882740,1908016,1788905,1826199,1938567,1668171,1862024,1929864,1872161,2211681,2039364,2141958,2129881,2104243,2271572,2146547,2134504,1843668,1914770,2384657,2497750,2727980,2114259,2648147,2621002,2523170,2623649,3152653,3227536,2842306,2822470,3007288,3365420,3392615,3675654,3801685,3294187,3133994,2981105,2245379,2224271,2525698,2340118,2711332,2427571,2742519,2738083,2898600,2673470,2795983,2948687,2861294,3182972,2913433,2869156,3337903,3490978,3513331,3060628,3157626,3291236,3271661,3535759,3426095,3845531,3760176,3958572,4893312,4823094,5153710,4708737,4866229,4941645,4582401,4772996,5147330,5306738,4785773,4999318,5712355,5010929,5403375,4563431,4976905,4570780,4910403,5432930,4807338,4951628,4849196,4667767,4617842,4949487,5332470,4870839,4652297,4977706,4849996,4837983,4948665,5272122,4808832,4271442,4408181,4316676,5495867,4704814,5048930,4813091,5077247,4322278,3794686,3794711,2916976,3160957,3461944,3219706,3381084,3217408,3043778,2868451,2898168,2815522,2444535,2588994,1919053,2328723,2334998,2463793,2751470,2780512,2266997,3044377,2797686,2770014,2833622,3477094,2785044,2716024,3300421,2697992,3505436,2895612,3125483,3191598,3389679,3277516,3122237,4014818,3324889,3027603,3365116,3786537,3719410,3331933,3632055,3684399,3512842,3768666,3343509,3407819,3066110,3183071,3344850,3862819,3748342,3096363,3255830,3264261,3067349,3326497,2943625,3330051,3419466,2943626,2439036,1864239,2221172,2289482,2551988,2584767,2544874,2644954,2523372,3028837,2610936,2938994,3383554,2976372,3096913,3182216,3444158,3465143,3792236,3799111,4155805,4544551,3801609,4209198,4780210,5460531,4662521,5497617,5913682,4388737,4778520,4213182,4562248,4642084,3696188,4202234,4431911,3739214,4497862,3985981],"mode":"lines","line":{"color":"#00526d","width":2,"dash":[]},"type":"scatter","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">#Gráfico dinámico con dygraphs</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">dygraph</span>(exportaciones_ts,<span class="at">main=</span><span class="st">"Serie de Exportaciones Mensuales en Colombia"</span>, <span class="at">ylab=</span><span class="st">"Valor total de las exportaciones"</span>)<span class="sc">%&gt;%</span> <span class="fu">dyRangeSelector</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="dygraphs html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-9c94bb344ce1d3269b1c" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-9c94bb344ce1d3269b1c">{"x":{"attrs":{"title":"Serie de Exportaciones Mensuales en Colombia","ylabel":"Valor total de las exportaciones","labels":["month","V1"],"legend":"auto","retainDateWindow":false,"axes":{"x":{"pixelsPerLabel":60}},"showRangeSelector":true,"rangeSelectorHeight":40,"rangeSelectorPlotFillColor":" #A7B1C4","rangeSelectorPlotStrokeColor":"#808FAB","interactionModel":"Dygraph.Interaction.defaultModel"},"scale":"monthly","annotations":[],"shadings":[],"events":[],"format":"date","data":[["2000-01-01T00:00:00.000Z","2000-02-01T00:00:00.000Z","2000-03-01T00:00:00.000Z","2000-04-01T00:00:00.000Z","2000-05-01T00:00:00.000Z","2000-06-01T00:00:00.000Z","2000-07-01T00:00:00.000Z","2000-08-01T00:00:00.000Z","2000-09-01T00:00:00.000Z","2000-10-01T00:00:00.000Z","2000-11-01T00:00:00.000Z","2000-12-01T00:00:00.000Z","2001-01-01T00:00:00.000Z","2001-02-01T00:00:00.000Z","2001-03-01T00:00:00.000Z","2001-04-01T00:00:00.000Z","2001-05-01T00:00:00.000Z","2001-06-01T00:00:00.000Z","2001-07-01T00:00:00.000Z","2001-08-01T00:00:00.000Z","2001-09-01T00:00:00.000Z","2001-10-01T00:00:00.000Z","2001-11-01T00:00:00.000Z","2001-12-01T00:00:00.000Z","2002-01-01T00:00:00.000Z","2002-02-01T00:00:00.000Z","2002-03-01T00:00:00.000Z","2002-04-01T00:00:00.000Z","2002-05-01T00:00:00.000Z","2002-06-01T00:00:00.000Z","2002-07-01T00:00:00.000Z","2002-08-01T00:00:00.000Z","2002-09-01T00:00:00.000Z","2002-10-01T00:00:00.000Z","2002-11-01T00:00:00.000Z","2002-12-01T00:00:00.000Z","2003-01-01T00:00:00.000Z","2003-02-01T00:00:00.000Z","2003-03-01T00:00:00.000Z","2003-04-01T00:00:00.000Z","2003-05-01T00:00:00.000Z","2003-06-01T00:00:00.000Z","2003-07-01T00:00:00.000Z","2003-08-01T00:00:00.000Z","2003-09-01T00:00:00.000Z","2003-10-01T00:00:00.000Z","2003-11-01T00:00:00.000Z","2003-12-01T00:00:00.000Z","2004-01-01T00:00:00.000Z","2004-02-01T00:00:00.000Z","2004-03-01T00:00:00.000Z","2004-04-01T00:00:00.000Z","2004-05-01T00:00:00.000Z","2004-06-01T00:00:00.000Z","2004-07-01T00:00:00.000Z","2004-08-01T00:00:00.000Z","2004-09-01T00:00:00.000Z","2004-10-01T00:00:00.000Z","2004-11-01T00:00:00.000Z","2004-12-01T00:00:00.000Z","2005-01-01T00:00:00.000Z","2005-02-01T00:00:00.000Z","2005-03-01T00:00:00.000Z","2005-04-01T00:00:00.000Z","2005-05-01T00:00:00.000Z","2005-06-01T00:00:00.000Z","2005-07-01T00:00:00.000Z","2005-08-01T00:00:00.000Z","2005-09-01T00:00:00.000Z","2005-10-01T00:00:00.000Z","2005-11-01T00:00:00.000Z","2005-12-01T00:00:00.000Z","2006-01-01T00:00:00.000Z","2006-02-01T00:00:00.000Z","2006-03-01T00:00:00.000Z","2006-04-01T00:00:00.000Z","2006-05-01T00:00:00.000Z","2006-06-01T00:00:00.000Z","2006-07-01T00:00:00.000Z","2006-08-01T00:00:00.000Z","2006-09-01T00:00:00.000Z","2006-10-01T00:00:00.000Z","2006-11-01T00:00:00.000Z","2006-12-01T00:00:00.000Z","2007-01-01T00:00:00.000Z","2007-02-01T00:00:00.000Z","2007-03-01T00:00:00.000Z","2007-04-01T00:00:00.000Z","2007-05-01T00:00:00.000Z","2007-06-01T00:00:00.000Z","2007-07-01T00:00:00.000Z","2007-08-01T00:00:00.000Z","2007-09-01T00:00:00.000Z","2007-10-01T00:00:00.000Z","2007-11-01T00:00:00.000Z","2007-12-01T00:00:00.000Z","2008-01-01T00:00:00.000Z","2008-02-01T00:00:00.000Z","2008-03-01T00:00:00.000Z","2008-04-01T00:00:00.000Z","2008-05-01T00:00:00.000Z","2008-06-01T00:00:00.000Z","2008-07-01T00:00:00.000Z","2008-08-01T00:00:00.000Z","2008-09-01T00:00:00.000Z","2008-10-01T00:00:00.000Z","2008-11-01T00:00:00.000Z","2008-12-01T00:00:00.000Z","2009-01-01T00:00:00.000Z","2009-02-01T00:00:00.000Z","2009-03-01T00:00:00.000Z","2009-04-01T00:00:00.000Z","2009-05-01T00:00:00.000Z","2009-06-01T00:00:00.000Z","2009-07-01T00:00:00.000Z","2009-08-01T00:00:00.000Z","2009-09-01T00:00:00.000Z","2009-10-01T00:00:00.000Z","2009-11-01T00:00:00.000Z","2009-12-01T00:00:00.000Z","2010-01-01T00:00:00.000Z","2010-02-01T00:00:00.000Z","2010-03-01T00:00:00.000Z","2010-04-01T00:00:00.000Z","2010-05-01T00:00:00.000Z","2010-06-01T00:00:00.000Z","2010-07-01T00:00:00.000Z","2010-08-01T00:00:00.000Z","2010-09-01T00:00:00.000Z","2010-10-01T00:00:00.000Z","2010-11-01T00:00:00.000Z","2010-12-01T00:00:00.000Z","2011-01-01T00:00:00.000Z","2011-02-01T00:00:00.000Z","2011-03-01T00:00:00.000Z","2011-04-01T00:00:00.000Z","2011-05-01T00:00:00.000Z","2011-06-01T00:00:00.000Z","2011-07-01T00:00:00.000Z","2011-08-01T00:00:00.000Z","2011-09-01T00:00:00.000Z","2011-10-01T00:00:00.000Z","2011-11-01T00:00:00.000Z","2011-12-01T00:00:00.000Z","2012-01-01T00:00:00.000Z","2012-02-01T00:00:00.000Z","2012-03-01T00:00:00.000Z","2012-04-01T00:00:00.000Z","2012-05-01T00:00:00.000Z","2012-06-01T00:00:00.000Z","2012-07-01T00:00:00.000Z","2012-08-01T00:00:00.000Z","2012-09-01T00:00:00.000Z","2012-10-01T00:00:00.000Z","2012-11-01T00:00:00.000Z","2012-12-01T00:00:00.000Z","2013-01-01T00:00:00.000Z","2013-02-01T00:00:00.000Z","2013-03-01T00:00:00.000Z","2013-04-01T00:00:00.000Z","2013-05-01T00:00:00.000Z","2013-06-01T00:00:00.000Z","2013-07-01T00:00:00.000Z","2013-08-01T00:00:00.000Z","2013-09-01T00:00:00.000Z","2013-10-01T00:00:00.000Z","2013-11-01T00:00:00.000Z","2013-12-01T00:00:00.000Z","2014-01-01T00:00:00.000Z","2014-02-01T00:00:00.000Z","2014-03-01T00:00:00.000Z","2014-04-01T00:00:00.000Z","2014-05-01T00:00:00.000Z","2014-06-01T00:00:00.000Z","2014-07-01T00:00:00.000Z","2014-08-01T00:00:00.000Z","2014-09-01T00:00:00.000Z","2014-10-01T00:00:00.000Z","2014-11-01T00:00:00.000Z","2014-12-01T00:00:00.000Z","2015-01-01T00:00:00.000Z","2015-02-01T00:00:00.000Z","2015-03-01T00:00:00.000Z","2015-04-01T00:00:00.000Z","2015-05-01T00:00:00.000Z","2015-06-01T00:00:00.000Z","2015-07-01T00:00:00.000Z","2015-08-01T00:00:00.000Z","2015-09-01T00:00:00.000Z","2015-10-01T00:00:00.000Z","2015-11-01T00:00:00.000Z","2015-12-01T00:00:00.000Z","2016-01-01T00:00:00.000Z","2016-02-01T00:00:00.000Z","2016-03-01T00:00:00.000Z","2016-04-01T00:00:00.000Z","2016-05-01T00:00:00.000Z","2016-06-01T00:00:00.000Z","2016-07-01T00:00:00.000Z","2016-08-01T00:00:00.000Z","2016-09-01T00:00:00.000Z","2016-10-01T00:00:00.000Z","2016-11-01T00:00:00.000Z","2016-12-01T00:00:00.000Z","2017-01-01T00:00:00.000Z","2017-02-01T00:00:00.000Z","2017-03-01T00:00:00.000Z","2017-04-01T00:00:00.000Z","2017-05-01T00:00:00.000Z","2017-06-01T00:00:00.000Z","2017-07-01T00:00:00.000Z","2017-08-01T00:00:00.000Z","2017-09-01T00:00:00.000Z","2017-10-01T00:00:00.000Z","2017-11-01T00:00:00.000Z","2017-12-01T00:00:00.000Z","2018-01-01T00:00:00.000Z","2018-02-01T00:00:00.000Z","2018-03-01T00:00:00.000Z","2018-04-01T00:00:00.000Z","2018-05-01T00:00:00.000Z","2018-06-01T00:00:00.000Z","2018-07-01T00:00:00.000Z","2018-08-01T00:00:00.000Z","2018-09-01T00:00:00.000Z","2018-10-01T00:00:00.000Z","2018-11-01T00:00:00.000Z","2018-12-01T00:00:00.000Z","2019-01-01T00:00:00.000Z","2019-02-01T00:00:00.000Z","2019-03-01T00:00:00.000Z","2019-04-01T00:00:00.000Z","2019-05-01T00:00:00.000Z","2019-06-01T00:00:00.000Z","2019-07-01T00:00:00.000Z","2019-08-01T00:00:00.000Z","2019-09-01T00:00:00.000Z","2019-10-01T00:00:00.000Z","2019-11-01T00:00:00.000Z","2019-12-01T00:00:00.000Z","2020-01-01T00:00:00.000Z","2020-02-01T00:00:00.000Z","2020-03-01T00:00:00.000Z","2020-04-01T00:00:00.000Z","2020-05-01T00:00:00.000Z","2020-06-01T00:00:00.000Z","2020-07-01T00:00:00.000Z","2020-08-01T00:00:00.000Z","2020-09-01T00:00:00.000Z","2020-10-01T00:00:00.000Z","2020-11-01T00:00:00.000Z","2020-12-01T00:00:00.000Z","2021-01-01T00:00:00.000Z","2021-02-01T00:00:00.000Z","2021-03-01T00:00:00.000Z","2021-04-01T00:00:00.000Z","2021-05-01T00:00:00.000Z","2021-06-01T00:00:00.000Z","2021-07-01T00:00:00.000Z","2021-08-01T00:00:00.000Z","2021-09-01T00:00:00.000Z","2021-10-01T00:00:00.000Z","2021-11-01T00:00:00.000Z","2021-12-01T00:00:00.000Z","2022-01-01T00:00:00.000Z","2022-02-01T00:00:00.000Z","2022-03-01T00:00:00.000Z","2022-04-01T00:00:00.000Z","2022-05-01T00:00:00.000Z","2022-06-01T00:00:00.000Z","2022-07-01T00:00:00.000Z","2022-08-01T00:00:00.000Z","2022-09-01T00:00:00.000Z","2022-10-01T00:00:00.000Z","2022-11-01T00:00:00.000Z","2022-12-01T00:00:00.000Z","2023-01-01T00:00:00.000Z","2023-02-01T00:00:00.000Z","2023-03-01T00:00:00.000Z","2023-04-01T00:00:00.000Z","2023-05-01T00:00:00.000Z","2023-06-01T00:00:00.000Z"],[1011676,1054098,1053546,886359,1146258,1153956,1104408,1242391,1102913,981716,1192681,1228398,1017195,964437,1002450,1058457,1068023,996736,1005867,1189605,1078781,1013772,965973,968599,943702,945935,859303,1123902,1076509,921463,1040876,915457,1055414,1070342,966897,1055590,923427,1033043,1034233,1101056,1181888,995297,1267598,1092850,1079472,1169195,1082836,1167628,1183399,1031826,1206657,1271618,1335727,1433647,1541103,1516523,1519458,1529291,1585709,1633370,1378980,1529265,1722081,1682450,1737198,2097853,1653833,1882740,1908016,1788905,1826199,1938567,1668171,1862024,1929864,1872161,2211681,2039364,2141958,2129881,2104243,2271572,2146547,2134504,1843668,1914770,2384657,2497750,2727980,2114259,2648147,2621002,2523170,2623649,3152653,3227536,2842306,2822470,3007288,3365420,3392615,3675654,3801685,3294187,3133994,2981105,2245379,2224271,2525698,2340118,2711332,2427571,2742519,2738083,2898600,2673470,2795983,2948687,2861294,3182972,2913433,2869156,3337903,3490978,3513331,3060628,3157626,3291236,3271661,3535759,3426095,3845531,3760176,3958572,4893312,4823094,5153710,4708737,4866229,4941645,4582401,4772996,5147330,5306738,4785773,4999318,5712355,5010929,5403375,4563431,4976905,4570780,4910403,5432930,4807338,4951628,4849196,4667767,4617842,4949487,5332470,4870839,4652297,4977706,4849996,4837983,4948665,5272122,4808832,4271442,4408181,4316676,5495867,4704814,5048930,4813091,5077247,4322278,3794686,3794711,2916976,3160957,3461944,3219706,3381084,3217408,3043778,2868451,2898168,2815522,2444535,2588994,1919053,2328723,2334998,2463793,2751470,2780512,2266997,3044377,2797686,2770014,2833622,3477094,2785044,2716024,3300421,2697992,3505436,2895612,3125483,3191598,3389679,3277516,3122237,4014818,3324889,3027603,3365116,3786537,3719410,3331933,3632055,3684399,3512842,3768666,3343509,3407819,3066110,3183071,3344850,3862819,3748342,3096363,3255830,3264261,3067349,3326497,2943625,3330051,3419466,2943626,2439036,1864239,2221172,2289482,2551988,2584767,2544874,2644954,2523372,3028837,2610936,2938994,3383554,2976372,3096913,3182216,3444158,3465143,3792236,3799111,4155805,4544551,3801609,4209198,4780210,5460531,4662521,5497617,5913682,4388737,4778520,4213182,4562248,4642084,3696188,4202234,4431911,3739214,4497862,3985981]]},"evals":["attrs.interactionModel"],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">#Obtener información del objeto de tipo ts</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>TSstudio<span class="sc">::</span><span class="fu">ts_info</span>(exportaciones_ts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> The exportaciones_ts series is a ts object with 1 variable and 282 observations
+ Frequency: 12 
+ Start time: 2000 1 
+ End time: 2023 6 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="do">##Gráfica de la serie con tsibble</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">autoplot</span>(exportaciones_tsbl,Valor)<span class="sc">+</span><span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Serie de Exportaciones Mensuales en Colombia"</span>,<span class="at">y=</span><span class="st">"Exportaciones en miles de dólares"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Serie-Exportaciones_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+
+
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

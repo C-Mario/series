@@ -1,0 +1,363 @@
+---
+title: "Descriptiva-Serie-Exportaciones"
+lag: es
+format: html
+editor_options: 
+  chunk_output_type: inline
+  echo: FALSE
+---
+
+```{r}
+library(TSstudio)
+library(zoo)
+library(xts)
+library(readxl)
+library(tidyverse)
+library(feasts)
+library(fable)
+library(timetk)
+library(tsibble)
+library(lubridate)
+library(dygraphs)
+library(MASS)
+```
+
+# Exportaciones mensuales de Colombia
+
+```{r include=FALSE}
+#Cargar datos
+load(file = "_environment.RData")
+
+#Ajuste del formato de los datos
+options(scipen = 12)
+Exportaciones$Total <- round(Exportaciones$Total)
+Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
+
+# Cambiar la ventana de datos
+Exportaciones <- Exportaciones[97:378,]
+
+# Crear dataframe
+exportaciones <- data.frame(as.Date(Exportaciones$Mes),Exportaciones$Total)
+colnames(exportaciones) <- c("Fecha", "Dato")
+```
+
+```{r include=FALSE}
+#Crear objeto de tipo ts indicandole la fecha de inicio y la frecuencia
+exportaciones_ts <- ts(exportaciones$Dato,start = c(2000,01),frequency = 12)
+```
+
+
+```{r}
+#Gráfico dinámico con dygraphs
+dygraph(exportaciones_ts,main="Serie de Exportaciones Mensuales en Colombia", ylab="Valor total de las exportaciones")%>% dyRangeSelector()
+```
+
+```{r}
+#Obtener información del objeto de tipo ts
+TSstudio::ts_info(exportaciones_ts)
+```
+
+La serie de tiempo de exportaciones de Colombia presnetada en el gráfico es una serie de tiempo mensual con frecuencia 12 con valores desde enero del 2000 hasta junio del 2023, sin ninguna observación faltante, o sea que cuenta con 282 observaciones. Del gráfico podemos suponer las siguientes características de la serie:
+
+-   **Varianza marginal:** La serie pareciera tener varianza marginal no constante, pues su rango de valores resulta ser pequeño en ciertos periodos de tiempo y grande en otros. Por ejemplo, de noviembre de 2008 a febrero de 2011 hay un rango grande, de marzo de 2011 a octubre de 2014 hay un rango pequeño y de noviembre de 2014 a febrero de 2016 hay de nuevo un rango grande.
+
+-   **Tendencia:** A simple vista la serie presenta una tendencia determinística lineal creciente en los primeros años de observación. Sin embargo, desde el año 2011 la serie no sigue el mismo patrón y su tendencia empieza a variar por periodos de tiempo, por lo que se puede pensar en una tendencia de tipo estocástico.
+
+-   **Componente Estacional:** Haciendo una observación detallada de la serie acortando los años con ayuda del gráfico dinámico, se puede ver que la serie presenta picos en los meses de mayo y noviembre. Por los que se cree que hay existencia de estacionalidad de periodo 6 meses.
+
+### Estabilización de la Varianza
+
+A continuación se evaluará si es necesario y conveniente hacer una tranformación de Box-Cox para estabilizar la varianza marginal de la serie.
+
+Veremos primero qué valores del parámetro lambda de la transformación de Box-Cox nos maximiza la log-verosimilitud. Si estos valores están lejos de 1 se sugiere hacer una transformación de Box-Cox.
+
+```{r}
+MASS::boxcox(lm(exportaciones_ts ~ 1),seq(-1, 2, length = 500))
+```
+
+A patir de la gráfica anterior se verifica que los valores de lambda que maximizan la log-verosimilitud estan alrededor de 0.6, con un intervalo que no incluye al 1. Se toma la decisión de transformar la serie con lambda igual a $0.6$ y se observam los resultados en comparación con la serie original.
+
+```{r}
+lexportaciones_ts <- (1/0.6)*((exportaciones_ts^(0.6))-1)
+```
+
+```{r}
+par(mar = c(1,1,1,1))
+par(mfrow=c(1,2))
+dygraph(exportaciones_ts,main="Serie de Exportaciones Mensuales en Colombia", ylab="Valor total de las exportaciones")%>% dyRangeSelector()
+dygraph(lexportaciones_ts,main="Serie transformada con lambda=0.6", ylab="Valor")%>% dyRangeSelector()
+```
+
+Se nota un ligero cambio en la varianza marginal de la serie, en particular una disminución general de la varianza marginal. Se verifican los valores del parámetro lambda de la transforación de Box-Cox que maximizan la log-verosimilitud de la serie transformada.
+
+```{r}
+MASS::boxcox(lm(lexportaciones_ts ~ 1),seq(-1, 2, length = 500))
+```
+
+El valor de lambda que maximiza la log-verosimilitud sobre la serie transformada es ahora muy cercano a 1, por lo que se considera una buena transformación. Sin embargo, dado que el cambio no es muy notorio se toma la recomendación de ser flexibles con el valor de lambda y se realiza una transformación que es más notoria y que cumple con incluir al uno entre los valores de lambda que maximizan la verosimilitud.
+
+El valor usado será lambda = 0.45, obteniendo los resultados siguientes
+
+```{r}
+lexportaciones_ts <- (1/0.45)*((exportaciones_ts^(0.45))-1)
+```
+
+```{r}
+par(mar = c(1,1,1,1))
+par(mfrow=c(2,1))
+dygraph(exportaciones_ts,main="Serie de Exportaciones Mensuales en Colombia", ylab="Valor total de las exportaciones")%>% dyRangeSelector()
+dygraph(lexportaciones_ts,main="Serie transformada con lambda=0.45", ylab="Valor")%>% dyRangeSelector()
+```
+
+```{r}
+MASS::boxcox(lm(lexportaciones_ts ~ 1),seq(-1, 5, length = 500))
+```
+
+Se decide continuar con esta última serie obtenida.
+
+```{r}
+#Otras opciones de transformación 
+library(VGAM)
+prueba<-VGAM::yeo.johnson(exportaciones_ts, lambda = 0.4)
+```
+
+```{r}
+dygraph(prueba,main="Serie transformada con yeo.jhonson", ylab="Valor")%>% dyRangeSelector()
+```
+
+### Análisis de Tendencia
+
+Inicialmente revisaremos la función de autocorrelación, pues su forma nos dará indicios de si exisste tendencia o no.
+
+```{r}
+acf(lexportaciones_ts, 36, main = "ACF de la serie estabilizada")
+```
+
+La serie presenta alta autocorrelación de los rezagos con un decaimiento leve a medida que el rezago es mayor, estoo es un indicio de que la serie presenta tendencia. A continuación se realizaran ajustes determinísticos de la misma.
+
+#### Ajuste determinístico lineal
+
+```{r}
+summary(fit <- lm(lexportaciones_ts~time(lexportaciones_ts), na.action=NULL))
+```
+
+```{r}
+plot(lexportaciones_ts, main= "Tendencia lineal ajustada")
+abline(fit,col = "red")# Se añade la recta ajusta
+```
+
+#### Serie sin tendencia
+
+```{r}
+noTendlexportaciones_ts <- lexportaciones_ts - predict(fit)
+plot(noTendlexportaciones_ts, main="Serie Sin tendencia", 
+     ylab= "Valor")
+```
+
+```{r}
+acf(noTendlexportaciones_ts,lag.max =length(noTendlexportaciones_ts), 
+    main="ACF Serie Sin tendencia")
+```
+
+#### Ajuste por medio de filtro de promedios móviles
+
+```{r}
+descom_lexportaciones <- decompose(lexportaciones_ts)
+plot(descom_lexportaciones)
+```
+
+```{r}
+plot(lexportaciones_ts, ylab= "Valor en escala logarítmica")
+abline(fit,col = "red")# Se añade la recta ajusta
+points(time(lexportaciones_ts), descom_lexportaciones$trend, col ="green", cex=0.4)
+```
+
+La línea de tendencia ajustada po medio del filtro de promedios móviles es muy distinta a la línea de tendencia lineal ajustada. Veamos como queda la serie al eliminar la tendencia usando este ajuste.
+
+```{r}
+noTendlexportaciones_ts2 <- lexportaciones_ts - descom_lexportaciones$trend
+plot(noTendlexportaciones_ts2, main="Serie Sin tendencia", 
+     ylab= "Valor")
+```
+
+Se observa que esta estimación de la tendencia se ajusta mejor, pues al eliminar la tendencia la serie oscila constantemente alrededor de cero.
+
+Sin embargo, a pesar que se estabilizó la varianza previamente, se sigue notando algo de varianza marginal no constante y de forma más notoria. Al inicio varinza baja y al final varianza alta.
+
+```{r}
+acf(noTendlexportaciones_ts2[7:276],lag.max =length(noTendlexportaciones_ts2), 
+    main="ACF serie Sin tendencia")
+```
+
+```{r}
+acf(noTendlexportaciones_ts2[7:276],lag.max =48, 
+    main="ACF serie Sin tendencia")
+```
+
+# Descomposición STL
+
+```{r include=FALSE}
+# Crear objeto de tipo Tsibble
+
+indice <- sort(exportaciones$Fecha)
+
+lexportaciones <- as.matrix(lexportaciones_ts)
+df_lexportaciones <- data.frame(Fecha=indice,lexportaciones=as.matrix(lexportaciones_ts))
+
+colnames(df_lexportaciones) <- c("Fecha", "lexportaciones")
+
+lexportaciones_tbl <- tibble(df_lexportaciones)
+```
+
+```{r}
+####Primera aproximación del ajuste STL
+lexportaciones_tbl%>%timetk::plot_time_series(Fecha, lexportaciones, 
+                   .interactive = TRUE,
+                   .plotly_slider = TRUE)
+```
+
+```{r}
+#####Ajuste STL
+
+lexportaciones_ajus <- smooth_vec(lexportaciones,span = 0.75, degree = 2)
+lexportaciones_tbl%>%dplyr::mutate(lexportaciones_ajus)
+```
+```{r}
+###Ajuste STL moviendo los parámetros
+lexportaciones_tbl%>%mutate(lexportaciones_ajus=smooth_vec(lexportaciones,span = 0.75, degree = 2))%>%
+  ggplot(aes(Fecha, lexportaciones)) +
+    geom_line() +
+    geom_line(aes(y = lexportaciones_ajus), color = "red")
+```
+
+Se observa que el ajuste es mucho más suavizado.
+
+
+```{r}
+###Eliminamos la tendencia con la predicción la recta xts
+noTendlexportaciones_ts3 <- lexportaciones_ts - lexportaciones_ajus
+plot(noTendlexportaciones_ts3, main="Serie Sin tendencia", 
+     ylab= "Valor en escala logarítmica") 
+```
+
+```{r}
+acf(noTendlexportaciones_ts3,lag.max =length(noTendlexportaciones_ts3), 
+    main="ACF serie Sin tendencia")
+```
+
+#### Serie Diferenciada
+
+```{r}
+###Diferenciando con base en el objeto ts
+dlexportaciones<-diff(lexportaciones_ts)
+plot(dlexportaciones)
+abline(h=0, col = "red")
+```
+
+Al observar la serie diferenciada se hace más evidente la presencia de varianza marginal no  constante en la serie, lo que quiere decir que las tansformación no la ha corregido lo suficiente.
+
+```{r}
+acf(dlexportaciones,lag.max =length(dlexportaciones), main="ACF de la Serie Diferenciada")
+```
+
+```{r}
+acf(dlexportaciones,lag.max =100, main="ACF de la Serie Diferenciada")
+```
+
+Varios rezagos superan el umbral de autocorrelación, en especial los que se encuentran cerca a las unidades. Por lo que se cree que hay presencia de una componente estacional de periodo 12.
+
+Dadas las anteriores estimaciones de la tendencia y analizando cada una de las series con dichas tendencias estimadas eliminadas, se opta por continuar el estudio de la serie sin la tendencia dada por el filtro de promedios móviles y con la serie con la tendencia eliminada por medio de la diferenciación de la serie.
+
+### Análisis de Estacionalidad 
+
+A continuación se busca determinar si la serie presenta una componente estacional con la ayuda de diversos métodos. Se aplican los métodos sobre las series que fueron elegidas en la sección anterior.
+
+#### Correlación de las observaciones con sus retardos 
+
+Se observa que tan correlacionadas estan las observaciones con sus retardos desde el 1 hasta el 12. Primero los resultados con la serie obtenida al estimar la tendencia con filtro de promedios móviles.
+
+```{r}
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(noTendlexportaciones_ts2[7:276], 12,corr=T)
+```
+
+Las correlaciones negativas que más destacan son las de los rezagos 4, 5 y 6. Y las positivas que mas destacan son las de los rezagos 1 y 12.
+
+Ahora veamos de la serie diferenciada:
+
+```{r}
+par(mar = c(3,2,3,2))
+astsa::lag1.plot(dlexportaciones, 12,corr=T)
+```
+
+Las correlaciones negativas que destacan son las de los rezagos 1 y 6, y la positiva es la del rezago 12. Coinciden en ser correlaciones negativas las del rezago 6 para ambos casos y en ser correlaciones positivas las del rezago 12 en ambos casos. Por lo que se sospecha de un ciclo estacional anual.
+
+#### Función de autocorrelación parcial
+
+```{r}
+#pacf
+pacf(noTendlexportaciones_ts2[7:276], 100, main = "PACF Serie sin tendencia")
+```
+
+```{r}
+#pacf
+pacf(dlexportaciones, 100, main = "PACF Serie Diferenciada")
+```
+
+#### AMI
+
+Sobre la serie ajustada por medio del filtro de promedios móviles
+
+```{r}
+tseriesChaos::mutual(noTendlexportaciones_ts2[7:276], partitions = 16, lag.max = 50, plot=TRUE)
+```
+
+Ahora veamos sobre la serie diferenciada:
+
+```{r}
+tseriesChaos::mutual(dlexportaciones, partitions = 16, lag.max = 50, plot=TRUE)
+```
+
+#### Mapas de calor
+
+Con la serie sin tendencia:
+
+```{r}
+prueba<-xts(noTendlexportaciones_ts2[7:276],indice[7:276])
+
+TSstudio::ts_heatmap(prueba, title = "Mapa de calor - Exportaciones sin tendencia")
+```
+
+```{r}
+TSstudio::ts_heatmap(dlexportaciones, title = "Mapa de calor - Exportaciones sin tendencia")
+```
+
+#### Perdiodograma
+
+```{r}
+# periodograma
+Periodograma <- spectrum(as.numeric(noTendlexportaciones_ts2[7:276]),log="no",span=c(5,5))
+```
+
+```{r}
+ubicacionElim<- which.max(Periodograma$spec)
+sprintf("El valor de la frecuencia donde se máximiza el periodograma para la serie es: %s",Periodograma$freq[ubicacionElim])
+```
+
+```{r}
+sprintf("El periodo correspondiente es aproximadamente: %s",1/Periodograma$freq[ubicacionElim])
+```
+
+```{r}
+# periodograma
+Periodograma <- spectrum(as.numeric(dlexportaciones),log="no",span=c(5,5))
+```
+
+```{r}
+ubicacionElim<- which.max(Periodograma$spec)
+sprintf("El valor de la frecuencia donde se máximiza el periodograma para la serie es: %s",Periodograma$freq[ubicacionElim])
+```
+
+```{r}
+sprintf("El periodo correspondiente es aproximadamente: %s",1/Periodograma$freq[ubicacionElim])
+```

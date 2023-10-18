@@ -1,0 +1,97 @@
+---
+title: "Descriptiva Serie Exportaciones"
+author: "Grupo 4"
+date: "2023-09-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#Librerias
+library(TSstudio)
+library(zoo)
+library(xts)
+library(readxl)
+library(tidyverse)
+library(feasts)
+library(fable)
+library(timetk)
+library(tsibble)
+library(lubridate)
+library(dygraphs)
+```
+
+```{r include=FALSE}
+#Cargar datos
+load(file = "_environment.RData")
+
+#Ajuste del formato de los datos
+options(scipen = 12)
+Exportaciones$Total <- round(Exportaciones$Total)
+Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
+
+# Cambiar la ventana de datos
+Exportaciones <- Exportaciones[97:378,]
+
+# Crear dataframe
+exportaciones <- data.frame(as.Date(Exportaciones$Mes),Exportaciones$Total)
+colnames(exportaciones) <- c("Fecha", "Dato")
+```
+
+
+```{r include=FALSE}
+#Crear objeto de tipo ts indicandole la fecha de inicio y la frecuencia
+exportaciones_ts <- ts(exportaciones$Dato,start = c(2000,01),frequency = 12)
+```
+
+```{r}
+# Graficar objeto de tipo ts
+plot(exportaciones_ts, main = "Serie original")
+```
+
+```{r}
+#Graficar dinámico
+TSstudio::ts_plot(exportaciones_ts,title="Serie Exportaciones Original",slider=TRUE)
+```
+
+```{r}
+#Gráfico dinámico con dygraphs
+dygraph(exportaciones_ts,main="Serie de Exportaciones Mensuales en Colombia", ylab="Valor total de las exportaciones")%>% dyRangeSelector()
+```
+
+
+
+```{r}
+#Obtener información del objeto de tipo ts
+TSstudio::ts_info(exportaciones_ts)
+```
+
+```{r include=FALSE}
+# Crear objeto de tipo Tsibble a partir de un objeto de tipo Tibble
+
+df_exportaciones=data.frame(Valor=Exportaciones$Total,Fecha=Exportaciones$Mes)
+tbl_exportaciones=tibble(df_exportaciones)
+tbl_exportaciones_format_fecha=tbl_exportaciones
+tbl_exportaciones_format_fecha$Fecha=yearmonth(tbl_exportaciones_format_fecha$Fecha)
+
+###El tipo de fechas debe ser alguno que reconozca tsibble
+
+exportaciones_tsbl=as_tsibble(tbl_exportaciones_format_fecha,index=Fecha)   
+
+####La fecha en tsibble es importante
+```
+
+
+```{r}
+##Gráfica de la serie con tsibble
+autoplot(exportaciones_tsbl,Valor)+labs(title="Serie de Exportaciones Mensuales en Colombia",y="Exportaciones en miles de dólares")
+```
+
+
+
+
+
+
+
+
+

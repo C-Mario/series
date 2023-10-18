@@ -18,18 +18,18 @@ Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
 # mirar fromato de exportaciones
 str(Exportaciones)
 
-# cambiar la ventana de datos
+# Cambiar la ventana de datos
 Exportaciones <- Exportaciones[97:378,]
 
-data <- data.frame(as.Date(Exportaciones$Mes),Exportaciones$Total)
+exportaciones <- data.frame(as.Date(Exportaciones$Mes),Exportaciones$Total)
 
-colnames(data) <- c("Fecha", "Dato")
-str(data)
+colnames(exportaciones) <- c("Fecha", "Dato")
+str(exportaciones)
 
 #Crear objeto de tipo ts indicandole la fecha de inicio y la frecuencia
-data_ts <- ts(data$Dato,start = c(2000,01),frequency = 12)
-TSstudio::ts_info(data_ts)
-plot(data_ts, main = "Serie original")
+exportaciones_ts <- ts(exportaciones$Dato,start = c(2000,01),frequency = 12)
+TSstudio::ts_info(exportaciones_ts)
+plot(exportaciones_ts, main = "Serie original")
 
 ###Creación objeto tssible a partir de un objeto tibble
 library(feasts)
