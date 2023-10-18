@@ -167,7 +167,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#datos" id="toc-datos" class="nav-link" data-scroll-target="#datos"><span class="header-section-number">1.1</span> Datos</a></li>
   <li><a href="#predicción-univariada" id="toc-predicción-univariada" class="nav-link" data-scroll-target="#predicción-univariada"><span class="header-section-number">1.2</span> Predicción univariada</a></li>
   <li><a href="#separación-entrenamiento-validación-prueba-y-normalización." id="toc-separación-entrenamiento-validación-prueba-y-normalización." class="nav-link" data-scroll-target="#separación-entrenamiento-validación-prueba-y-normalización."><span class="header-section-number">1.3</span> Separación (Entrenamiento-Validación-Prueba) y Normalización.</a></li>
-  <li><a href="#configuración-para-el-ajuste-de-los-modelos" id="toc-configuración-para-el-ajuste-de-los-modelos" class="nav-link" data-scroll-target="#configuración-para-el-ajuste-de-los-modelos"><span class="header-section-number">1.4</span> Configuración para el ajuste de los modelos</a></li>
+  <li><a href="#configuración-del-problema-de-aprendizaje-automático" id="toc-configuración-del-problema-de-aprendizaje-automático" class="nav-link" data-scroll-target="#configuración-del-problema-de-aprendizaje-automático"><span class="header-section-number">1.4</span> Configuración del problema de aprendizaje automático</a></li>
+  <li><a href="#modelo-de-red-neuronal-multicapa" id="toc-modelo-de-red-neuronal-multicapa" class="nav-link" data-scroll-target="#modelo-de-red-neuronal-multicapa"><span class="header-section-number">1.5</span> Modelo de red neuronal multicapa</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -177,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Redes neuronales</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Código</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">Redes neuronales</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Código</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -194,10 +195,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="exportaciones" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="exportaciones"><span class="header-section-number">1</span> <strong><em>Exportaciones</em></strong></h2>
+<div class="cell" data-execution_count="1">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">from</span> tensorflow.keras.callbacks <span class="im">import</span> CSVLogger, EarlyStopping</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> matplotlib <span class="im">as</span> mpl</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="im">import</span> os</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="im">import</span> time</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="im">import</span> gc</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="im">import</span> sys</span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf</span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_pacf</span>
+<span id="cb1-14"><a href="#cb1-14"></a></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="bu">print</span>(<span class="ss">f"Tensorflow Version: </span><span class="sc">{</span>tf<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="bu">print</span>(<span class="ss">f"Pandas Version: </span><span class="sc">{</span>pd<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="bu">print</span>(<span class="ss">f"Numpy Version: </span><span class="sc">{</span>np<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18"></a><span class="bu">print</span>(<span class="ss">f"System Version: </span><span class="sc">{</span>sys<span class="sc">.</span>version<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19"></a></span>
+<span id="cb1-20"><a href="#cb1-20"></a>mpl.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> (<span class="dv">17</span>, <span class="dv">5</span>)</span>
+<span id="cb1-21"><a href="#cb1-21"></a>mpl.rcParams[<span class="st">'axes.grid'</span>] <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb1-22"><a href="#cb1-22"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23"></a></span>
+<span id="cb1-24"><a href="#cb1-24"></a>notebookstart<span class="op">=</span> time.time()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="2">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">import</span> IPython</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="im">import</span> IPython.display</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <section id="datos" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="datos"><span class="header-section-number">1.1</span> Datos</h3>
 <p>Total de Exportaciones <strong>Colombia</strong> desde enero del año 2000 hasta junio del año 2023.</p>
 <div class="cell" data-execution_count="3">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Lectura de la serie</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>Exportaciones <span class="op">=</span> pd.read_excel(<span class="st">"datos/Exportaciones.xlsx"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>                   header <span class="op">=</span> <span class="dv">0</span>, usecols <span class="op">=</span> [<span class="st">'Mes'</span>,<span class="st">'Total'</span>]).iloc[<span class="dv">96</span>:].reset_index(drop <span class="op">=</span> <span class="va">True</span>).<span class="bu">round</span>()</span>
+<span id="cb3-4"><a href="#cb3-4"></a>Exportaciones[<span class="st">'Total'</span>] <span class="op">=</span> Exportaciones[<span class="st">'Total'</span>].astype(<span class="bu">int</span>) </span>
+<span id="cb3-5"><a href="#cb3-5"></a>Exportaciones</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
@@ -278,7 +323,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="predicción-univariada" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="predicción-univariada"><span class="header-section-number">1.2</span> Predicción univariada</h3>
 <p>Se quiere predecir la variable “Total de Exportaciones” (<strong>Total</strong>) en base a sus retardos. <br> A continuación se presenta el gráfico de la serie de tiempo:</p>
+<div class="cell" data-execution_count="4">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>features_considered <span class="op">=</span> [<span class="st">'Total'</span>] <span class="co"># la variable a usar en la predicción es ella misma</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>features <span class="op">=</span> Exportaciones[features_considered] <span class="co"># solo se usará la variable Total en la predicción</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>features.index <span class="op">=</span> Exportaciones[<span class="st">'Mes'</span>] <span class="co"># variable que indica el tiempo (la serie es mensual)</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>features.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <div class="cell" data-execution_count="5">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>features.plot(subplots <span class="op">=</span> <span class="va">True</span>, ) <span class="co"># gráfico de la serie de tiempo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>array([&lt;Axes: xlabel='Mes'&gt;], dtype=object)</code></pre>
 </div>
@@ -296,7 +354,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Datos de validación (<strong>20%</strong>) para un total de <strong>56</strong> observaciones. Desde 2016-06 hasta 2021-01.</li>
 <li>Datos de entrenamiento (<strong>10%</strong>) para un total de <strong>29</strong> observaciones. Desde 2021-02 hasta 2023-06.</li>
 </ul>
+<div class="cell" data-execution_count="6">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># partición del conjuntos de datos en entrenamiento, validación y prueba</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span> <span class="bu">enumerate</span>(features.columns)} <span class="co"># índice = 0</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a></span>
+<span id="cb7-4"><a href="#cb7-4"></a>n <span class="op">=</span> <span class="bu">len</span>(features) <span class="co"># longitud de la serie (282)</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>train_df <span class="op">=</span> features[<span class="dv">0</span>:<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>)] <span class="co"># 2000-01 hasta 2016-05</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>val_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>):<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>)] <span class="co"># 2016-06 hasta 2021-01</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>test_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>):] <span class="co"># 2021-02 hasta 2023-06</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a></span>
+<span id="cb7-9"><a href="#cb7-9"></a>num_features <span class="op">=</span> features.shape[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="7">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="bu">print</span>(<span class="st">"longitud dataframe entrenamiento:"</span>, train_df.shape)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="bu">print</span>(<span class="st">"longitud dataframe validación:"</span>, val_df.shape)</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="bu">print</span>(<span class="st">"longitud dataframe prueba:"</span>, test_df.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="8">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Normalización de las observaciones</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>train_mean <span class="op">=</span> train_df.mean()</span>
+<span id="cb9-3"><a href="#cb9-3"></a>train_std <span class="op">=</span> train_df.std()</span>
+<span id="cb9-4"><a href="#cb9-4"></a></span>
+<span id="cb9-5"><a href="#cb9-5"></a>train_df <span class="op">=</span> (train_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb9-6"><a href="#cb9-6"></a>val_df <span class="op">=</span> (val_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb9-7"><a href="#cb9-7"></a>test_df <span class="op">=</span> (test_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="9">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># todo el dataframe normalizado por train_mean y train_std</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>df_std <span class="op">=</span> (features <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb10-3"><a href="#cb10-3"></a>df_std <span class="op">=</span> df_std.melt(var_name<span class="op">=</span><span class="st">''</span>, value_name<span class="op">=</span><span class="st">'Datos normalizados'</span>)</span>
+<span id="cb10-4"><a href="#cb10-4"></a>df_std</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <div class="cell" data-execution_count="10">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># plt.subplot(1, 2, 1)</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="co"># sns.violinplot(y=Exportaciones["Total"])</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a></span>
+<span id="cb11-4"><a href="#cb11-4"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb11-5"><a href="#cb11-5"></a>ax <span class="op">=</span> sns.violinplot(x <span class="op">=</span> <span class="st">''</span>, y <span class="op">=</span> <span class="st">'Datos normalizados'</span>, data <span class="op">=</span> df_std)</span>
+<span id="cb11-6"><a href="#cb11-6"></a>_ <span class="op">=</span> ax.set_xticklabels(features.keys(), rotation<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -307,16 +417,409 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><br></p>
 </section>
-<section id="configuración-para-el-ajuste-de-los-modelos" class="level3" data-number="1.4">
-<h3 data-number="1.4" class="anchored" data-anchor-id="configuración-para-el-ajuste-de-los-modelos"><span class="header-section-number">1.4</span> Configuración para el ajuste de los modelos</h3>
+<section id="configuración-del-problema-de-aprendizaje-automático" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="configuración-del-problema-de-aprendizaje-automático"><span class="header-section-number">1.4</span> Configuración del problema de aprendizaje automático</h3>
+<p>Se definen las clases y funciones necesarias para resolver el problema de redes neuronales por medio de tensores.</p>
 <ul>
 <li>Se usará un tamaño de lote de <strong>32</strong>.</li>
 <li>El número máximo de épocas será de <strong>20</strong>.</li>
 </ul>
+<div class="cell" data-execution_count="11">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">class</span> WindowGenerator():</span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_width, label_width, shift,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>               train_df<span class="op">=</span>train_df, val_df<span class="op">=</span>val_df, test_df<span class="op">=</span>test_df,</span>
+<span id="cb12-4"><a href="#cb12-4"></a>               label_columns<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb12-5"><a href="#cb12-5"></a>    <span class="co"># Store the raw data.</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>    <span class="va">self</span>.train_df <span class="op">=</span> train_df</span>
+<span id="cb12-7"><a href="#cb12-7"></a>    <span class="va">self</span>.val_df <span class="op">=</span> val_df</span>
+<span id="cb12-8"><a href="#cb12-8"></a>    <span class="va">self</span>.test_df <span class="op">=</span> test_df</span>
+<span id="cb12-9"><a href="#cb12-9"></a></span>
+<span id="cb12-10"><a href="#cb12-10"></a>    <span class="co"># Work out the label column indices.</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a>    <span class="va">self</span>.label_columns <span class="op">=</span> label_columns</span>
+<span id="cb12-12"><a href="#cb12-12"></a>    <span class="cf">if</span> label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb12-13"><a href="#cb12-13"></a>      <span class="va">self</span>.label_columns_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
+<span id="cb12-14"><a href="#cb12-14"></a>                                    <span class="bu">enumerate</span>(label_columns)}</span>
+<span id="cb12-15"><a href="#cb12-15"></a>    <span class="va">self</span>.column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a>                           <span class="bu">enumerate</span>(train_df.columns)}</span>
+<span id="cb12-17"><a href="#cb12-17"></a></span>
+<span id="cb12-18"><a href="#cb12-18"></a>    <span class="co"># Work out the window parameters.</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a>    <span class="va">self</span>.input_width <span class="op">=</span> input_width</span>
+<span id="cb12-20"><a href="#cb12-20"></a>    <span class="va">self</span>.label_width <span class="op">=</span> label_width</span>
+<span id="cb12-21"><a href="#cb12-21"></a>    <span class="va">self</span>.shift <span class="op">=</span> shift</span>
+<span id="cb12-22"><a href="#cb12-22"></a></span>
+<span id="cb12-23"><a href="#cb12-23"></a>    <span class="va">self</span>.total_window_size <span class="op">=</span> input_width <span class="op">+</span> shift</span>
+<span id="cb12-24"><a href="#cb12-24"></a></span>
+<span id="cb12-25"><a href="#cb12-25"></a>    <span class="va">self</span>.input_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="dv">0</span>, input_width)</span>
+<span id="cb12-26"><a href="#cb12-26"></a>    <span class="va">self</span>.input_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.input_slice]</span>
+<span id="cb12-27"><a href="#cb12-27"></a></span>
+<span id="cb12-28"><a href="#cb12-28"></a>    <span class="va">self</span>.label_start <span class="op">=</span> <span class="va">self</span>.total_window_size <span class="op">-</span> <span class="va">self</span>.label_width</span>
+<span id="cb12-29"><a href="#cb12-29"></a>    <span class="va">self</span>.labels_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="va">self</span>.label_start, <span class="va">None</span>)</span>
+<span id="cb12-30"><a href="#cb12-30"></a>    <span class="va">self</span>.label_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.labels_slice]</span>
+<span id="cb12-31"><a href="#cb12-31"></a></span>
+<span id="cb12-32"><a href="#cb12-32"></a>  <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
+<span id="cb12-33"><a href="#cb12-33"></a>    <span class="cf">return</span> <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>.join([</span>
+<span id="cb12-34"><a href="#cb12-34"></a>        <span class="ss">f'Total window size: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>total_window_size<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb12-35"><a href="#cb12-35"></a>        <span class="ss">f'Input indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>input_indices<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb12-36"><a href="#cb12-36"></a>        <span class="ss">f'Label indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_indices<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb12-37"><a href="#cb12-37"></a>        <span class="ss">f'Label column name(s): </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_columns<span class="sc">}</span><span class="ss">'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="12">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">def</span> split_window(<span class="va">self</span>, features):</span>
+<span id="cb13-2"><a href="#cb13-2"></a>  inputs <span class="op">=</span> features[:, <span class="va">self</span>.input_slice, :]</span>
+<span id="cb13-3"><a href="#cb13-3"></a>  labels <span class="op">=</span> features[:, <span class="va">self</span>.labels_slice, :]</span>
+<span id="cb13-4"><a href="#cb13-4"></a>  <span class="cf">if</span> <span class="va">self</span>.label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb13-5"><a href="#cb13-5"></a>    labels <span class="op">=</span> tf.stack(</span>
+<span id="cb13-6"><a href="#cb13-6"></a>        [labels[:, :, <span class="va">self</span>.column_indices[name]] <span class="cf">for</span> name <span class="kw">in</span> <span class="va">self</span>.label_columns],</span>
+<span id="cb13-7"><a href="#cb13-7"></a>        axis<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb13-8"><a href="#cb13-8"></a></span>
+<span id="cb13-9"><a href="#cb13-9"></a>  <span class="co"># Slicing doesn't preserve static shape information, so set the shapes</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a>  <span class="co"># manually. This way the `tf.data.Datasets` are easier to inspect.</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a>  inputs.set_shape([<span class="va">None</span>, <span class="va">self</span>.input_width, <span class="va">None</span>])</span>
+<span id="cb13-12"><a href="#cb13-12"></a>  labels.set_shape([<span class="va">None</span>, <span class="va">self</span>.label_width, <span class="va">None</span>])</span>
+<span id="cb13-13"><a href="#cb13-13"></a></span>
+<span id="cb13-14"><a href="#cb13-14"></a>  <span class="cf">return</span> inputs, labels</span>
+<span id="cb13-15"><a href="#cb13-15"></a></span>
+<span id="cb13-16"><a href="#cb13-16"></a>WindowGenerator.split_window <span class="op">=</span> split_window</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="13">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">def</span> make_dataset(<span class="va">self</span>, data):</span>
+<span id="cb14-2"><a href="#cb14-2"></a>  data <span class="op">=</span> np.array(data, dtype<span class="op">=</span>np.float32)</span>
+<span id="cb14-3"><a href="#cb14-3"></a>  ds <span class="op">=</span> tf.keras.utils.timeseries_dataset_from_array(</span>
+<span id="cb14-4"><a href="#cb14-4"></a>      data<span class="op">=</span>data,</span>
+<span id="cb14-5"><a href="#cb14-5"></a>      targets<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb14-6"><a href="#cb14-6"></a>      sequence_length<span class="op">=</span><span class="va">self</span>.total_window_size,</span>
+<span id="cb14-7"><a href="#cb14-7"></a>      sequence_stride<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb14-8"><a href="#cb14-8"></a>      shuffle<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb14-9"><a href="#cb14-9"></a>      batch_size<span class="op">=</span><span class="dv">32</span>,) </span>
+<span id="cb14-10"><a href="#cb14-10"></a></span>
+<span id="cb14-11"><a href="#cb14-11"></a>  ds <span class="op">=</span> ds.<span class="bu">map</span>(<span class="va">self</span>.split_window)</span>
+<span id="cb14-12"><a href="#cb14-12"></a></span>
+<span id="cb14-13"><a href="#cb14-13"></a>  <span class="cf">return</span> ds</span>
+<span id="cb14-14"><a href="#cb14-14"></a></span>
+<span id="cb14-15"><a href="#cb14-15"></a>WindowGenerator.make_dataset <span class="op">=</span> make_dataset</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="14">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="at">@property</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="kw">def</span> train(<span class="va">self</span>):</span>
+<span id="cb15-3"><a href="#cb15-3"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.train_df)</span>
+<span id="cb15-4"><a href="#cb15-4"></a></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="at">@property</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="kw">def</span> val(<span class="va">self</span>):</span>
+<span id="cb15-7"><a href="#cb15-7"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.val_df)</span>
+<span id="cb15-8"><a href="#cb15-8"></a></span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="at">@property</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="kw">def</span> test(<span class="va">self</span>):</span>
+<span id="cb15-11"><a href="#cb15-11"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.test_df)</span>
+<span id="cb15-12"><a href="#cb15-12"></a></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="at">@property</span></span>
+<span id="cb15-14"><a href="#cb15-14"></a><span class="kw">def</span> example(<span class="va">self</span>):</span>
+<span id="cb15-15"><a href="#cb15-15"></a>  <span class="co">"""Get and cache an example batch of `inputs, labels` for plotting."""</span></span>
+<span id="cb15-16"><a href="#cb15-16"></a>  result <span class="op">=</span> <span class="bu">getattr</span>(<span class="va">self</span>, <span class="st">'_example'</span>, <span class="va">None</span>)</span>
+<span id="cb15-17"><a href="#cb15-17"></a>  <span class="cf">if</span> result <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb15-18"><a href="#cb15-18"></a>    <span class="co"># No example batch was found, so get one from the `.train` dataset</span></span>
+<span id="cb15-19"><a href="#cb15-19"></a>    result <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(<span class="va">self</span>.train))</span>
+<span id="cb15-20"><a href="#cb15-20"></a>    <span class="co"># And cache it for next time</span></span>
+<span id="cb15-21"><a href="#cb15-21"></a>    <span class="va">self</span>._example <span class="op">=</span> result</span>
+<span id="cb15-22"><a href="#cb15-22"></a>  <span class="cf">return</span> result</span>
+<span id="cb15-23"><a href="#cb15-23"></a></span>
+<span id="cb15-24"><a href="#cb15-24"></a>WindowGenerator.train <span class="op">=</span> train</span>
+<span id="cb15-25"><a href="#cb15-25"></a>WindowGenerator.val <span class="op">=</span> val</span>
+<span id="cb15-26"><a href="#cb15-26"></a>WindowGenerator.test <span class="op">=</span> test</span>
+<span id="cb15-27"><a href="#cb15-27"></a>WindowGenerator.example <span class="op">=</span> example</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="15">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">def</span> plot(<span class="va">self</span>, model<span class="op">=</span><span class="va">None</span>, plot_col<span class="op">=</span><span class="st">'Total'</span>, max_subplots<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb16-2"><a href="#cb16-2"></a>  inputs, labels <span class="op">=</span> <span class="va">self</span>.example</span>
+<span id="cb16-3"><a href="#cb16-3"></a>  plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb16-4"><a href="#cb16-4"></a>  plot_col_index <span class="op">=</span> <span class="va">self</span>.column_indices[plot_col]</span>
+<span id="cb16-5"><a href="#cb16-5"></a>  max_n <span class="op">=</span> <span class="bu">min</span>(max_subplots, <span class="bu">len</span>(inputs))</span>
+<span id="cb16-6"><a href="#cb16-6"></a>  <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(max_n):</span>
+<span id="cb16-7"><a href="#cb16-7"></a>    plt.subplot(max_n, <span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb16-8"><a href="#cb16-8"></a>    plt.ylabel(<span class="ss">f'</span><span class="sc">{</span>plot_col<span class="sc">}</span><span class="ss"> [normed]'</span>)</span>
+<span id="cb16-9"><a href="#cb16-9"></a>    plt.plot(<span class="va">self</span>.input_indices, inputs[n, :, plot_col_index],</span>
+<span id="cb16-10"><a href="#cb16-10"></a>             label<span class="op">=</span><span class="st">'Inputs'</span>, marker<span class="op">=</span><span class="st">'.'</span>, zorder<span class="op">=-</span><span class="dv">10</span>)</span>
+<span id="cb16-11"><a href="#cb16-11"></a></span>
+<span id="cb16-12"><a href="#cb16-12"></a>    <span class="cf">if</span> <span class="va">self</span>.label_columns:</span>
+<span id="cb16-13"><a href="#cb16-13"></a>      label_col_index <span class="op">=</span> <span class="va">self</span>.label_columns_indices.get(plot_col, <span class="va">None</span>)</span>
+<span id="cb16-14"><a href="#cb16-14"></a>    <span class="cf">else</span>:</span>
+<span id="cb16-15"><a href="#cb16-15"></a>      label_col_index <span class="op">=</span> plot_col_index</span>
+<span id="cb16-16"><a href="#cb16-16"></a></span>
+<span id="cb16-17"><a href="#cb16-17"></a>    <span class="cf">if</span> label_col_index <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb16-18"><a href="#cb16-18"></a>      <span class="cf">continue</span></span>
+<span id="cb16-19"><a href="#cb16-19"></a></span>
+<span id="cb16-20"><a href="#cb16-20"></a>    plt.scatter(<span class="va">self</span>.label_indices, labels[n, :, label_col_index],</span>
+<span id="cb16-21"><a href="#cb16-21"></a>                edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Labels'</span>, c<span class="op">=</span><span class="st">'#2ca02c'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
+<span id="cb16-22"><a href="#cb16-22"></a>    <span class="cf">if</span> model <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb16-23"><a href="#cb16-23"></a>      predictions <span class="op">=</span> model(inputs)</span>
+<span id="cb16-24"><a href="#cb16-24"></a>      plt.scatter(<span class="va">self</span>.label_indices, predictions[n, :, label_col_index],</span>
+<span id="cb16-25"><a href="#cb16-25"></a>                  marker<span class="op">=</span><span class="st">'X'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Predictions'</span>,</span>
+<span id="cb16-26"><a href="#cb16-26"></a>                  c<span class="op">=</span><span class="st">'#ff7f0e'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
+<span id="cb16-27"><a href="#cb16-27"></a></span>
+<span id="cb16-28"><a href="#cb16-28"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb16-29"><a href="#cb16-29"></a>      plt.legend()</span>
+<span id="cb16-30"><a href="#cb16-30"></a></span>
+<span id="cb16-31"><a href="#cb16-31"></a>  plt.xlabel(<span class="st">'Time [h]'</span>)</span>
+<span id="cb16-32"><a href="#cb16-32"></a></span>
+<span id="cb16-33"><a href="#cb16-33"></a>WindowGenerator.plot <span class="op">=</span> plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="16">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Definimos número de épocas necesarias y funciones de pérdida</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a>MAX_EPOCHS <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="kw">def</span> compile_and_fit(model, window, patience<span class="op">=</span><span class="dv">2</span>): <span class="co">#patiences como el número de épocas que espera antes de parar</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a>  <span class="co"># Para evitar sobreajuste</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a>  early_stopping <span class="op">=</span> tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">'val_loss'</span>,</span>
+<span id="cb17-7"><a href="#cb17-7"></a>                                                    patience<span class="op">=</span>patience,</span>
+<span id="cb17-8"><a href="#cb17-8"></a>                                                    mode<span class="op">=</span><span class="st">'min'</span>)</span>
+<span id="cb17-9"><a href="#cb17-9"></a></span>
+<span id="cb17-10"><a href="#cb17-10"></a>  model.<span class="bu">compile</span>(loss<span class="op">=</span>tf.losses.MeanSquaredError(),</span>
+<span id="cb17-11"><a href="#cb17-11"></a>                optimizer<span class="op">=</span>tf.optimizers.Adam(),</span>
+<span id="cb17-12"><a href="#cb17-12"></a>                metrics<span class="op">=</span>[tf.metrics.MeanAbsoluteError()])</span>
+<span id="cb17-13"><a href="#cb17-13"></a></span>
+<span id="cb17-14"><a href="#cb17-14"></a>  history <span class="op">=</span> model.fit(window.train, epochs<span class="op">=</span>MAX_EPOCHS,</span>
+<span id="cb17-15"><a href="#cb17-15"></a>                      validation_data<span class="op">=</span>window.val,</span>
+<span id="cb17-16"><a href="#cb17-16"></a>                      callbacks<span class="op">=</span>[early_stopping])</span>
+<span id="cb17-17"><a href="#cb17-17"></a>  <span class="cf">return</span> history</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="modelo-de-red-neuronal-multicapa" class="level3" data-number="1.5">
+<h3 data-number="1.5" class="anchored" data-anchor-id="modelo-de-red-neuronal-multicapa"><span class="header-section-number">1.5</span> Modelo de red neuronal multicapa</h3>
+<p>El interés en este caso es predecir el valor del total de las exportaciones 1 paso adelante (siguiente mes) con base en la información disponible de los últimos 12 meses del total de las exportaciones.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a>w1 <span class="op">=</span> WindowGenerator(input_width<span class="op">=</span><span class="dv">12</span>, label_width<span class="op">=</span><span class="dv">1</span>, shift<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb18-2"><a href="#cb18-2"></a>                     label_columns<span class="op">=</span>[<span class="st">'Total'</span>])</span>
+<span id="cb18-3"><a href="#cb18-3"></a>w1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A continuación se muestra la configuración del modelo. Se usan las 12 observaciones anteriores para predecir la siguiente.</p>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>w1.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="redes_files/figure-html/cell-23-output-1.png" width="972" height="654" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><br></p>
+<section id="tuning-o-búsqueda-de-los-hiperparámetros" class="level4" data-number="1.5.1">
+<h4 data-number="1.5.1" class="anchored" data-anchor-id="tuning-o-búsqueda-de-los-hiperparámetros"><span class="header-section-number">1.5.1</span> Tuning o búsqueda de los hiperparámetros</h4>
+<p>La búsqueda de los hiperparámetros que minimicen el error cuadrático medio sobre el conjunto de validación se hará con el método <strong>BayesianOptimization Tuner</strong>. El método consiste en escoger aleatoriamente algunas (pocas) combinaciones de los parámetros, luego basado en el rendimiento de esos hiperparámetros, escoge los siguientes mejores hiperparámetros. Es decir que toma en cuenta el histórico de los hiperparámetros que ya han sido probados en el modelo.</p>
+<div class="cell" data-execution_count="30">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">def</span> build_model(hp):</span>
+<span id="cb20-2"><a href="#cb20-2"></a>    model <span class="op">=</span> keras.Sequential()</span>
+<span id="cb20-3"><a href="#cb20-3"></a>    model.add(layers.Dense(units<span class="op">=</span>hp.Int(<span class="st">"num_units"</span>, min_value<span class="op">=</span><span class="dv">32</span>, max_value<span class="op">=</span><span class="dv">564</span>, step<span class="op">=</span><span class="dv">32</span>),</span>
+<span id="cb20-4"><a href="#cb20-4"></a>                activation<span class="op">=</span>hp.Choice(<span class="st">"activation"</span>, [<span class="st">"relu"</span>, <span class="st">"tanh"</span>])))</span>
+<span id="cb20-5"><a href="#cb20-5"></a>    <span class="co"># Tune the number of layers.</span></span>
+<span id="cb20-6"><a href="#cb20-6"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(hp.Int(<span class="st">"num_layers"</span>, <span class="dv">1</span>, <span class="dv">5</span>)):</span>
+<span id="cb20-7"><a href="#cb20-7"></a>        model.add(</span>
+<span id="cb20-8"><a href="#cb20-8"></a>            layers.Dense(</span>
+<span id="cb20-9"><a href="#cb20-9"></a>                <span class="co"># Tune number of units separately.</span></span>
+<span id="cb20-10"><a href="#cb20-10"></a>                units<span class="op">=</span>hp.Int(<span class="ss">f"units_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>, min_value<span class="op">=</span><span class="dv">32</span>, max_value<span class="op">=</span><span class="dv">564</span>, step<span class="op">=</span><span class="dv">32</span>),</span>
+<span id="cb20-11"><a href="#cb20-11"></a>                activation<span class="op">=</span>hp.Choice(<span class="st">"activation"</span>, [<span class="st">"relu"</span>, <span class="st">"tanh"</span>]),</span>
+<span id="cb20-12"><a href="#cb20-12"></a>            )</span>
+<span id="cb20-13"><a href="#cb20-13"></a>        )</span>
+<span id="cb20-14"><a href="#cb20-14"></a>    <span class="cf">if</span> hp.Boolean(<span class="st">"dropout"</span>):</span>
+<span id="cb20-15"><a href="#cb20-15"></a>        model.add(layers.Dropout(rate<span class="op">=</span><span class="fl">0.25</span>))</span>
+<span id="cb20-16"><a href="#cb20-16"></a>    model.add(layers.Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">"linear"</span>))</span>
+<span id="cb20-17"><a href="#cb20-17"></a>    learning_rate <span class="op">=</span> hp.Float(<span class="st">"lr"</span>, min_value<span class="op">=</span><span class="fl">1e-4</span>, max_value<span class="op">=</span><span class="fl">1e-2</span>, sampling<span class="op">=</span><span class="st">"log"</span>)</span>
+<span id="cb20-18"><a href="#cb20-18"></a>    model.<span class="bu">compile</span>(</span>
+<span id="cb20-19"><a href="#cb20-19"></a>        optimizer<span class="op">=</span>keras.optimizers.Adam(learning_rate<span class="op">=</span>learning_rate),</span>
+<span id="cb20-20"><a href="#cb20-20"></a>        loss<span class="op">=</span><span class="st">"mean_squared_error"</span>,</span>
+<span id="cb20-21"><a href="#cb20-21"></a>        metrics<span class="op">=</span>[<span class="st">"mean_squared_error"</span>]</span>
+<span id="cb20-22"><a href="#cb20-22"></a>    )</span>
+<span id="cb20-23"><a href="#cb20-23"></a>    <span class="cf">return</span> model</span>
+<span id="cb20-24"><a href="#cb20-24"></a></span>
+<span id="cb20-25"><a href="#cb20-25"></a></span>
+<span id="cb20-26"><a href="#cb20-26"></a>build_model(kt.HyperParameters())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="31">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a>tuner_BayesianOptimization_mlp <span class="op">=</span> kt.BayesianOptimization(</span>
+<span id="cb21-2"><a href="#cb21-2"></a>    hypermodel<span class="op">=</span>build_model,</span>
+<span id="cb21-3"><a href="#cb21-3"></a>    objective<span class="op">=</span><span class="st">"val_loss"</span>,</span>
+<span id="cb21-4"><a href="#cb21-4"></a>    max_trials<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb21-5"><a href="#cb21-5"></a>    num_initial_points<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb21-6"><a href="#cb21-6"></a>    alpha<span class="op">=</span><span class="fl">0.0001</span>,</span>
+<span id="cb21-7"><a href="#cb21-7"></a>    beta<span class="op">=</span><span class="fl">2.6</span>,</span>
+<span id="cb21-8"><a href="#cb21-8"></a>    seed<span class="op">=</span><span class="dv">1234</span>,</span>
+<span id="cb21-9"><a href="#cb21-9"></a>    hyperparameters<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb21-10"><a href="#cb21-10"></a>    tune_new_entries<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb21-11"><a href="#cb21-11"></a>    allow_new_entries<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb21-12"><a href="#cb21-12"></a>    max_retries_per_trial<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb21-13"><a href="#cb21-13"></a>    max_consecutive_failed_trials<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb21-14"><a href="#cb21-14"></a>    overwrite<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb21-15"><a href="#cb21-15"></a>    directory<span class="op">=</span><span class="st">"dirsalida"</span>,</span>
+<span id="cb21-16"><a href="#cb21-16"></a>    project_name<span class="op">=</span><span class="st">"helloworld"</span></span>
+<span id="cb21-17"><a href="#cb21-17"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="33">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>stop_early<span class="op">=</span>tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">"val_loss"</span>,patience<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="34">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a>tuner_BayesianOptimization_mlp.search((w1.train), epochs<span class="op">=</span><span class="dv">20</span>, validation_data<span class="op">=</span>(w1.val),callbacks<span class="op">=</span>[stop_early])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="35">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># Get the top 2 models.</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>models_mlp <span class="op">=</span> tuner_BayesianOptimization_mlp.get_best_models(num_models<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb24-3"><a href="#cb24-3"></a>best_model_mlp <span class="op">=</span> models_mlp[<span class="dv">0</span>]</span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="co"># Build the model.</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="co"># Needed for `Sequential` without specified `input_shape`.</span></span>
+<span id="cb24-6"><a href="#cb24-6"></a>best_model_mlp.build(input_shape<span class="op">=</span>(<span class="dv">32</span>, <span class="dv">12</span>, <span class="dv">1</span>))</span>
+<span id="cb24-7"><a href="#cb24-7"></a>best_model_mlp.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Model: "sequential"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense (Dense)               (32, 12, 480)             960       
+                                                                 
+ dense_1 (Dense)             (32, 12, 96)              46176     
+                                                                 
+ dense_2 (Dense)             (32, 12, 288)             27936     
+                                                                 
+ dropout (Dropout)           (32, 12, 288)             0         
+                                                                 
+ dense_3 (Dense)             (32, 12, 1)               289       
+                                                                 
+=================================================================
+Total params: 75361 (294.38 KB)
+Trainable params: 75361 (294.38 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________</code></pre>
+</div>
+</div>
+</section>
+<section id="ajuste-del-mejor-modelo-con-el-conjunto-de-entrenamientovalidación" class="level4" data-number="1.5.2">
+<h4 data-number="1.5.2" class="anchored" data-anchor-id="ajuste-del-mejor-modelo-con-el-conjunto-de-entrenamientovalidación"><span class="header-section-number">1.5.2</span> Ajuste del mejor modelo con el conjunto de entrenamiento+validación</h4>
+<div class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># Get the top 2 hyperparameters.</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>best_hps_mlp <span class="op">=</span> tuner_BayesianOptimization_mlp.get_best_hyperparameters(<span class="dv">5</span>)</span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="co"># Build the model with the best hp.</span></span>
+<span id="cb26-4"><a href="#cb26-4"></a>callback<span class="op">=</span>tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">"loss"</span>,patience<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb26-5"><a href="#cb26-5"></a>model_mlp <span class="op">=</span> build_model(best_hps_mlp[<span class="dv">0</span>])</span>
+<span id="cb26-6"><a href="#cb26-6"></a><span class="co"># Fit with the entire dataset.</span></span>
+<span id="cb26-7"><a href="#cb26-7"></a><span class="bu">print</span>(model_mlp.fit(train_plus_val, epochs<span class="op">=</span><span class="dv">20</span>,callbacks<span class="op">=</span>[callback]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/20
+1/8 [==&gt;...........................] - ETA: 5s - loss: 1.4122 - mean_squared_error: 1.41228/8 [==============================] - 1s 4ms/step - loss: 0.7863 - mean_squared_error: 0.7863
+Epoch 2/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.5162 - mean_squared_error: 0.51628/8 [==============================] - 0s 7ms/step - loss: 0.3506 - mean_squared_error: 0.3506
+Epoch 3/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.0233 - mean_squared_error: 0.02338/8 [==============================] - 0s 6ms/step - loss: 0.1684 - mean_squared_error: 0.1684
+Epoch 4/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.0290 - mean_squared_error: 0.02908/8 [==============================] - 0s 5ms/step - loss: 0.1420 - mean_squared_error: 0.1420
+Epoch 5/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.0712 - mean_squared_error: 0.07128/8 [==============================] - 0s 4ms/step - loss: 0.1642 - mean_squared_error: 0.1642
+Epoch 6/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.0251 - mean_squared_error: 0.02518/8 [==============================] - 0s 4ms/step - loss: 0.1443 - mean_squared_error: 0.1443
+Epoch 7/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.1885 - mean_squared_error: 0.18858/8 [==============================] - 0s 4ms/step - loss: 0.1640 - mean_squared_error: 0.1640
+Epoch 8/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.0703 - mean_squared_error: 0.07038/8 [==============================] - 0s 7ms/step - loss: 0.1592 - mean_squared_error: 0.1592
+Epoch 9/20
+1/8 [==&gt;...........................] - ETA: 0s - loss: 0.1406 - mean_squared_error: 0.14068/8 [==============================] - 0s 4ms/step - loss: 0.1597 - mean_squared_error: 0.1597
+&lt;keras.src.callbacks.History object at 0x0000024D8D4B66D0&gt;</code></pre>
+</div>
+</div>
+<p><br></p>
+</section>
+<section id="errores-de-predicción-del-modelo" class="level4" data-number="1.5.3">
+<h4 data-number="1.5.3" class="anchored" data-anchor-id="errores-de-predicción-del-modelo"><span class="header-section-number">1.5.3</span> Errores de predicción del modelo</h4>
+<div class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>model_mlp.evaluate(w1.test, verbose<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="42">
+<pre><code>[0.5116912126541138, 0.5116912126541138]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a>input_predict_mlp<span class="op">=</span>tf.constant(np.array(test_df[<span class="op">-</span><span class="dv">17</span>:]),dtype<span class="op">=</span>tf.float32, shape<span class="op">=</span>(<span class="dv">17</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb30-2"><a href="#cb30-2"></a>prediction_test<span class="op">=</span>model_mlp.predict(input_predict_mlp)<span class="op">*</span>train_std[<span class="st">'Total'</span>]<span class="op">+</span>train_mean[<span class="st">'Total'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># Verdaderos valores vs predicciones</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a><span class="bu">print</span>(pd.DataFrame({<span class="st">'Verdaderos valores'</span>:true_series.reshape(<span class="dv">17</span>), <span class="st">'Predicciones'</span>:prediction_test.reshape(<span class="dv">17</span>)}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Verdaderos valores  Predicciones
+0            4209198.0    3971073.50
+1            4780210.0    4430670.00
+2            5460531.0    4976678.50
+3            4662521.0    4335952.00
+4            5497617.0    5006430.50
+5            5913682.0    5339993.00
+6            4388737.0    4115597.00
+7            4778520.0    4429310.00
+8            4213182.0    3974280.50
+9            4562248.0    4255250.00
+10           4642084.0    4319503.50
+11           3696188.0    3557442.75
+12           4202234.0    3965467.50
+13           4431911.0    4150350.75
+14           3739214.0    3592181.50
+15           4497862.0    4203431.00
+16           3985981.0    3791390.25</code></pre>
+</div>
+</div>
+<p>La raíz del error cuadrático medio de las predicciones respecto a los verdaderos valores en el conjunto de prueba es igual a:</p>
+<div class="cell" data-execution_count="48">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a>errors_squared<span class="op">=</span>tf.keras.metrics.mean_squared_error(true_series, prediction_test).numpy()</span>
+<span id="cb33-2"><a href="#cb33-2"></a><span class="bu">print</span>(<span class="st">"RECM:"</span>,errors_squared.mean()<span class="op">**</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RECM: 329234.1145871734</code></pre>
+</div>
+</div>
+</section>
+<section id="gráfico-de-las-predicciones-sobre-los-datos-de-prueba" class="level4" data-number="1.5.4">
+<h4 data-number="1.5.4" class="anchored" data-anchor-id="gráfico-de-las-predicciones-sobre-los-datos-de-prueba"><span class="header-section-number">1.5.4</span> Gráfico de las predicciones sobre los datos de prueba</h4>
+<div class="cell" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>plt.plot(true_series_final)</span>
+<span id="cb35-2"><a href="#cb35-2"></a>plt.plot(prediction_test_final)</span>
+<span id="cb35-3"><a href="#cb35-3"></a>plt.legend([<span class="st">'Respesta real'</span>,<span class="st">'Predicción de la Respuesta'</span>],loc<span class="op">=</span><span class="st">"best"</span>, fontsize<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb35-4"><a href="#cb35-4"></a>plt.ylabel(<span class="st">'Y y $\hat</span><span class="sc">{Y}</span><span class="st">$ en conjunto de prueba'</span>, fontsize<span class="op">=</span><span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="52">
+<pre><code>Text(0, 0.5, 'Y y $\\hat{Y}$ en conjunto de prueba')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="redes_files/figure-html/cell-53-output-2.png" width="1345" height="424"></p>
+</div>
+</div>
 
 
 <!-- -->
 
+</section>
 </section>
 </section>
 
@@ -605,312 +1108,673 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">---</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="an">title:</span><span class="co"> "Redes neuronales"</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="an">echo:</span><span class="co"> false</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="an">output:</span><span class="co"> false</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">---</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">## ***Exportaciones***</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="in">```{python}</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="im">from</span> tensorflow.keras.callbacks <span class="im">import</span> CSVLogger, EarlyStopping</span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="im">import</span> matplotlib <span class="im">as</span> mpl</span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="im">import</span> os</span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="im">import</span> time</span>
-<span id="cb2-22"><a href="#cb2-22"></a><span class="im">import</span> gc</span>
-<span id="cb2-23"><a href="#cb2-23"></a><span class="im">import</span> sys</span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf</span>
-<span id="cb2-25"><a href="#cb2-25"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_pacf</span>
-<span id="cb2-26"><a href="#cb2-26"></a></span>
-<span id="cb2-27"><a href="#cb2-27"></a><span class="bu">print</span>(<span class="ss">f"Tensorflow Version: </span><span class="sc">{</span>tf<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-28"><a href="#cb2-28"></a><span class="bu">print</span>(<span class="ss">f"Pandas Version: </span><span class="sc">{</span>pd<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-29"><a href="#cb2-29"></a><span class="bu">print</span>(<span class="ss">f"Numpy Version: </span><span class="sc">{</span>np<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-30"><a href="#cb2-30"></a><span class="bu">print</span>(<span class="ss">f"System Version: </span><span class="sc">{</span>sys<span class="sc">.</span>version<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-31"><a href="#cb2-31"></a></span>
-<span id="cb2-32"><a href="#cb2-32"></a>mpl.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> (<span class="dv">17</span>, <span class="dv">5</span>)</span>
-<span id="cb2-33"><a href="#cb2-33"></a>mpl.rcParams[<span class="st">'axes.grid'</span>] <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb2-34"><a href="#cb2-34"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
-<span id="cb2-35"><a href="#cb2-35"></a></span>
-<span id="cb2-36"><a href="#cb2-36"></a>notebookstart<span class="op">=</span> time.time()</span>
-<span id="cb2-37"><a href="#cb2-37"></a><span class="in">```</span></span>
-<span id="cb2-38"><a href="#cb2-38"></a></span>
-<span id="cb2-41"><a href="#cb2-41"></a><span class="in">```{python}</span></span>
-<span id="cb2-42"><a href="#cb2-42"></a><span class="im">import</span> IPython</span>
-<span id="cb2-43"><a href="#cb2-43"></a><span class="im">import</span> IPython.display</span>
-<span id="cb2-44"><a href="#cb2-44"></a><span class="in">```</span></span>
-<span id="cb2-45"><a href="#cb2-45"></a></span>
-<span id="cb2-46"><a href="#cb2-46"></a><span class="fu">### Datos</span></span>
-<span id="cb2-47"><a href="#cb2-47"></a></span>
-<span id="cb2-48"><a href="#cb2-48"></a>Total de Exportaciones **Colombia** desde enero del año 2000 hasta junio del año 2023.</span>
-<span id="cb2-49"><a href="#cb2-49"></a></span>
-<span id="cb2-52"><a href="#cb2-52"></a><span class="in">```{python}</span></span>
-<span id="cb2-53"><a href="#cb2-53"></a><span class="co">#| output: true</span></span>
-<span id="cb2-54"><a href="#cb2-54"></a></span>
-<span id="cb2-55"><a href="#cb2-55"></a><span class="co"># Lectura de la serie</span></span>
-<span id="cb2-56"><a href="#cb2-56"></a>Exportaciones <span class="op">=</span> pd.read_excel(<span class="st">"datos/Exportaciones.xlsx"</span>,</span>
-<span id="cb2-57"><a href="#cb2-57"></a>                   header <span class="op">=</span> <span class="dv">0</span>, usecols <span class="op">=</span> [<span class="st">'Mes'</span>,<span class="st">'Total'</span>]).iloc[<span class="dv">96</span>:].reset_index(drop <span class="op">=</span> <span class="va">True</span>).<span class="bu">round</span>()</span>
-<span id="cb2-58"><a href="#cb2-58"></a>Exportaciones[<span class="st">'Total'</span>] <span class="op">=</span> Exportaciones[<span class="st">'Total'</span>].astype(<span class="bu">int</span>) </span>
-<span id="cb2-59"><a href="#cb2-59"></a>Exportaciones</span>
-<span id="cb2-60"><a href="#cb2-60"></a><span class="in">```</span></span>
-<span id="cb2-61"><a href="#cb2-61"></a></span>
-<span id="cb2-62"><a href="#cb2-62"></a><span class="kw">&lt;br&gt;</span></span>
-<span id="cb2-63"><a href="#cb2-63"></a></span>
-<span id="cb2-64"><a href="#cb2-64"></a><span class="fu">### Predicción univariada</span></span>
-<span id="cb2-65"><a href="#cb2-65"></a></span>
-<span id="cb2-66"><a href="#cb2-66"></a>Se quiere predecir la variable "Total de Exportaciones" (**Total**) en base a sus retardos. <span class="kw">&lt;br&gt;</span></span>
-<span id="cb2-67"><a href="#cb2-67"></a>A continuación se presenta el gráfico de la serie de tiempo:</span>
-<span id="cb2-68"><a href="#cb2-68"></a></span>
-<span id="cb2-69"><a href="#cb2-69"></a></span>
-<span id="cb2-72"><a href="#cb2-72"></a><span class="in">```{python}</span></span>
-<span id="cb2-73"><a href="#cb2-73"></a>features_considered <span class="op">=</span> [<span class="st">'Total'</span>] <span class="co"># la variable a usar en la predicción es ella misma</span></span>
-<span id="cb2-74"><a href="#cb2-74"></a>features <span class="op">=</span> Exportaciones[features_considered] <span class="co"># solo se usará la variable Total en la predicción</span></span>
-<span id="cb2-75"><a href="#cb2-75"></a>features.index <span class="op">=</span> Exportaciones[<span class="st">'Mes'</span>] <span class="co"># variable que indica el tiempo (la serie es mensual)</span></span>
-<span id="cb2-76"><a href="#cb2-76"></a>features.head()</span>
-<span id="cb2-77"><a href="#cb2-77"></a><span class="in">```</span></span>
-<span id="cb2-78"><a href="#cb2-78"></a></span>
-<span id="cb2-79"><a href="#cb2-79"></a></span>
-<span id="cb2-82"><a href="#cb2-82"></a><span class="in">```{python}</span></span>
-<span id="cb2-83"><a href="#cb2-83"></a><span class="co">#| output: true</span></span>
-<span id="cb2-84"><a href="#cb2-84"></a></span>
-<span id="cb2-85"><a href="#cb2-85"></a>features.plot(subplots <span class="op">=</span> <span class="va">True</span>, ) <span class="co"># gráfico de la serie de tiempo</span></span>
-<span id="cb2-86"><a href="#cb2-86"></a><span class="in">```</span></span>
-<span id="cb2-87"><a href="#cb2-87"></a></span>
-<span id="cb2-88"><a href="#cb2-88"></a><span class="kw">&lt;br&gt;</span></span>
-<span id="cb2-89"><a href="#cb2-89"></a></span>
-<span id="cb2-90"><a href="#cb2-90"></a><span class="fu">### Separación (Entrenamiento-Validación-Prueba) y Normalización.</span></span>
-<span id="cb2-91"><a href="#cb2-91"></a></span>
-<span id="cb2-92"><a href="#cb2-92"></a>El conjunto de datos original se divide en tres partes, de la siguiente manera:</span>
-<span id="cb2-93"><a href="#cb2-93"></a></span>
-<span id="cb2-94"><a href="#cb2-94"></a><span class="ss">- </span>Datos de entrenamiento (**70%**) para un total de **197** observaciones. Desde 2000-01 hasta 2016-05.</span>
-<span id="cb2-95"><a href="#cb2-95"></a><span class="ss">- </span>Datos de validación (**20%**) para un total de **56** observaciones. Desde 2016-06 hasta 2021-01.</span>
-<span id="cb2-96"><a href="#cb2-96"></a><span class="ss">- </span>Datos de entrenamiento (**10%**) para un total de **29** observaciones. Desde 2021-02 hasta 2023-06.</span>
-<span id="cb2-97"><a href="#cb2-97"></a></span>
-<span id="cb2-100"><a href="#cb2-100"></a><span class="in">```{python}</span></span>
-<span id="cb2-101"><a href="#cb2-101"></a><span class="co"># partición del conjuntos de datos en entrenamiento, validación y prueba</span></span>
-<span id="cb2-102"><a href="#cb2-102"></a>column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span> <span class="bu">enumerate</span>(features.columns)} <span class="co"># índice = 0</span></span>
-<span id="cb2-103"><a href="#cb2-103"></a></span>
-<span id="cb2-104"><a href="#cb2-104"></a>n <span class="op">=</span> <span class="bu">len</span>(features) <span class="co"># longitud de la serie (282)</span></span>
-<span id="cb2-105"><a href="#cb2-105"></a>train_df <span class="op">=</span> features[<span class="dv">0</span>:<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>)] <span class="co"># 2000-01 hasta 2016-05</span></span>
-<span id="cb2-106"><a href="#cb2-106"></a>val_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>):<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>)] <span class="co"># 2016-06 hasta 2021-01</span></span>
-<span id="cb2-107"><a href="#cb2-107"></a>test_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>):] <span class="co"># 2021-02 hasta 2023-06</span></span>
-<span id="cb2-108"><a href="#cb2-108"></a></span>
-<span id="cb2-109"><a href="#cb2-109"></a>num_features <span class="op">=</span> features.shape[<span class="dv">1</span>]</span>
-<span id="cb2-110"><a href="#cb2-110"></a><span class="in">```</span></span>
-<span id="cb2-111"><a href="#cb2-111"></a></span>
-<span id="cb2-114"><a href="#cb2-114"></a><span class="in">```{python}</span></span>
-<span id="cb2-115"><a href="#cb2-115"></a><span class="bu">print</span>(<span class="st">"longitud dataframe entrenamiento:"</span>, train_df.shape)</span>
-<span id="cb2-116"><a href="#cb2-116"></a><span class="bu">print</span>(<span class="st">"longitud dataframe validación:"</span>, val_df.shape)</span>
-<span id="cb2-117"><a href="#cb2-117"></a><span class="bu">print</span>(<span class="st">"longitud dataframe prueba:"</span>, test_df.shape)</span>
-<span id="cb2-118"><a href="#cb2-118"></a><span class="in">```</span></span>
-<span id="cb2-119"><a href="#cb2-119"></a></span>
-<span id="cb2-122"><a href="#cb2-122"></a><span class="in">```{python}</span></span>
-<span id="cb2-123"><a href="#cb2-123"></a><span class="co"># Normalización de las observaciones</span></span>
-<span id="cb2-124"><a href="#cb2-124"></a>train_mean <span class="op">=</span> train_df.mean()</span>
-<span id="cb2-125"><a href="#cb2-125"></a>train_std <span class="op">=</span> train_df.std()</span>
-<span id="cb2-126"><a href="#cb2-126"></a></span>
-<span id="cb2-127"><a href="#cb2-127"></a>train_df <span class="op">=</span> (train_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
-<span id="cb2-128"><a href="#cb2-128"></a>val_df <span class="op">=</span> (val_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
-<span id="cb2-129"><a href="#cb2-129"></a>test_df <span class="op">=</span> (test_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
-<span id="cb2-130"><a href="#cb2-130"></a><span class="in">```</span></span>
-<span id="cb2-131"><a href="#cb2-131"></a></span>
-<span id="cb2-134"><a href="#cb2-134"></a><span class="in">```{python}</span></span>
-<span id="cb2-135"><a href="#cb2-135"></a><span class="co"># todo el dataframe normalizado por train_mean y train_std</span></span>
-<span id="cb2-136"><a href="#cb2-136"></a>df_std <span class="op">=</span> (features <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
-<span id="cb2-137"><a href="#cb2-137"></a>df_std <span class="op">=</span> df_std.melt(var_name<span class="op">=</span><span class="st">''</span>, value_name<span class="op">=</span><span class="st">'Datos normalizados'</span>)</span>
-<span id="cb2-138"><a href="#cb2-138"></a>df_std</span>
-<span id="cb2-139"><a href="#cb2-139"></a><span class="in">```</span></span>
-<span id="cb2-140"><a href="#cb2-140"></a></span>
-<span id="cb2-143"><a href="#cb2-143"></a><span class="in">```{python}</span></span>
-<span id="cb2-144"><a href="#cb2-144"></a><span class="co">#| output: true</span></span>
-<span id="cb2-145"><a href="#cb2-145"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb2-146"><a href="#cb2-146"></a></span>
-<span id="cb2-147"><a href="#cb2-147"></a><span class="co"># plt.subplot(1, 2, 1)</span></span>
-<span id="cb2-148"><a href="#cb2-148"></a><span class="co"># sns.violinplot(y=Exportaciones["Total"])</span></span>
-<span id="cb2-149"><a href="#cb2-149"></a></span>
-<span id="cb2-150"><a href="#cb2-150"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
-<span id="cb2-151"><a href="#cb2-151"></a>ax <span class="op">=</span> sns.violinplot(x <span class="op">=</span> <span class="st">''</span>, y <span class="op">=</span> <span class="st">'Datos normalizados'</span>, data <span class="op">=</span> df_std)</span>
-<span id="cb2-152"><a href="#cb2-152"></a>_ <span class="op">=</span> ax.set_xticklabels(features.keys(), rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-153"><a href="#cb2-153"></a><span class="in">```</span></span>
-<span id="cb2-154"><a href="#cb2-154"></a></span>
-<span id="cb2-157"><a href="#cb2-157"></a><span class="in">```{python}</span></span>
-<span id="cb2-158"><a href="#cb2-158"></a><span class="kw">class</span> WindowGenerator():</span>
-<span id="cb2-159"><a href="#cb2-159"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_width, label_width, shift,</span>
-<span id="cb2-160"><a href="#cb2-160"></a>               train_df<span class="op">=</span>train_df, val_df<span class="op">=</span>val_df, test_df<span class="op">=</span>test_df,</span>
-<span id="cb2-161"><a href="#cb2-161"></a>               label_columns<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb2-162"><a href="#cb2-162"></a>    <span class="co"># Store the raw data.</span></span>
-<span id="cb2-163"><a href="#cb2-163"></a>    <span class="va">self</span>.train_df <span class="op">=</span> train_df</span>
-<span id="cb2-164"><a href="#cb2-164"></a>    <span class="va">self</span>.val_df <span class="op">=</span> val_df</span>
-<span id="cb2-165"><a href="#cb2-165"></a>    <span class="va">self</span>.test_df <span class="op">=</span> test_df</span>
-<span id="cb2-166"><a href="#cb2-166"></a></span>
-<span id="cb2-167"><a href="#cb2-167"></a>    <span class="co"># Work out the label column indices.</span></span>
-<span id="cb2-168"><a href="#cb2-168"></a>    <span class="va">self</span>.label_columns <span class="op">=</span> label_columns</span>
-<span id="cb2-169"><a href="#cb2-169"></a>    <span class="cf">if</span> label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-170"><a href="#cb2-170"></a>      <span class="va">self</span>.label_columns_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
-<span id="cb2-171"><a href="#cb2-171"></a>                                    <span class="bu">enumerate</span>(label_columns)}</span>
-<span id="cb2-172"><a href="#cb2-172"></a>    <span class="va">self</span>.column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
-<span id="cb2-173"><a href="#cb2-173"></a>                           <span class="bu">enumerate</span>(train_df.columns)}</span>
-<span id="cb2-174"><a href="#cb2-174"></a></span>
-<span id="cb2-175"><a href="#cb2-175"></a>    <span class="co"># Work out the window parameters.</span></span>
-<span id="cb2-176"><a href="#cb2-176"></a>    <span class="va">self</span>.input_width <span class="op">=</span> input_width</span>
-<span id="cb2-177"><a href="#cb2-177"></a>    <span class="va">self</span>.label_width <span class="op">=</span> label_width</span>
-<span id="cb2-178"><a href="#cb2-178"></a>    <span class="va">self</span>.shift <span class="op">=</span> shift</span>
-<span id="cb2-179"><a href="#cb2-179"></a></span>
-<span id="cb2-180"><a href="#cb2-180"></a>    <span class="va">self</span>.total_window_size <span class="op">=</span> input_width <span class="op">+</span> shift</span>
-<span id="cb2-181"><a href="#cb2-181"></a></span>
-<span id="cb2-182"><a href="#cb2-182"></a>    <span class="va">self</span>.input_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="dv">0</span>, input_width)</span>
-<span id="cb2-183"><a href="#cb2-183"></a>    <span class="va">self</span>.input_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.input_slice]</span>
-<span id="cb2-184"><a href="#cb2-184"></a></span>
-<span id="cb2-185"><a href="#cb2-185"></a>    <span class="va">self</span>.label_start <span class="op">=</span> <span class="va">self</span>.total_window_size <span class="op">-</span> <span class="va">self</span>.label_width</span>
-<span id="cb2-186"><a href="#cb2-186"></a>    <span class="va">self</span>.labels_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="va">self</span>.label_start, <span class="va">None</span>)</span>
-<span id="cb2-187"><a href="#cb2-187"></a>    <span class="va">self</span>.label_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.labels_slice]</span>
-<span id="cb2-188"><a href="#cb2-188"></a></span>
-<span id="cb2-189"><a href="#cb2-189"></a>  <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
-<span id="cb2-190"><a href="#cb2-190"></a>    <span class="cf">return</span> <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>.join([</span>
-<span id="cb2-191"><a href="#cb2-191"></a>        <span class="ss">f'Total window size: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>total_window_size<span class="sc">}</span><span class="ss">'</span>,</span>
-<span id="cb2-192"><a href="#cb2-192"></a>        <span class="ss">f'Input indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>input_indices<span class="sc">}</span><span class="ss">'</span>,</span>
-<span id="cb2-193"><a href="#cb2-193"></a>        <span class="ss">f'Label indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_indices<span class="sc">}</span><span class="ss">'</span>,</span>
-<span id="cb2-194"><a href="#cb2-194"></a>        <span class="ss">f'Label column name(s): </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_columns<span class="sc">}</span><span class="ss">'</span>])</span>
-<span id="cb2-195"><a href="#cb2-195"></a><span class="in">```</span></span>
-<span id="cb2-196"><a href="#cb2-196"></a></span>
-<span id="cb2-199"><a href="#cb2-199"></a><span class="in">```{python}</span></span>
-<span id="cb2-200"><a href="#cb2-200"></a><span class="kw">def</span> split_window(<span class="va">self</span>, features):</span>
-<span id="cb2-201"><a href="#cb2-201"></a>  inputs <span class="op">=</span> features[:, <span class="va">self</span>.input_slice, :]</span>
-<span id="cb2-202"><a href="#cb2-202"></a>  labels <span class="op">=</span> features[:, <span class="va">self</span>.labels_slice, :]</span>
-<span id="cb2-203"><a href="#cb2-203"></a>  <span class="cf">if</span> <span class="va">self</span>.label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-204"><a href="#cb2-204"></a>    labels <span class="op">=</span> tf.stack(</span>
-<span id="cb2-205"><a href="#cb2-205"></a>        [labels[:, :, <span class="va">self</span>.column_indices[name]] <span class="cf">for</span> name <span class="kw">in</span> <span class="va">self</span>.label_columns],</span>
-<span id="cb2-206"><a href="#cb2-206"></a>        axis<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb2-207"><a href="#cb2-207"></a></span>
-<span id="cb2-208"><a href="#cb2-208"></a>  <span class="co"># Slicing doesn't preserve static shape information, so set the shapes</span></span>
-<span id="cb2-209"><a href="#cb2-209"></a>  <span class="co"># manually. This way the `tf.data.Datasets` are easier to inspect.</span></span>
-<span id="cb2-210"><a href="#cb2-210"></a>  inputs.set_shape([<span class="va">None</span>, <span class="va">self</span>.input_width, <span class="va">None</span>])</span>
-<span id="cb2-211"><a href="#cb2-211"></a>  labels.set_shape([<span class="va">None</span>, <span class="va">self</span>.label_width, <span class="va">None</span>])</span>
-<span id="cb2-212"><a href="#cb2-212"></a></span>
-<span id="cb2-213"><a href="#cb2-213"></a>  <span class="cf">return</span> inputs, labels</span>
-<span id="cb2-214"><a href="#cb2-214"></a></span>
-<span id="cb2-215"><a href="#cb2-215"></a>WindowGenerator.split_window <span class="op">=</span> split_window</span>
-<span id="cb2-216"><a href="#cb2-216"></a><span class="in">```</span></span>
-<span id="cb2-217"><a href="#cb2-217"></a></span>
-<span id="cb2-220"><a href="#cb2-220"></a><span class="in">```{python}</span></span>
-<span id="cb2-221"><a href="#cb2-221"></a><span class="kw">def</span> make_dataset(<span class="va">self</span>, data):</span>
-<span id="cb2-222"><a href="#cb2-222"></a>  data <span class="op">=</span> np.array(data, dtype<span class="op">=</span>np.float32)</span>
-<span id="cb2-223"><a href="#cb2-223"></a>  ds <span class="op">=</span> tf.keras.utils.timeseries_dataset_from_array(</span>
-<span id="cb2-224"><a href="#cb2-224"></a>      data<span class="op">=</span>data,</span>
-<span id="cb2-225"><a href="#cb2-225"></a>      targets<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb2-226"><a href="#cb2-226"></a>      sequence_length<span class="op">=</span><span class="va">self</span>.total_window_size,</span>
-<span id="cb2-227"><a href="#cb2-227"></a>      sequence_stride<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb2-228"><a href="#cb2-228"></a>      shuffle<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb2-229"><a href="#cb2-229"></a>      batch_size<span class="op">=</span><span class="dv">32</span>,) </span>
-<span id="cb2-230"><a href="#cb2-230"></a></span>
-<span id="cb2-231"><a href="#cb2-231"></a>  ds <span class="op">=</span> ds.<span class="bu">map</span>(<span class="va">self</span>.split_window)</span>
-<span id="cb2-232"><a href="#cb2-232"></a></span>
-<span id="cb2-233"><a href="#cb2-233"></a>  <span class="cf">return</span> ds</span>
-<span id="cb2-234"><a href="#cb2-234"></a></span>
-<span id="cb2-235"><a href="#cb2-235"></a>WindowGenerator.make_dataset <span class="op">=</span> make_dataset</span>
-<span id="cb2-236"><a href="#cb2-236"></a><span class="in">```</span></span>
-<span id="cb2-237"><a href="#cb2-237"></a></span>
-<span id="cb2-240"><a href="#cb2-240"></a><span class="in">```{python}</span></span>
-<span id="cb2-241"><a href="#cb2-241"></a><span class="at">@property</span></span>
-<span id="cb2-242"><a href="#cb2-242"></a><span class="kw">def</span> train(<span class="va">self</span>):</span>
-<span id="cb2-243"><a href="#cb2-243"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.train_df)</span>
-<span id="cb2-244"><a href="#cb2-244"></a></span>
-<span id="cb2-245"><a href="#cb2-245"></a><span class="at">@property</span></span>
-<span id="cb2-246"><a href="#cb2-246"></a><span class="kw">def</span> val(<span class="va">self</span>):</span>
-<span id="cb2-247"><a href="#cb2-247"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.val_df)</span>
-<span id="cb2-248"><a href="#cb2-248"></a></span>
-<span id="cb2-249"><a href="#cb2-249"></a><span class="at">@property</span></span>
-<span id="cb2-250"><a href="#cb2-250"></a><span class="kw">def</span> test(<span class="va">self</span>):</span>
-<span id="cb2-251"><a href="#cb2-251"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.test_df)</span>
-<span id="cb2-252"><a href="#cb2-252"></a></span>
-<span id="cb2-253"><a href="#cb2-253"></a><span class="at">@property</span></span>
-<span id="cb2-254"><a href="#cb2-254"></a><span class="kw">def</span> example(<span class="va">self</span>):</span>
-<span id="cb2-255"><a href="#cb2-255"></a>  <span class="co">"""Get and cache an example batch of `inputs, labels` for plotting."""</span></span>
-<span id="cb2-256"><a href="#cb2-256"></a>  result <span class="op">=</span> <span class="bu">getattr</span>(<span class="va">self</span>, <span class="st">'_example'</span>, <span class="va">None</span>)</span>
-<span id="cb2-257"><a href="#cb2-257"></a>  <span class="cf">if</span> result <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb2-258"><a href="#cb2-258"></a>    <span class="co"># No example batch was found, so get one from the `.train` dataset</span></span>
-<span id="cb2-259"><a href="#cb2-259"></a>    result <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(<span class="va">self</span>.train))</span>
-<span id="cb2-260"><a href="#cb2-260"></a>    <span class="co"># And cache it for next time</span></span>
-<span id="cb2-261"><a href="#cb2-261"></a>    <span class="va">self</span>._example <span class="op">=</span> result</span>
-<span id="cb2-262"><a href="#cb2-262"></a>  <span class="cf">return</span> result</span>
-<span id="cb2-263"><a href="#cb2-263"></a></span>
-<span id="cb2-264"><a href="#cb2-264"></a>WindowGenerator.train <span class="op">=</span> train</span>
-<span id="cb2-265"><a href="#cb2-265"></a>WindowGenerator.val <span class="op">=</span> val</span>
-<span id="cb2-266"><a href="#cb2-266"></a>WindowGenerator.test <span class="op">=</span> test</span>
-<span id="cb2-267"><a href="#cb2-267"></a>WindowGenerator.example <span class="op">=</span> example</span>
-<span id="cb2-268"><a href="#cb2-268"></a><span class="in">```</span></span>
-<span id="cb2-269"><a href="#cb2-269"></a></span>
-<span id="cb2-272"><a href="#cb2-272"></a><span class="in">```{python}</span></span>
-<span id="cb2-273"><a href="#cb2-273"></a><span class="kw">def</span> plot(<span class="va">self</span>, model<span class="op">=</span><span class="va">None</span>, plot_col<span class="op">=</span><span class="st">'Total'</span>, max_subplots<span class="op">=</span><span class="dv">3</span>):</span>
-<span id="cb2-274"><a href="#cb2-274"></a>  inputs, labels <span class="op">=</span> <span class="va">self</span>.example</span>
-<span id="cb2-275"><a href="#cb2-275"></a>  plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
-<span id="cb2-276"><a href="#cb2-276"></a>  plot_col_index <span class="op">=</span> <span class="va">self</span>.column_indices[plot_col]</span>
-<span id="cb2-277"><a href="#cb2-277"></a>  max_n <span class="op">=</span> <span class="bu">min</span>(max_subplots, <span class="bu">len</span>(inputs))</span>
-<span id="cb2-278"><a href="#cb2-278"></a>  <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(max_n):</span>
-<span id="cb2-279"><a href="#cb2-279"></a>    plt.subplot(max_n, <span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb2-280"><a href="#cb2-280"></a>    plt.ylabel(<span class="ss">f'</span><span class="sc">{</span>plot_col<span class="sc">}</span><span class="ss"> [normed]'</span>)</span>
-<span id="cb2-281"><a href="#cb2-281"></a>    plt.plot(<span class="va">self</span>.input_indices, inputs[n, :, plot_col_index],</span>
-<span id="cb2-282"><a href="#cb2-282"></a>             label<span class="op">=</span><span class="st">'Inputs'</span>, marker<span class="op">=</span><span class="st">'.'</span>, zorder<span class="op">=-</span><span class="dv">10</span>)</span>
-<span id="cb2-283"><a href="#cb2-283"></a></span>
-<span id="cb2-284"><a href="#cb2-284"></a>    <span class="cf">if</span> <span class="va">self</span>.label_columns:</span>
-<span id="cb2-285"><a href="#cb2-285"></a>      label_col_index <span class="op">=</span> <span class="va">self</span>.label_columns_indices.get(plot_col, <span class="va">None</span>)</span>
-<span id="cb2-286"><a href="#cb2-286"></a>    <span class="cf">else</span>:</span>
-<span id="cb2-287"><a href="#cb2-287"></a>      label_col_index <span class="op">=</span> plot_col_index</span>
-<span id="cb2-288"><a href="#cb2-288"></a></span>
-<span id="cb2-289"><a href="#cb2-289"></a>    <span class="cf">if</span> label_col_index <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb2-290"><a href="#cb2-290"></a>      <span class="cf">continue</span></span>
-<span id="cb2-291"><a href="#cb2-291"></a></span>
-<span id="cb2-292"><a href="#cb2-292"></a>    plt.scatter(<span class="va">self</span>.label_indices, labels[n, :, label_col_index],</span>
-<span id="cb2-293"><a href="#cb2-293"></a>                edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Labels'</span>, c<span class="op">=</span><span class="st">'#2ca02c'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
-<span id="cb2-294"><a href="#cb2-294"></a>    <span class="cf">if</span> model <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-295"><a href="#cb2-295"></a>      predictions <span class="op">=</span> model(inputs)</span>
-<span id="cb2-296"><a href="#cb2-296"></a>      plt.scatter(<span class="va">self</span>.label_indices, predictions[n, :, label_col_index],</span>
-<span id="cb2-297"><a href="#cb2-297"></a>                  marker<span class="op">=</span><span class="st">'X'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Predictions'</span>,</span>
-<span id="cb2-298"><a href="#cb2-298"></a>                  c<span class="op">=</span><span class="st">'#ff7f0e'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
-<span id="cb2-299"><a href="#cb2-299"></a></span>
-<span id="cb2-300"><a href="#cb2-300"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb2-301"><a href="#cb2-301"></a>      plt.legend()</span>
-<span id="cb2-302"><a href="#cb2-302"></a></span>
-<span id="cb2-303"><a href="#cb2-303"></a>  plt.xlabel(<span class="st">'Time [h]'</span>)</span>
-<span id="cb2-304"><a href="#cb2-304"></a></span>
-<span id="cb2-305"><a href="#cb2-305"></a>WindowGenerator.plot <span class="op">=</span> plot</span>
-<span id="cb2-306"><a href="#cb2-306"></a><span class="in">```</span></span>
-<span id="cb2-307"><a href="#cb2-307"></a></span>
-<span id="cb2-310"><a href="#cb2-310"></a><span class="in">```{python}</span></span>
-<span id="cb2-311"><a href="#cb2-311"></a><span class="co"># Definimos número de épocas necesarias y funciones de pérdida</span></span>
-<span id="cb2-312"><a href="#cb2-312"></a>MAX_EPOCHS <span class="op">=</span> <span class="dv">200</span></span>
-<span id="cb2-313"><a href="#cb2-313"></a></span>
-<span id="cb2-314"><a href="#cb2-314"></a><span class="kw">def</span> compile_and_fit(model, window, patience<span class="op">=</span><span class="dv">2</span>): <span class="co">#patiences como el número de épocas que espera antes de parar</span></span>
-<span id="cb2-315"><a href="#cb2-315"></a>  <span class="co"># Para evitar sobreajuste</span></span>
-<span id="cb2-316"><a href="#cb2-316"></a>  early_stopping <span class="op">=</span> tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">'val_loss'</span>,</span>
-<span id="cb2-317"><a href="#cb2-317"></a>                                                    patience<span class="op">=</span>patience,</span>
-<span id="cb2-318"><a href="#cb2-318"></a>                                                    mode<span class="op">=</span><span class="st">'min'</span>)</span>
-<span id="cb2-319"><a href="#cb2-319"></a></span>
-<span id="cb2-320"><a href="#cb2-320"></a>  model.<span class="bu">compile</span>(loss<span class="op">=</span>tf.losses.MeanSquaredError(),</span>
-<span id="cb2-321"><a href="#cb2-321"></a>                optimizer<span class="op">=</span>tf.optimizers.Adam(),</span>
-<span id="cb2-322"><a href="#cb2-322"></a>                metrics<span class="op">=</span>[tf.metrics.MeanAbsoluteError()])</span>
-<span id="cb2-323"><a href="#cb2-323"></a></span>
-<span id="cb2-324"><a href="#cb2-324"></a>  history <span class="op">=</span> model.fit(window.train, epochs<span class="op">=</span>MAX_EPOCHS,</span>
-<span id="cb2-325"><a href="#cb2-325"></a>                      validation_data<span class="op">=</span>window.val,</span>
-<span id="cb2-326"><a href="#cb2-326"></a>                      callbacks<span class="op">=</span>[early_stopping])</span>
-<span id="cb2-327"><a href="#cb2-327"></a>  <span class="cf">return</span> history</span>
-<span id="cb2-328"><a href="#cb2-328"></a><span class="in">```</span></span>
-<span id="cb2-329"><a href="#cb2-329"></a></span>
-<span id="cb2-330"><a href="#cb2-330"></a><span class="kw">&lt;br&gt;</span></span>
-<span id="cb2-331"><a href="#cb2-331"></a></span>
-<span id="cb2-332"><a href="#cb2-332"></a><span class="fu">### Configuración para el ajuste de los modelos</span></span>
-<span id="cb2-333"><a href="#cb2-333"></a></span>
-<span id="cb2-334"><a href="#cb2-334"></a><span class="ss">- </span>Se usará un tamaño de lote de **32**.</span>
-<span id="cb2-335"><a href="#cb2-335"></a><span class="ss">- </span>El número máximo de épocas será de **20**.</span>
-<span id="cb2-336"><a href="#cb2-336"></a></span>
-<span id="cb2-339"><a href="#cb2-339"></a><span class="in">```{python}</span></span>
-<span id="cb2-340"><a href="#cb2-340"></a><span class="in">```</span></span>
+<div class="sourceCode" id="cb37" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb37-1"><a href="#cb37-1"></a><span class="co">---</span></span>
+<span id="cb37-2"><a href="#cb37-2"></a><span class="an">title:</span><span class="co"> "Redes neuronales"</span></span>
+<span id="cb37-3"><a href="#cb37-3"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb37-4"><a href="#cb37-4"></a><span class="an">echo:</span><span class="co"> true</span></span>
+<span id="cb37-5"><a href="#cb37-5"></a><span class="an">output:</span><span class="co"> false</span></span>
+<span id="cb37-6"><a href="#cb37-6"></a><span class="an">code-fold:</span><span class="co"> true</span></span>
+<span id="cb37-7"><a href="#cb37-7"></a><span class="co">---</span></span>
+<span id="cb37-8"><a href="#cb37-8"></a></span>
+<span id="cb37-9"><a href="#cb37-9"></a><span class="fu">## ***Exportaciones***</span></span>
+<span id="cb37-10"><a href="#cb37-10"></a></span>
+<span id="cb37-13"><a href="#cb37-13"></a><span class="in">```{python}</span></span>
+<span id="cb37-14"><a href="#cb37-14"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb37-15"><a href="#cb37-15"></a><span class="im">from</span> tensorflow.keras.callbacks <span class="im">import</span> CSVLogger, EarlyStopping</span>
+<span id="cb37-16"><a href="#cb37-16"></a><span class="im">import</span> matplotlib <span class="im">as</span> mpl</span>
+<span id="cb37-17"><a href="#cb37-17"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb37-18"><a href="#cb37-18"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb37-19"><a href="#cb37-19"></a><span class="im">import</span> os</span>
+<span id="cb37-20"><a href="#cb37-20"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb37-21"><a href="#cb37-21"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb37-22"><a href="#cb37-22"></a><span class="im">import</span> time</span>
+<span id="cb37-23"><a href="#cb37-23"></a><span class="im">import</span> gc</span>
+<span id="cb37-24"><a href="#cb37-24"></a><span class="im">import</span> sys</span>
+<span id="cb37-25"><a href="#cb37-25"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf</span>
+<span id="cb37-26"><a href="#cb37-26"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_pacf</span>
+<span id="cb37-27"><a href="#cb37-27"></a></span>
+<span id="cb37-28"><a href="#cb37-28"></a><span class="bu">print</span>(<span class="ss">f"Tensorflow Version: </span><span class="sc">{</span>tf<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb37-29"><a href="#cb37-29"></a><span class="bu">print</span>(<span class="ss">f"Pandas Version: </span><span class="sc">{</span>pd<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb37-30"><a href="#cb37-30"></a><span class="bu">print</span>(<span class="ss">f"Numpy Version: </span><span class="sc">{</span>np<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb37-31"><a href="#cb37-31"></a><span class="bu">print</span>(<span class="ss">f"System Version: </span><span class="sc">{</span>sys<span class="sc">.</span>version<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb37-32"><a href="#cb37-32"></a></span>
+<span id="cb37-33"><a href="#cb37-33"></a>mpl.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> (<span class="dv">17</span>, <span class="dv">5</span>)</span>
+<span id="cb37-34"><a href="#cb37-34"></a>mpl.rcParams[<span class="st">'axes.grid'</span>] <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb37-35"><a href="#cb37-35"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb37-36"><a href="#cb37-36"></a></span>
+<span id="cb37-37"><a href="#cb37-37"></a>notebookstart<span class="op">=</span> time.time()</span>
+<span id="cb37-38"><a href="#cb37-38"></a><span class="in">```</span></span>
+<span id="cb37-39"><a href="#cb37-39"></a></span>
+<span id="cb37-42"><a href="#cb37-42"></a><span class="in">```{python}</span></span>
+<span id="cb37-43"><a href="#cb37-43"></a><span class="im">import</span> IPython</span>
+<span id="cb37-44"><a href="#cb37-44"></a><span class="im">import</span> IPython.display</span>
+<span id="cb37-45"><a href="#cb37-45"></a><span class="in">```</span></span>
+<span id="cb37-46"><a href="#cb37-46"></a></span>
+<span id="cb37-47"><a href="#cb37-47"></a><span class="fu">### Datos</span></span>
+<span id="cb37-48"><a href="#cb37-48"></a></span>
+<span id="cb37-49"><a href="#cb37-49"></a>Total de Exportaciones **Colombia** desde enero del año 2000 hasta junio del año 2023.</span>
+<span id="cb37-50"><a href="#cb37-50"></a></span>
+<span id="cb37-53"><a href="#cb37-53"></a><span class="in">```{python}</span></span>
+<span id="cb37-54"><a href="#cb37-54"></a><span class="co">#| output: true</span></span>
+<span id="cb37-55"><a href="#cb37-55"></a></span>
+<span id="cb37-56"><a href="#cb37-56"></a><span class="co"># Lectura de la serie</span></span>
+<span id="cb37-57"><a href="#cb37-57"></a>Exportaciones <span class="op">=</span> pd.read_excel(<span class="st">"datos/Exportaciones.xlsx"</span>,</span>
+<span id="cb37-58"><a href="#cb37-58"></a>                   header <span class="op">=</span> <span class="dv">0</span>, usecols <span class="op">=</span> [<span class="st">'Mes'</span>,<span class="st">'Total'</span>]).iloc[<span class="dv">96</span>:].reset_index(drop <span class="op">=</span> <span class="va">True</span>).<span class="bu">round</span>()</span>
+<span id="cb37-59"><a href="#cb37-59"></a>Exportaciones[<span class="st">'Total'</span>] <span class="op">=</span> Exportaciones[<span class="st">'Total'</span>].astype(<span class="bu">int</span>) </span>
+<span id="cb37-60"><a href="#cb37-60"></a>Exportaciones</span>
+<span id="cb37-61"><a href="#cb37-61"></a><span class="in">```</span></span>
+<span id="cb37-62"><a href="#cb37-62"></a></span>
+<span id="cb37-63"><a href="#cb37-63"></a><span class="kw">&lt;br&gt;</span></span>
+<span id="cb37-64"><a href="#cb37-64"></a></span>
+<span id="cb37-65"><a href="#cb37-65"></a><span class="fu">### Predicción univariada</span></span>
+<span id="cb37-66"><a href="#cb37-66"></a></span>
+<span id="cb37-67"><a href="#cb37-67"></a>Se quiere predecir la variable "Total de Exportaciones" (**Total**) en base a sus retardos. <span class="kw">&lt;br&gt;</span></span>
+<span id="cb37-68"><a href="#cb37-68"></a>A continuación se presenta el gráfico de la serie de tiempo:</span>
+<span id="cb37-69"><a href="#cb37-69"></a></span>
+<span id="cb37-70"><a href="#cb37-70"></a></span>
+<span id="cb37-73"><a href="#cb37-73"></a><span class="in">```{python}</span></span>
+<span id="cb37-74"><a href="#cb37-74"></a>features_considered <span class="op">=</span> [<span class="st">'Total'</span>] <span class="co"># la variable a usar en la predicción es ella misma</span></span>
+<span id="cb37-75"><a href="#cb37-75"></a>features <span class="op">=</span> Exportaciones[features_considered] <span class="co"># solo se usará la variable Total en la predicción</span></span>
+<span id="cb37-76"><a href="#cb37-76"></a>features.index <span class="op">=</span> Exportaciones[<span class="st">'Mes'</span>] <span class="co"># variable que indica el tiempo (la serie es mensual)</span></span>
+<span id="cb37-77"><a href="#cb37-77"></a>features.head()</span>
+<span id="cb37-78"><a href="#cb37-78"></a><span class="in">```</span></span>
+<span id="cb37-79"><a href="#cb37-79"></a></span>
+<span id="cb37-80"><a href="#cb37-80"></a></span>
+<span id="cb37-83"><a href="#cb37-83"></a><span class="in">```{python}</span></span>
+<span id="cb37-84"><a href="#cb37-84"></a><span class="co">#| output: true</span></span>
+<span id="cb37-85"><a href="#cb37-85"></a></span>
+<span id="cb37-86"><a href="#cb37-86"></a>features.plot(subplots <span class="op">=</span> <span class="va">True</span>, ) <span class="co"># gráfico de la serie de tiempo</span></span>
+<span id="cb37-87"><a href="#cb37-87"></a><span class="in">```</span></span>
+<span id="cb37-88"><a href="#cb37-88"></a></span>
+<span id="cb37-89"><a href="#cb37-89"></a><span class="kw">&lt;br&gt;</span></span>
+<span id="cb37-90"><a href="#cb37-90"></a></span>
+<span id="cb37-91"><a href="#cb37-91"></a><span class="fu">### Separación (Entrenamiento-Validación-Prueba) y Normalización.</span></span>
+<span id="cb37-92"><a href="#cb37-92"></a></span>
+<span id="cb37-93"><a href="#cb37-93"></a>El conjunto de datos original se divide en tres partes, de la siguiente manera:</span>
+<span id="cb37-94"><a href="#cb37-94"></a></span>
+<span id="cb37-95"><a href="#cb37-95"></a><span class="ss">- </span>Datos de entrenamiento (**70%**) para un total de **197** observaciones. Desde 2000-01 hasta 2016-05.</span>
+<span id="cb37-96"><a href="#cb37-96"></a><span class="ss">- </span>Datos de validación (**20%**) para un total de **56** observaciones. Desde 2016-06 hasta 2021-01.</span>
+<span id="cb37-97"><a href="#cb37-97"></a><span class="ss">- </span>Datos de entrenamiento (**10%**) para un total de **29** observaciones. Desde 2021-02 hasta 2023-06.</span>
+<span id="cb37-98"><a href="#cb37-98"></a></span>
+<span id="cb37-101"><a href="#cb37-101"></a><span class="in">```{python}</span></span>
+<span id="cb37-102"><a href="#cb37-102"></a><span class="co"># partición del conjuntos de datos en entrenamiento, validación y prueba</span></span>
+<span id="cb37-103"><a href="#cb37-103"></a>column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span> <span class="bu">enumerate</span>(features.columns)} <span class="co"># índice = 0</span></span>
+<span id="cb37-104"><a href="#cb37-104"></a></span>
+<span id="cb37-105"><a href="#cb37-105"></a>n <span class="op">=</span> <span class="bu">len</span>(features) <span class="co"># longitud de la serie (282)</span></span>
+<span id="cb37-106"><a href="#cb37-106"></a>train_df <span class="op">=</span> features[<span class="dv">0</span>:<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>)] <span class="co"># 2000-01 hasta 2016-05</span></span>
+<span id="cb37-107"><a href="#cb37-107"></a>val_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.7</span>):<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>)] <span class="co"># 2016-06 hasta 2021-01</span></span>
+<span id="cb37-108"><a href="#cb37-108"></a>test_df <span class="op">=</span> features[<span class="bu">int</span>(n<span class="op">*</span><span class="fl">0.9</span>):] <span class="co"># 2021-02 hasta 2023-06</span></span>
+<span id="cb37-109"><a href="#cb37-109"></a></span>
+<span id="cb37-110"><a href="#cb37-110"></a>num_features <span class="op">=</span> features.shape[<span class="dv">1</span>]</span>
+<span id="cb37-111"><a href="#cb37-111"></a><span class="in">```</span></span>
+<span id="cb37-112"><a href="#cb37-112"></a></span>
+<span id="cb37-115"><a href="#cb37-115"></a><span class="in">```{python}</span></span>
+<span id="cb37-116"><a href="#cb37-116"></a><span class="bu">print</span>(<span class="st">"longitud dataframe entrenamiento:"</span>, train_df.shape)</span>
+<span id="cb37-117"><a href="#cb37-117"></a><span class="bu">print</span>(<span class="st">"longitud dataframe validación:"</span>, val_df.shape)</span>
+<span id="cb37-118"><a href="#cb37-118"></a><span class="bu">print</span>(<span class="st">"longitud dataframe prueba:"</span>, test_df.shape)</span>
+<span id="cb37-119"><a href="#cb37-119"></a><span class="in">```</span></span>
+<span id="cb37-120"><a href="#cb37-120"></a></span>
+<span id="cb37-123"><a href="#cb37-123"></a><span class="in">```{python}</span></span>
+<span id="cb37-124"><a href="#cb37-124"></a><span class="co"># Normalización de las observaciones</span></span>
+<span id="cb37-125"><a href="#cb37-125"></a>train_mean <span class="op">=</span> train_df.mean()</span>
+<span id="cb37-126"><a href="#cb37-126"></a>train_std <span class="op">=</span> train_df.std()</span>
+<span id="cb37-127"><a href="#cb37-127"></a></span>
+<span id="cb37-128"><a href="#cb37-128"></a>train_df <span class="op">=</span> (train_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb37-129"><a href="#cb37-129"></a>val_df <span class="op">=</span> (val_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb37-130"><a href="#cb37-130"></a>test_df <span class="op">=</span> (test_df <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb37-131"><a href="#cb37-131"></a><span class="in">```</span></span>
+<span id="cb37-132"><a href="#cb37-132"></a></span>
+<span id="cb37-135"><a href="#cb37-135"></a><span class="in">```{python}</span></span>
+<span id="cb37-136"><a href="#cb37-136"></a><span class="co"># todo el dataframe normalizado por train_mean y train_std</span></span>
+<span id="cb37-137"><a href="#cb37-137"></a>df_std <span class="op">=</span> (features <span class="op">-</span> train_mean) <span class="op">/</span> train_std</span>
+<span id="cb37-138"><a href="#cb37-138"></a>df_std <span class="op">=</span> df_std.melt(var_name<span class="op">=</span><span class="st">''</span>, value_name<span class="op">=</span><span class="st">'Datos normalizados'</span>)</span>
+<span id="cb37-139"><a href="#cb37-139"></a>df_std</span>
+<span id="cb37-140"><a href="#cb37-140"></a><span class="in">```</span></span>
+<span id="cb37-141"><a href="#cb37-141"></a></span>
+<span id="cb37-144"><a href="#cb37-144"></a><span class="in">```{python}</span></span>
+<span id="cb37-145"><a href="#cb37-145"></a><span class="co">#| output: true</span></span>
+<span id="cb37-146"><a href="#cb37-146"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb37-147"><a href="#cb37-147"></a></span>
+<span id="cb37-148"><a href="#cb37-148"></a><span class="co"># plt.subplot(1, 2, 1)</span></span>
+<span id="cb37-149"><a href="#cb37-149"></a><span class="co"># sns.violinplot(y=Exportaciones["Total"])</span></span>
+<span id="cb37-150"><a href="#cb37-150"></a></span>
+<span id="cb37-151"><a href="#cb37-151"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb37-152"><a href="#cb37-152"></a>ax <span class="op">=</span> sns.violinplot(x <span class="op">=</span> <span class="st">''</span>, y <span class="op">=</span> <span class="st">'Datos normalizados'</span>, data <span class="op">=</span> df_std)</span>
+<span id="cb37-153"><a href="#cb37-153"></a>_ <span class="op">=</span> ax.set_xticklabels(features.keys(), rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb37-154"><a href="#cb37-154"></a><span class="in">```</span></span>
+<span id="cb37-155"><a href="#cb37-155"></a></span>
+<span id="cb37-156"><a href="#cb37-156"></a><span class="kw">&lt;br&gt;</span></span>
+<span id="cb37-157"><a href="#cb37-157"></a></span>
+<span id="cb37-158"><a href="#cb37-158"></a><span class="fu">### Configuración del problema de aprendizaje automático</span></span>
+<span id="cb37-159"><a href="#cb37-159"></a></span>
+<span id="cb37-160"><a href="#cb37-160"></a>Se definen las clases y funciones necesarias para resolver el problema de redes neuronales por</span>
+<span id="cb37-161"><a href="#cb37-161"></a>medio de tensores.</span>
+<span id="cb37-162"><a href="#cb37-162"></a></span>
+<span id="cb37-163"><a href="#cb37-163"></a><span class="ss">- </span>Se usará un tamaño de lote de **32**.</span>
+<span id="cb37-164"><a href="#cb37-164"></a><span class="ss">- </span>El número máximo de épocas será de **20**.</span>
+<span id="cb37-165"><a href="#cb37-165"></a></span>
+<span id="cb37-168"><a href="#cb37-168"></a><span class="in">```{python}</span></span>
+<span id="cb37-169"><a href="#cb37-169"></a><span class="kw">class</span> WindowGenerator():</span>
+<span id="cb37-170"><a href="#cb37-170"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_width, label_width, shift,</span>
+<span id="cb37-171"><a href="#cb37-171"></a>               train_df<span class="op">=</span>train_df, val_df<span class="op">=</span>val_df, test_df<span class="op">=</span>test_df,</span>
+<span id="cb37-172"><a href="#cb37-172"></a>               label_columns<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb37-173"><a href="#cb37-173"></a>    <span class="co"># Store the raw data.</span></span>
+<span id="cb37-174"><a href="#cb37-174"></a>    <span class="va">self</span>.train_df <span class="op">=</span> train_df</span>
+<span id="cb37-175"><a href="#cb37-175"></a>    <span class="va">self</span>.val_df <span class="op">=</span> val_df</span>
+<span id="cb37-176"><a href="#cb37-176"></a>    <span class="va">self</span>.test_df <span class="op">=</span> test_df</span>
+<span id="cb37-177"><a href="#cb37-177"></a></span>
+<span id="cb37-178"><a href="#cb37-178"></a>    <span class="co"># Work out the label column indices.</span></span>
+<span id="cb37-179"><a href="#cb37-179"></a>    <span class="va">self</span>.label_columns <span class="op">=</span> label_columns</span>
+<span id="cb37-180"><a href="#cb37-180"></a>    <span class="cf">if</span> label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb37-181"><a href="#cb37-181"></a>      <span class="va">self</span>.label_columns_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
+<span id="cb37-182"><a href="#cb37-182"></a>                                    <span class="bu">enumerate</span>(label_columns)}</span>
+<span id="cb37-183"><a href="#cb37-183"></a>    <span class="va">self</span>.column_indices <span class="op">=</span> {name: i <span class="cf">for</span> i, name <span class="kw">in</span></span>
+<span id="cb37-184"><a href="#cb37-184"></a>                           <span class="bu">enumerate</span>(train_df.columns)}</span>
+<span id="cb37-185"><a href="#cb37-185"></a></span>
+<span id="cb37-186"><a href="#cb37-186"></a>    <span class="co"># Work out the window parameters.</span></span>
+<span id="cb37-187"><a href="#cb37-187"></a>    <span class="va">self</span>.input_width <span class="op">=</span> input_width</span>
+<span id="cb37-188"><a href="#cb37-188"></a>    <span class="va">self</span>.label_width <span class="op">=</span> label_width</span>
+<span id="cb37-189"><a href="#cb37-189"></a>    <span class="va">self</span>.shift <span class="op">=</span> shift</span>
+<span id="cb37-190"><a href="#cb37-190"></a></span>
+<span id="cb37-191"><a href="#cb37-191"></a>    <span class="va">self</span>.total_window_size <span class="op">=</span> input_width <span class="op">+</span> shift</span>
+<span id="cb37-192"><a href="#cb37-192"></a></span>
+<span id="cb37-193"><a href="#cb37-193"></a>    <span class="va">self</span>.input_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="dv">0</span>, input_width)</span>
+<span id="cb37-194"><a href="#cb37-194"></a>    <span class="va">self</span>.input_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.input_slice]</span>
+<span id="cb37-195"><a href="#cb37-195"></a></span>
+<span id="cb37-196"><a href="#cb37-196"></a>    <span class="va">self</span>.label_start <span class="op">=</span> <span class="va">self</span>.total_window_size <span class="op">-</span> <span class="va">self</span>.label_width</span>
+<span id="cb37-197"><a href="#cb37-197"></a>    <span class="va">self</span>.labels_slice <span class="op">=</span> <span class="bu">slice</span>(<span class="va">self</span>.label_start, <span class="va">None</span>)</span>
+<span id="cb37-198"><a href="#cb37-198"></a>    <span class="va">self</span>.label_indices <span class="op">=</span> np.arange(<span class="va">self</span>.total_window_size)[<span class="va">self</span>.labels_slice]</span>
+<span id="cb37-199"><a href="#cb37-199"></a></span>
+<span id="cb37-200"><a href="#cb37-200"></a>  <span class="kw">def</span> <span class="fu">__repr__</span>(<span class="va">self</span>):</span>
+<span id="cb37-201"><a href="#cb37-201"></a>    <span class="cf">return</span> <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>.join([</span>
+<span id="cb37-202"><a href="#cb37-202"></a>        <span class="ss">f'Total window size: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>total_window_size<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb37-203"><a href="#cb37-203"></a>        <span class="ss">f'Input indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>input_indices<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb37-204"><a href="#cb37-204"></a>        <span class="ss">f'Label indices: </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_indices<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb37-205"><a href="#cb37-205"></a>        <span class="ss">f'Label column name(s): </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>label_columns<span class="sc">}</span><span class="ss">'</span>])</span>
+<span id="cb37-206"><a href="#cb37-206"></a><span class="in">```</span></span>
+<span id="cb37-207"><a href="#cb37-207"></a></span>
+<span id="cb37-210"><a href="#cb37-210"></a><span class="in">```{python}</span></span>
+<span id="cb37-211"><a href="#cb37-211"></a><span class="kw">def</span> split_window(<span class="va">self</span>, features):</span>
+<span id="cb37-212"><a href="#cb37-212"></a>  inputs <span class="op">=</span> features[:, <span class="va">self</span>.input_slice, :]</span>
+<span id="cb37-213"><a href="#cb37-213"></a>  labels <span class="op">=</span> features[:, <span class="va">self</span>.labels_slice, :]</span>
+<span id="cb37-214"><a href="#cb37-214"></a>  <span class="cf">if</span> <span class="va">self</span>.label_columns <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb37-215"><a href="#cb37-215"></a>    labels <span class="op">=</span> tf.stack(</span>
+<span id="cb37-216"><a href="#cb37-216"></a>        [labels[:, :, <span class="va">self</span>.column_indices[name]] <span class="cf">for</span> name <span class="kw">in</span> <span class="va">self</span>.label_columns],</span>
+<span id="cb37-217"><a href="#cb37-217"></a>        axis<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb37-218"><a href="#cb37-218"></a></span>
+<span id="cb37-219"><a href="#cb37-219"></a>  <span class="co"># Slicing doesn't preserve static shape information, so set the shapes</span></span>
+<span id="cb37-220"><a href="#cb37-220"></a>  <span class="co"># manually. This way the `tf.data.Datasets` are easier to inspect.</span></span>
+<span id="cb37-221"><a href="#cb37-221"></a>  inputs.set_shape([<span class="va">None</span>, <span class="va">self</span>.input_width, <span class="va">None</span>])</span>
+<span id="cb37-222"><a href="#cb37-222"></a>  labels.set_shape([<span class="va">None</span>, <span class="va">self</span>.label_width, <span class="va">None</span>])</span>
+<span id="cb37-223"><a href="#cb37-223"></a></span>
+<span id="cb37-224"><a href="#cb37-224"></a>  <span class="cf">return</span> inputs, labels</span>
+<span id="cb37-225"><a href="#cb37-225"></a></span>
+<span id="cb37-226"><a href="#cb37-226"></a>WindowGenerator.split_window <span class="op">=</span> split_window</span>
+<span id="cb37-227"><a href="#cb37-227"></a><span class="in">```</span></span>
+<span id="cb37-228"><a href="#cb37-228"></a></span>
+<span id="cb37-231"><a href="#cb37-231"></a><span class="in">```{python}</span></span>
+<span id="cb37-232"><a href="#cb37-232"></a><span class="kw">def</span> make_dataset(<span class="va">self</span>, data):</span>
+<span id="cb37-233"><a href="#cb37-233"></a>  data <span class="op">=</span> np.array(data, dtype<span class="op">=</span>np.float32)</span>
+<span id="cb37-234"><a href="#cb37-234"></a>  ds <span class="op">=</span> tf.keras.utils.timeseries_dataset_from_array(</span>
+<span id="cb37-235"><a href="#cb37-235"></a>      data<span class="op">=</span>data,</span>
+<span id="cb37-236"><a href="#cb37-236"></a>      targets<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb37-237"><a href="#cb37-237"></a>      sequence_length<span class="op">=</span><span class="va">self</span>.total_window_size,</span>
+<span id="cb37-238"><a href="#cb37-238"></a>      sequence_stride<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb37-239"><a href="#cb37-239"></a>      shuffle<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb37-240"><a href="#cb37-240"></a>      batch_size<span class="op">=</span><span class="dv">32</span>,) </span>
+<span id="cb37-241"><a href="#cb37-241"></a></span>
+<span id="cb37-242"><a href="#cb37-242"></a>  ds <span class="op">=</span> ds.<span class="bu">map</span>(<span class="va">self</span>.split_window)</span>
+<span id="cb37-243"><a href="#cb37-243"></a></span>
+<span id="cb37-244"><a href="#cb37-244"></a>  <span class="cf">return</span> ds</span>
+<span id="cb37-245"><a href="#cb37-245"></a></span>
+<span id="cb37-246"><a href="#cb37-246"></a>WindowGenerator.make_dataset <span class="op">=</span> make_dataset</span>
+<span id="cb37-247"><a href="#cb37-247"></a><span class="in">```</span></span>
+<span id="cb37-248"><a href="#cb37-248"></a></span>
+<span id="cb37-251"><a href="#cb37-251"></a><span class="in">```{python}</span></span>
+<span id="cb37-252"><a href="#cb37-252"></a><span class="at">@property</span></span>
+<span id="cb37-253"><a href="#cb37-253"></a><span class="kw">def</span> train(<span class="va">self</span>):</span>
+<span id="cb37-254"><a href="#cb37-254"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.train_df)</span>
+<span id="cb37-255"><a href="#cb37-255"></a></span>
+<span id="cb37-256"><a href="#cb37-256"></a><span class="at">@property</span></span>
+<span id="cb37-257"><a href="#cb37-257"></a><span class="kw">def</span> val(<span class="va">self</span>):</span>
+<span id="cb37-258"><a href="#cb37-258"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.val_df)</span>
+<span id="cb37-259"><a href="#cb37-259"></a></span>
+<span id="cb37-260"><a href="#cb37-260"></a><span class="at">@property</span></span>
+<span id="cb37-261"><a href="#cb37-261"></a><span class="kw">def</span> test(<span class="va">self</span>):</span>
+<span id="cb37-262"><a href="#cb37-262"></a>  <span class="cf">return</span> <span class="va">self</span>.make_dataset(<span class="va">self</span>.test_df)</span>
+<span id="cb37-263"><a href="#cb37-263"></a></span>
+<span id="cb37-264"><a href="#cb37-264"></a><span class="at">@property</span></span>
+<span id="cb37-265"><a href="#cb37-265"></a><span class="kw">def</span> example(<span class="va">self</span>):</span>
+<span id="cb37-266"><a href="#cb37-266"></a>  <span class="co">"""Get and cache an example batch of `inputs, labels` for plotting."""</span></span>
+<span id="cb37-267"><a href="#cb37-267"></a>  result <span class="op">=</span> <span class="bu">getattr</span>(<span class="va">self</span>, <span class="st">'_example'</span>, <span class="va">None</span>)</span>
+<span id="cb37-268"><a href="#cb37-268"></a>  <span class="cf">if</span> result <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb37-269"><a href="#cb37-269"></a>    <span class="co"># No example batch was found, so get one from the `.train` dataset</span></span>
+<span id="cb37-270"><a href="#cb37-270"></a>    result <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(<span class="va">self</span>.train))</span>
+<span id="cb37-271"><a href="#cb37-271"></a>    <span class="co"># And cache it for next time</span></span>
+<span id="cb37-272"><a href="#cb37-272"></a>    <span class="va">self</span>._example <span class="op">=</span> result</span>
+<span id="cb37-273"><a href="#cb37-273"></a>  <span class="cf">return</span> result</span>
+<span id="cb37-274"><a href="#cb37-274"></a></span>
+<span id="cb37-275"><a href="#cb37-275"></a>WindowGenerator.train <span class="op">=</span> train</span>
+<span id="cb37-276"><a href="#cb37-276"></a>WindowGenerator.val <span class="op">=</span> val</span>
+<span id="cb37-277"><a href="#cb37-277"></a>WindowGenerator.test <span class="op">=</span> test</span>
+<span id="cb37-278"><a href="#cb37-278"></a>WindowGenerator.example <span class="op">=</span> example</span>
+<span id="cb37-279"><a href="#cb37-279"></a><span class="in">```</span></span>
+<span id="cb37-280"><a href="#cb37-280"></a></span>
+<span id="cb37-283"><a href="#cb37-283"></a><span class="in">```{python}</span></span>
+<span id="cb37-284"><a href="#cb37-284"></a><span class="kw">def</span> plot(<span class="va">self</span>, model<span class="op">=</span><span class="va">None</span>, plot_col<span class="op">=</span><span class="st">'Total'</span>, max_subplots<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb37-285"><a href="#cb37-285"></a>  inputs, labels <span class="op">=</span> <span class="va">self</span>.example</span>
+<span id="cb37-286"><a href="#cb37-286"></a>  plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb37-287"><a href="#cb37-287"></a>  plot_col_index <span class="op">=</span> <span class="va">self</span>.column_indices[plot_col]</span>
+<span id="cb37-288"><a href="#cb37-288"></a>  max_n <span class="op">=</span> <span class="bu">min</span>(max_subplots, <span class="bu">len</span>(inputs))</span>
+<span id="cb37-289"><a href="#cb37-289"></a>  <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(max_n):</span>
+<span id="cb37-290"><a href="#cb37-290"></a>    plt.subplot(max_n, <span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb37-291"><a href="#cb37-291"></a>    plt.ylabel(<span class="ss">f'</span><span class="sc">{</span>plot_col<span class="sc">}</span><span class="ss"> [normed]'</span>)</span>
+<span id="cb37-292"><a href="#cb37-292"></a>    plt.plot(<span class="va">self</span>.input_indices, inputs[n, :, plot_col_index],</span>
+<span id="cb37-293"><a href="#cb37-293"></a>             label<span class="op">=</span><span class="st">'Inputs'</span>, marker<span class="op">=</span><span class="st">'.'</span>, zorder<span class="op">=-</span><span class="dv">10</span>)</span>
+<span id="cb37-294"><a href="#cb37-294"></a></span>
+<span id="cb37-295"><a href="#cb37-295"></a>    <span class="cf">if</span> <span class="va">self</span>.label_columns:</span>
+<span id="cb37-296"><a href="#cb37-296"></a>      label_col_index <span class="op">=</span> <span class="va">self</span>.label_columns_indices.get(plot_col, <span class="va">None</span>)</span>
+<span id="cb37-297"><a href="#cb37-297"></a>    <span class="cf">else</span>:</span>
+<span id="cb37-298"><a href="#cb37-298"></a>      label_col_index <span class="op">=</span> plot_col_index</span>
+<span id="cb37-299"><a href="#cb37-299"></a></span>
+<span id="cb37-300"><a href="#cb37-300"></a>    <span class="cf">if</span> label_col_index <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb37-301"><a href="#cb37-301"></a>      <span class="cf">continue</span></span>
+<span id="cb37-302"><a href="#cb37-302"></a></span>
+<span id="cb37-303"><a href="#cb37-303"></a>    plt.scatter(<span class="va">self</span>.label_indices, labels[n, :, label_col_index],</span>
+<span id="cb37-304"><a href="#cb37-304"></a>                edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Labels'</span>, c<span class="op">=</span><span class="st">'#2ca02c'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
+<span id="cb37-305"><a href="#cb37-305"></a>    <span class="cf">if</span> model <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb37-306"><a href="#cb37-306"></a>      predictions <span class="op">=</span> model(inputs)</span>
+<span id="cb37-307"><a href="#cb37-307"></a>      plt.scatter(<span class="va">self</span>.label_indices, predictions[n, :, label_col_index],</span>
+<span id="cb37-308"><a href="#cb37-308"></a>                  marker<span class="op">=</span><span class="st">'X'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Predictions'</span>,</span>
+<span id="cb37-309"><a href="#cb37-309"></a>                  c<span class="op">=</span><span class="st">'#ff7f0e'</span>, s<span class="op">=</span><span class="dv">64</span>)</span>
+<span id="cb37-310"><a href="#cb37-310"></a></span>
+<span id="cb37-311"><a href="#cb37-311"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb37-312"><a href="#cb37-312"></a>      plt.legend()</span>
+<span id="cb37-313"><a href="#cb37-313"></a></span>
+<span id="cb37-314"><a href="#cb37-314"></a>  plt.xlabel(<span class="st">'Time [h]'</span>)</span>
+<span id="cb37-315"><a href="#cb37-315"></a></span>
+<span id="cb37-316"><a href="#cb37-316"></a>WindowGenerator.plot <span class="op">=</span> plot</span>
+<span id="cb37-317"><a href="#cb37-317"></a><span class="in">```</span></span>
+<span id="cb37-318"><a href="#cb37-318"></a></span>
+<span id="cb37-321"><a href="#cb37-321"></a><span class="in">```{python}</span></span>
+<span id="cb37-322"><a href="#cb37-322"></a><span class="co"># Definimos número de épocas necesarias y funciones de pérdida</span></span>
+<span id="cb37-323"><a href="#cb37-323"></a>MAX_EPOCHS <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb37-324"><a href="#cb37-324"></a></span>
+<span id="cb37-325"><a href="#cb37-325"></a><span class="kw">def</span> compile_and_fit(model, window, patience<span class="op">=</span><span class="dv">2</span>): <span class="co">#patiences como el número de épocas que espera antes de parar</span></span>
+<span id="cb37-326"><a href="#cb37-326"></a>  <span class="co"># Para evitar sobreajuste</span></span>
+<span id="cb37-327"><a href="#cb37-327"></a>  early_stopping <span class="op">=</span> tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">'val_loss'</span>,</span>
+<span id="cb37-328"><a href="#cb37-328"></a>                                                    patience<span class="op">=</span>patience,</span>
+<span id="cb37-329"><a href="#cb37-329"></a>                                                    mode<span class="op">=</span><span class="st">'min'</span>)</span>
+<span id="cb37-330"><a href="#cb37-330"></a></span>
+<span id="cb37-331"><a href="#cb37-331"></a>  model.<span class="bu">compile</span>(loss<span class="op">=</span>tf.losses.MeanSquaredError(),</span>
+<span id="cb37-332"><a href="#cb37-332"></a>                optimizer<span class="op">=</span>tf.optimizers.Adam(),</span>
+<span id="cb37-333"><a href="#cb37-333"></a>                metrics<span class="op">=</span>[tf.metrics.MeanAbsoluteError()])</span>
+<span id="cb37-334"><a href="#cb37-334"></a></span>
+<span id="cb37-335"><a href="#cb37-335"></a>  history <span class="op">=</span> model.fit(window.train, epochs<span class="op">=</span>MAX_EPOCHS,</span>
+<span id="cb37-336"><a href="#cb37-336"></a>                      validation_data<span class="op">=</span>window.val,</span>
+<span id="cb37-337"><a href="#cb37-337"></a>                      callbacks<span class="op">=</span>[early_stopping])</span>
+<span id="cb37-338"><a href="#cb37-338"></a>  <span class="cf">return</span> history</span>
+<span id="cb37-339"><a href="#cb37-339"></a><span class="in">```</span></span>
+<span id="cb37-340"><a href="#cb37-340"></a></span>
+<span id="cb37-341"><a href="#cb37-341"></a><span class="fu">### Modelo de red neuronal multicapa</span></span>
+<span id="cb37-342"><a href="#cb37-342"></a></span>
+<span id="cb37-343"><a href="#cb37-343"></a>El interés en este caso es predecir el valor del total de las exportaciones 1 paso adelante </span>
+<span id="cb37-344"><a href="#cb37-344"></a>(siguiente mes) con base en la información disponible de los últimos 12 meses del total de las exportaciones.</span>
+<span id="cb37-345"><a href="#cb37-345"></a></span>
+<span id="cb37-348"><a href="#cb37-348"></a><span class="in">```{python}</span></span>
+<span id="cb37-349"><a href="#cb37-349"></a><span class="co">#| echo: true</span></span>
+<span id="cb37-350"><a href="#cb37-350"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-351"><a href="#cb37-351"></a></span>
+<span id="cb37-352"><a href="#cb37-352"></a>w1 <span class="op">=</span> WindowGenerator(input_width<span class="op">=</span><span class="dv">12</span>, label_width<span class="op">=</span><span class="dv">1</span>, shift<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb37-353"><a href="#cb37-353"></a>                     label_columns<span class="op">=</span>[<span class="st">'Total'</span>])</span>
+<span id="cb37-354"><a href="#cb37-354"></a>w1</span>
+<span id="cb37-355"><a href="#cb37-355"></a><span class="in">```</span></span>
+<span id="cb37-356"><a href="#cb37-356"></a></span>
+<span id="cb37-359"><a href="#cb37-359"></a><span class="in">```{python}</span></span>
+<span id="cb37-360"><a href="#cb37-360"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-361"><a href="#cb37-361"></a></span>
+<span id="cb37-362"><a href="#cb37-362"></a><span class="cf">for</span> batch <span class="kw">in</span> w1.train.take(<span class="dv">1</span>):</span>
+<span id="cb37-363"><a href="#cb37-363"></a>    inputs_train,targets_train <span class="op">=</span> batch</span>
+<span id="cb37-364"><a href="#cb37-364"></a>    </span>
+<span id="cb37-365"><a href="#cb37-365"></a><span class="bu">print</span>(<span class="st">"Input shape:"</span>, inputs_train.numpy().shape)</span>
+<span id="cb37-366"><a href="#cb37-366"></a><span class="bu">print</span>(<span class="st">"Target shape:"</span>, targets_train.numpy().shape)</span>
+<span id="cb37-367"><a href="#cb37-367"></a><span class="in">```</span></span>
+<span id="cb37-368"><a href="#cb37-368"></a></span>
+<span id="cb37-371"><a href="#cb37-371"></a><span class="in">```{python}</span></span>
+<span id="cb37-372"><a href="#cb37-372"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-373"><a href="#cb37-373"></a></span>
+<span id="cb37-374"><a href="#cb37-374"></a><span class="cf">for</span> batch <span class="kw">in</span> w1.val.take(<span class="dv">1</span>):</span>
+<span id="cb37-375"><a href="#cb37-375"></a>    inputs_val,targets_val <span class="op">=</span> batch</span>
+<span id="cb37-376"><a href="#cb37-376"></a></span>
+<span id="cb37-377"><a href="#cb37-377"></a><span class="bu">print</span>(<span class="st">"Input shape:"</span>, inputs_val.numpy().shape)</span>
+<span id="cb37-378"><a href="#cb37-378"></a><span class="bu">print</span>(<span class="st">"Target shape:"</span>, targets_val.numpy().shape)</span>
+<span id="cb37-379"><a href="#cb37-379"></a><span class="in">```</span></span>
+<span id="cb37-380"><a href="#cb37-380"></a></span>
+<span id="cb37-383"><a href="#cb37-383"></a><span class="in">```{python}</span></span>
+<span id="cb37-384"><a href="#cb37-384"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-385"><a href="#cb37-385"></a></span>
+<span id="cb37-386"><a href="#cb37-386"></a><span class="cf">for</span> batch <span class="kw">in</span> w1.test.take(<span class="dv">1</span>):</span>
+<span id="cb37-387"><a href="#cb37-387"></a>    inputs_test,targets_test <span class="op">=</span> batch</span>
+<span id="cb37-388"><a href="#cb37-388"></a></span>
+<span id="cb37-389"><a href="#cb37-389"></a><span class="bu">print</span>(<span class="st">"Input shape:"</span>, inputs_val.numpy().shape)</span>
+<span id="cb37-390"><a href="#cb37-390"></a><span class="bu">print</span>(<span class="st">"Target shape:"</span>, targets_val.numpy().shape)</span>
+<span id="cb37-391"><a href="#cb37-391"></a><span class="in">```</span></span>
+<span id="cb37-392"><a href="#cb37-392"></a></span>
+<span id="cb37-395"><a href="#cb37-395"></a><span class="in">```{python}</span></span>
+<span id="cb37-396"><a href="#cb37-396"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-397"><a href="#cb37-397"></a></span>
+<span id="cb37-398"><a href="#cb37-398"></a>w1.train.element_spec</span>
+<span id="cb37-399"><a href="#cb37-399"></a><span class="in">```</span></span>
+<span id="cb37-400"><a href="#cb37-400"></a></span>
+<span id="cb37-401"><a href="#cb37-401"></a>A continuación se muestra la configuración del modelo. Se usan las 12 observaciones anteriores para </span>
+<span id="cb37-402"><a href="#cb37-402"></a>predecir la siguiente.</span>
+<span id="cb37-403"><a href="#cb37-403"></a></span>
+<span id="cb37-406"><a href="#cb37-406"></a><span class="in">```{python}</span></span>
+<span id="cb37-407"><a href="#cb37-407"></a><span class="co">#| output: true</span></span>
+<span id="cb37-408"><a href="#cb37-408"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-409"><a href="#cb37-409"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb37-410"><a href="#cb37-410"></a></span>
+<span id="cb37-411"><a href="#cb37-411"></a>w1.plot()</span>
+<span id="cb37-412"><a href="#cb37-412"></a><span class="in">```</span></span>
+<span id="cb37-413"><a href="#cb37-413"></a></span>
+<span id="cb37-414"><a href="#cb37-414"></a><span class="kw">&lt;br&gt;</span></span>
+<span id="cb37-415"><a href="#cb37-415"></a></span>
+<span id="cb37-418"><a href="#cb37-418"></a><span class="in">```{python}</span></span>
+<span id="cb37-419"><a href="#cb37-419"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-420"><a href="#cb37-420"></a></span>
+<span id="cb37-421"><a href="#cb37-421"></a><span class="co">## Ejemplo de los lotes en los datos de entrenamiento</span></span>
+<span id="cb37-422"><a href="#cb37-422"></a>i<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb37-423"><a href="#cb37-423"></a><span class="cf">for</span> batch <span class="kw">in</span> w1.train.take(<span class="dv">1</span>):</span>
+<span id="cb37-424"><a href="#cb37-424"></a>    inputs, targets <span class="op">=</span> batch</span>
+<span id="cb37-425"><a href="#cb37-425"></a>    <span class="bu">print</span>(<span class="st">"Covariable o input"</span>,i,inputs)</span>
+<span id="cb37-426"><a href="#cb37-426"></a>    <span class="bu">print</span>(<span class="st">"Respuesta o etiqueta"</span>,i,targets)</span>
+<span id="cb37-427"><a href="#cb37-427"></a>    i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb37-428"><a href="#cb37-428"></a><span class="in">```</span></span>
+<span id="cb37-429"><a href="#cb37-429"></a></span>
+<span id="cb37-432"><a href="#cb37-432"></a><span class="in">```{python}</span></span>
+<span id="cb37-433"><a href="#cb37-433"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-434"><a href="#cb37-434"></a></span>
+<span id="cb37-435"><a href="#cb37-435"></a><span class="co">## Ejemplo de los lotes en los datos de validación</span></span>
+<span id="cb37-436"><a href="#cb37-436"></a>i<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb37-437"><a href="#cb37-437"></a><span class="cf">for</span> batch <span class="kw">in</span> w1.val.take(<span class="dv">1</span>):</span>
+<span id="cb37-438"><a href="#cb37-438"></a>    inputs, targets <span class="op">=</span> batch</span>
+<span id="cb37-439"><a href="#cb37-439"></a>    <span class="bu">print</span>(<span class="st">"Covariable o input"</span>,i,inputs)</span>
+<span id="cb37-440"><a href="#cb37-440"></a>    <span class="bu">print</span>(<span class="st">"Respuesta o etiqueta"</span>,i,targets)</span>
+<span id="cb37-441"><a href="#cb37-441"></a>    i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb37-442"><a href="#cb37-442"></a><span class="in">```</span></span>
+<span id="cb37-443"><a href="#cb37-443"></a></span>
+<span id="cb37-446"><a href="#cb37-446"></a><span class="in">```{python}</span></span>
+<span id="cb37-447"><a href="#cb37-447"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-448"><a href="#cb37-448"></a></span>
+<span id="cb37-449"><a href="#cb37-449"></a><span class="co">## Ejemplo de los lotes en los datos de prueba</span></span>
+<span id="cb37-450"><a href="#cb37-450"></a>i<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb37-451"><a href="#cb37-451"></a><span class="cf">for</span> batch <span class="kw">in</span> w1.test.take(<span class="dv">1</span>):</span>
+<span id="cb37-452"><a href="#cb37-452"></a>    inputs, targets <span class="op">=</span> batch</span>
+<span id="cb37-453"><a href="#cb37-453"></a>    <span class="bu">print</span>(<span class="st">"Covariable o input"</span>,i,inputs)</span>
+<span id="cb37-454"><a href="#cb37-454"></a>    <span class="bu">print</span>(<span class="st">"Respuesta o etiqueta"</span>,i,targets)</span>
+<span id="cb37-455"><a href="#cb37-455"></a>    i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb37-456"><a href="#cb37-456"></a><span class="in">```</span></span>
+<span id="cb37-457"><a href="#cb37-457"></a></span>
+<span id="cb37-460"><a href="#cb37-460"></a><span class="in">```{python}</span></span>
+<span id="cb37-461"><a href="#cb37-461"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-462"><a href="#cb37-462"></a></span>
+<span id="cb37-463"><a href="#cb37-463"></a>input_dataset_train <span class="op">=</span> w1.train.<span class="bu">map</span>(<span class="kw">lambda</span> x,y: x)</span>
+<span id="cb37-464"><a href="#cb37-464"></a>target_dataset_train <span class="op">=</span> w1.train.<span class="bu">map</span>(<span class="kw">lambda</span> x,y: y)</span>
+<span id="cb37-465"><a href="#cb37-465"></a><span class="in">```</span></span>
+<span id="cb37-466"><a href="#cb37-466"></a></span>
+<span id="cb37-469"><a href="#cb37-469"></a><span class="in">```{python}</span></span>
+<span id="cb37-470"><a href="#cb37-470"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-471"><a href="#cb37-471"></a></span>
+<span id="cb37-472"><a href="#cb37-472"></a>input_dataset_val <span class="op">=</span> w1.val.<span class="bu">map</span>(<span class="kw">lambda</span> x,y: x)</span>
+<span id="cb37-473"><a href="#cb37-473"></a>target_dataset_val <span class="op">=</span> w1.val.<span class="bu">map</span>(<span class="kw">lambda</span> x,y: y)</span>
+<span id="cb37-474"><a href="#cb37-474"></a><span class="in">```</span></span>
+<span id="cb37-475"><a href="#cb37-475"></a></span>
+<span id="cb37-478"><a href="#cb37-478"></a><span class="in">```{python}</span></span>
+<span id="cb37-479"><a href="#cb37-479"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-480"><a href="#cb37-480"></a></span>
+<span id="cb37-481"><a href="#cb37-481"></a>input_dataset_test <span class="op">=</span> w1.test.<span class="bu">map</span>(<span class="kw">lambda</span> x,y: x)</span>
+<span id="cb37-482"><a href="#cb37-482"></a>target_dataset_test <span class="op">=</span> w1.test.<span class="bu">map</span>(<span class="kw">lambda</span> x,y: y)</span>
+<span id="cb37-483"><a href="#cb37-483"></a><span class="in">```</span></span>
+<span id="cb37-484"><a href="#cb37-484"></a></span>
+<span id="cb37-485"><a href="#cb37-485"></a><span class="fu">#### Tuning o búsqueda de los hiperparámetros</span></span>
+<span id="cb37-486"><a href="#cb37-486"></a></span>
+<span id="cb37-487"><a href="#cb37-487"></a>La búsqueda de los hiperparámetros que minimicen el error cuadrático medio sobre el conjunto de </span>
+<span id="cb37-488"><a href="#cb37-488"></a>validación se hará con el método **BayesianOptimization Tuner**. El método consiste en escoger </span>
+<span id="cb37-489"><a href="#cb37-489"></a>aleatoriamente algunas (pocas) combinaciones de los parámetros, luego basado en el rendimiento de </span>
+<span id="cb37-490"><a href="#cb37-490"></a>esos hiperparámetros, escoge los siguientes mejores hiperparámetros. Es decir que toma en cuenta el</span>
+<span id="cb37-491"><a href="#cb37-491"></a>histórico de los hiperparámetros que ya han sido probados en el modelo.</span>
+<span id="cb37-492"><a href="#cb37-492"></a></span>
+<span id="cb37-495"><a href="#cb37-495"></a><span class="in">```{python}</span></span>
+<span id="cb37-496"><a href="#cb37-496"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-497"><a href="#cb37-497"></a></span>
+<span id="cb37-498"><a href="#cb37-498"></a><span class="im">from</span> tensorflow <span class="im">import</span> keras</span>
+<span id="cb37-499"><a href="#cb37-499"></a><span class="im">import</span> keras_tuner <span class="im">as</span> kt</span>
+<span id="cb37-500"><a href="#cb37-500"></a><span class="im">from</span> tensorflow.keras <span class="im">import</span> layers</span>
+<span id="cb37-501"><a href="#cb37-501"></a><span class="in">```</span></span>
+<span id="cb37-502"><a href="#cb37-502"></a></span>
+<span id="cb37-505"><a href="#cb37-505"></a><span class="in">```{python}</span></span>
+<span id="cb37-506"><a href="#cb37-506"></a><span class="kw">def</span> build_model(hp):</span>
+<span id="cb37-507"><a href="#cb37-507"></a>    model <span class="op">=</span> keras.Sequential()</span>
+<span id="cb37-508"><a href="#cb37-508"></a>    model.add(layers.Dense(units<span class="op">=</span>hp.Int(<span class="st">"num_units"</span>, min_value<span class="op">=</span><span class="dv">32</span>, max_value<span class="op">=</span><span class="dv">564</span>, step<span class="op">=</span><span class="dv">32</span>),</span>
+<span id="cb37-509"><a href="#cb37-509"></a>                activation<span class="op">=</span>hp.Choice(<span class="st">"activation"</span>, [<span class="st">"relu"</span>, <span class="st">"tanh"</span>])))</span>
+<span id="cb37-510"><a href="#cb37-510"></a>    <span class="co"># Tune the number of layers.</span></span>
+<span id="cb37-511"><a href="#cb37-511"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(hp.Int(<span class="st">"num_layers"</span>, <span class="dv">1</span>, <span class="dv">5</span>)):</span>
+<span id="cb37-512"><a href="#cb37-512"></a>        model.add(</span>
+<span id="cb37-513"><a href="#cb37-513"></a>            layers.Dense(</span>
+<span id="cb37-514"><a href="#cb37-514"></a>                <span class="co"># Tune number of units separately.</span></span>
+<span id="cb37-515"><a href="#cb37-515"></a>                units<span class="op">=</span>hp.Int(<span class="ss">f"units_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>, min_value<span class="op">=</span><span class="dv">32</span>, max_value<span class="op">=</span><span class="dv">564</span>, step<span class="op">=</span><span class="dv">32</span>),</span>
+<span id="cb37-516"><a href="#cb37-516"></a>                activation<span class="op">=</span>hp.Choice(<span class="st">"activation"</span>, [<span class="st">"relu"</span>, <span class="st">"tanh"</span>]),</span>
+<span id="cb37-517"><a href="#cb37-517"></a>            )</span>
+<span id="cb37-518"><a href="#cb37-518"></a>        )</span>
+<span id="cb37-519"><a href="#cb37-519"></a>    <span class="cf">if</span> hp.Boolean(<span class="st">"dropout"</span>):</span>
+<span id="cb37-520"><a href="#cb37-520"></a>        model.add(layers.Dropout(rate<span class="op">=</span><span class="fl">0.25</span>))</span>
+<span id="cb37-521"><a href="#cb37-521"></a>    model.add(layers.Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">"linear"</span>))</span>
+<span id="cb37-522"><a href="#cb37-522"></a>    learning_rate <span class="op">=</span> hp.Float(<span class="st">"lr"</span>, min_value<span class="op">=</span><span class="fl">1e-4</span>, max_value<span class="op">=</span><span class="fl">1e-2</span>, sampling<span class="op">=</span><span class="st">"log"</span>)</span>
+<span id="cb37-523"><a href="#cb37-523"></a>    model.<span class="bu">compile</span>(</span>
+<span id="cb37-524"><a href="#cb37-524"></a>        optimizer<span class="op">=</span>keras.optimizers.Adam(learning_rate<span class="op">=</span>learning_rate),</span>
+<span id="cb37-525"><a href="#cb37-525"></a>        loss<span class="op">=</span><span class="st">"mean_squared_error"</span>,</span>
+<span id="cb37-526"><a href="#cb37-526"></a>        metrics<span class="op">=</span>[<span class="st">"mean_squared_error"</span>]</span>
+<span id="cb37-527"><a href="#cb37-527"></a>    )</span>
+<span id="cb37-528"><a href="#cb37-528"></a>    <span class="cf">return</span> model</span>
+<span id="cb37-529"><a href="#cb37-529"></a></span>
+<span id="cb37-530"><a href="#cb37-530"></a></span>
+<span id="cb37-531"><a href="#cb37-531"></a>build_model(kt.HyperParameters())</span>
+<span id="cb37-532"><a href="#cb37-532"></a><span class="in">```</span></span>
+<span id="cb37-533"><a href="#cb37-533"></a></span>
+<span id="cb37-536"><a href="#cb37-536"></a><span class="in">```{python}</span></span>
+<span id="cb37-537"><a href="#cb37-537"></a>tuner_BayesianOptimization_mlp <span class="op">=</span> kt.BayesianOptimization(</span>
+<span id="cb37-538"><a href="#cb37-538"></a>    hypermodel<span class="op">=</span>build_model,</span>
+<span id="cb37-539"><a href="#cb37-539"></a>    objective<span class="op">=</span><span class="st">"val_loss"</span>,</span>
+<span id="cb37-540"><a href="#cb37-540"></a>    max_trials<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb37-541"><a href="#cb37-541"></a>    num_initial_points<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb37-542"><a href="#cb37-542"></a>    alpha<span class="op">=</span><span class="fl">0.0001</span>,</span>
+<span id="cb37-543"><a href="#cb37-543"></a>    beta<span class="op">=</span><span class="fl">2.6</span>,</span>
+<span id="cb37-544"><a href="#cb37-544"></a>    seed<span class="op">=</span><span class="dv">1234</span>,</span>
+<span id="cb37-545"><a href="#cb37-545"></a>    hyperparameters<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb37-546"><a href="#cb37-546"></a>    tune_new_entries<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb37-547"><a href="#cb37-547"></a>    allow_new_entries<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb37-548"><a href="#cb37-548"></a>    max_retries_per_trial<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb37-549"><a href="#cb37-549"></a>    max_consecutive_failed_trials<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb37-550"><a href="#cb37-550"></a>    overwrite<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb37-551"><a href="#cb37-551"></a>    directory<span class="op">=</span><span class="st">"dirsalida"</span>,</span>
+<span id="cb37-552"><a href="#cb37-552"></a>    project_name<span class="op">=</span><span class="st">"helloworld"</span></span>
+<span id="cb37-553"><a href="#cb37-553"></a>)</span>
+<span id="cb37-554"><a href="#cb37-554"></a><span class="in">```</span></span>
+<span id="cb37-555"><a href="#cb37-555"></a></span>
+<span id="cb37-558"><a href="#cb37-558"></a><span class="in">```{python}</span></span>
+<span id="cb37-559"><a href="#cb37-559"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-560"><a href="#cb37-560"></a></span>
+<span id="cb37-561"><a href="#cb37-561"></a>tuner_BayesianOptimization_mlp.search_space_summary()</span>
+<span id="cb37-562"><a href="#cb37-562"></a><span class="in">```</span></span>
+<span id="cb37-563"><a href="#cb37-563"></a></span>
+<span id="cb37-566"><a href="#cb37-566"></a><span class="in">```{python}</span></span>
+<span id="cb37-567"><a href="#cb37-567"></a>stop_early<span class="op">=</span>tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">"val_loss"</span>,patience<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb37-568"><a href="#cb37-568"></a><span class="in">```</span></span>
+<span id="cb37-569"><a href="#cb37-569"></a></span>
+<span id="cb37-572"><a href="#cb37-572"></a><span class="in">```{python}</span></span>
+<span id="cb37-573"><a href="#cb37-573"></a>tuner_BayesianOptimization_mlp.search((w1.train), epochs<span class="op">=</span><span class="dv">20</span>, validation_data<span class="op">=</span>(w1.val),callbacks<span class="op">=</span>[stop_early])</span>
+<span id="cb37-574"><a href="#cb37-574"></a><span class="in">```</span></span>
+<span id="cb37-575"><a href="#cb37-575"></a></span>
+<span id="cb37-578"><a href="#cb37-578"></a><span class="in">```{python}</span></span>
+<span id="cb37-579"><a href="#cb37-579"></a><span class="co">#| output: true</span></span>
+<span id="cb37-580"><a href="#cb37-580"></a></span>
+<span id="cb37-581"><a href="#cb37-581"></a><span class="co"># Get the top 2 models.</span></span>
+<span id="cb37-582"><a href="#cb37-582"></a>models_mlp <span class="op">=</span> tuner_BayesianOptimization_mlp.get_best_models(num_models<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb37-583"><a href="#cb37-583"></a>best_model_mlp <span class="op">=</span> models_mlp[<span class="dv">0</span>]</span>
+<span id="cb37-584"><a href="#cb37-584"></a><span class="co"># Build the model.</span></span>
+<span id="cb37-585"><a href="#cb37-585"></a><span class="co"># Needed for `Sequential` without specified `input_shape`.</span></span>
+<span id="cb37-586"><a href="#cb37-586"></a>best_model_mlp.build(input_shape<span class="op">=</span>(<span class="dv">32</span>, <span class="dv">12</span>, <span class="dv">1</span>))</span>
+<span id="cb37-587"><a href="#cb37-587"></a>best_model_mlp.summary()</span>
+<span id="cb37-588"><a href="#cb37-588"></a><span class="in">```</span></span>
+<span id="cb37-589"><a href="#cb37-589"></a></span>
+<span id="cb37-592"><a href="#cb37-592"></a><span class="in">```{python}</span></span>
+<span id="cb37-593"><a href="#cb37-593"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-594"><a href="#cb37-594"></a><span class="co">#| output: false</span></span>
+<span id="cb37-595"><a href="#cb37-595"></a></span>
+<span id="cb37-596"><a href="#cb37-596"></a>tuner_BayesianOptimization_mlp.results_summary()</span>
+<span id="cb37-597"><a href="#cb37-597"></a><span class="in">```</span></span>
+<span id="cb37-598"><a href="#cb37-598"></a></span>
+<span id="cb37-599"><a href="#cb37-599"></a><span class="fu">#### Ajuste del mejor modelo con el conjunto de entrenamiento+validación</span></span>
+<span id="cb37-600"><a href="#cb37-600"></a></span>
+<span id="cb37-603"><a href="#cb37-603"></a><span class="in">```{python}</span></span>
+<span id="cb37-604"><a href="#cb37-604"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-605"><a href="#cb37-605"></a></span>
+<span id="cb37-606"><a href="#cb37-606"></a>train_plus_val<span class="op">=</span>w1.train.concatenate(w1.val)<span class="co">###verificar que en efecto</span></span>
+<span id="cb37-607"><a href="#cb37-607"></a>train_plus_val</span>
+<span id="cb37-608"><a href="#cb37-608"></a><span class="in">```</span></span>
+<span id="cb37-609"><a href="#cb37-609"></a></span>
+<span id="cb37-612"><a href="#cb37-612"></a><span class="in">```{python}</span></span>
+<span id="cb37-613"><a href="#cb37-613"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-614"><a href="#cb37-614"></a><span class="co">#| output: true</span></span>
+<span id="cb37-615"><a href="#cb37-615"></a></span>
+<span id="cb37-616"><a href="#cb37-616"></a><span class="co"># Get the top 2 hyperparameters.</span></span>
+<span id="cb37-617"><a href="#cb37-617"></a>best_hps_mlp <span class="op">=</span> tuner_BayesianOptimization_mlp.get_best_hyperparameters(<span class="dv">5</span>)</span>
+<span id="cb37-618"><a href="#cb37-618"></a><span class="co"># Build the model with the best hp.</span></span>
+<span id="cb37-619"><a href="#cb37-619"></a>callback<span class="op">=</span>tf.keras.callbacks.EarlyStopping(monitor<span class="op">=</span><span class="st">"loss"</span>,patience<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb37-620"><a href="#cb37-620"></a>model_mlp <span class="op">=</span> build_model(best_hps_mlp[<span class="dv">0</span>])</span>
+<span id="cb37-621"><a href="#cb37-621"></a><span class="co"># Fit with the entire dataset.</span></span>
+<span id="cb37-622"><a href="#cb37-622"></a><span class="bu">print</span>(model_mlp.fit(train_plus_val, epochs<span class="op">=</span><span class="dv">20</span>,callbacks<span class="op">=</span>[callback]))</span>
+<span id="cb37-623"><a href="#cb37-623"></a><span class="in">```</span></span>
+<span id="cb37-624"><a href="#cb37-624"></a></span>
+<span id="cb37-627"><a href="#cb37-627"></a><span class="in">```{python}</span></span>
+<span id="cb37-628"><a href="#cb37-628"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-629"><a href="#cb37-629"></a></span>
+<span id="cb37-630"><a href="#cb37-630"></a>model_mlp.layers[<span class="dv">0</span>].get_weights()[<span class="dv">0</span>]</span>
+<span id="cb37-631"><a href="#cb37-631"></a><span class="in">```</span></span>
+<span id="cb37-632"><a href="#cb37-632"></a></span>
+<span id="cb37-635"><a href="#cb37-635"></a><span class="in">```{python}</span></span>
+<span id="cb37-636"><a href="#cb37-636"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-637"><a href="#cb37-637"></a></span>
+<span id="cb37-638"><a href="#cb37-638"></a><span class="bu">print</span>(model_mlp.layers[<span class="dv">0</span>].weights)</span>
+<span id="cb37-639"><a href="#cb37-639"></a><span class="in">```</span></span>
+<span id="cb37-640"><a href="#cb37-640"></a></span>
+<span id="cb37-643"><a href="#cb37-643"></a><span class="in">```{python}</span></span>
+<span id="cb37-644"><a href="#cb37-644"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-645"><a href="#cb37-645"></a></span>
+<span id="cb37-646"><a href="#cb37-646"></a><span class="bu">print</span>(model_mlp.layers[<span class="dv">0</span>].bias.numpy())</span>
+<span id="cb37-647"><a href="#cb37-647"></a><span class="in">```</span></span>
+<span id="cb37-648"><a href="#cb37-648"></a></span>
+<span id="cb37-649"><a href="#cb37-649"></a><span class="kw">&lt;br&gt;</span></span>
+<span id="cb37-650"><a href="#cb37-650"></a></span>
+<span id="cb37-651"><a href="#cb37-651"></a><span class="fu">#### Errores de predicción del modelo</span></span>
+<span id="cb37-652"><a href="#cb37-652"></a></span>
+<span id="cb37-655"><a href="#cb37-655"></a><span class="in">```{python}</span></span>
+<span id="cb37-656"><a href="#cb37-656"></a><span class="co">#| output: true</span></span>
+<span id="cb37-657"><a href="#cb37-657"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-658"><a href="#cb37-658"></a></span>
+<span id="cb37-659"><a href="#cb37-659"></a>model_mlp.evaluate(w1.test, verbose<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb37-660"><a href="#cb37-660"></a><span class="in">```</span></span>
+<span id="cb37-661"><a href="#cb37-661"></a></span>
+<span id="cb37-664"><a href="#cb37-664"></a><span class="in">```{python}</span></span>
+<span id="cb37-665"><a href="#cb37-665"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-666"><a href="#cb37-666"></a></span>
+<span id="cb37-667"><a href="#cb37-667"></a>input_predict_mlp<span class="op">=</span>tf.constant(np.array(test_df[<span class="op">-</span><span class="dv">17</span>:]),dtype<span class="op">=</span>tf.float32, shape<span class="op">=</span>(<span class="dv">17</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb37-668"><a href="#cb37-668"></a>prediction_test<span class="op">=</span>model_mlp.predict(input_predict_mlp)<span class="op">*</span>train_std[<span class="st">'Total'</span>]<span class="op">+</span>train_mean[<span class="st">'Total'</span>]</span>
+<span id="cb37-669"><a href="#cb37-669"></a><span class="in">```</span></span>
+<span id="cb37-670"><a href="#cb37-670"></a></span>
+<span id="cb37-673"><a href="#cb37-673"></a><span class="in">```{python}</span></span>
+<span id="cb37-674"><a href="#cb37-674"></a><span class="co">#| output: false</span></span>
+<span id="cb37-675"><a href="#cb37-675"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-676"><a href="#cb37-676"></a></span>
+<span id="cb37-677"><a href="#cb37-677"></a><span class="bu">print</span>(prediction_test.shape)</span>
+<span id="cb37-678"><a href="#cb37-678"></a><span class="bu">print</span>(prediction_test)</span>
+<span id="cb37-679"><a href="#cb37-679"></a><span class="in">```</span></span>
+<span id="cb37-680"><a href="#cb37-680"></a></span>
+<span id="cb37-683"><a href="#cb37-683"></a><span class="in">```{python}</span></span>
+<span id="cb37-684"><a href="#cb37-684"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-685"><a href="#cb37-685"></a></span>
+<span id="cb37-686"><a href="#cb37-686"></a>i<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb37-687"><a href="#cb37-687"></a><span class="cf">for</span> batch <span class="kw">in</span> target_dataset_test.take(<span class="dv">17</span>):</span>
+<span id="cb37-688"><a href="#cb37-688"></a>    <span class="cf">if</span> i<span class="op">==</span><span class="dv">1</span>:</span>
+<span id="cb37-689"><a href="#cb37-689"></a>        targets_test <span class="op">=</span> batch.numpy()</span>
+<span id="cb37-690"><a href="#cb37-690"></a>    <span class="cf">elif</span> i<span class="op">&gt;</span><span class="dv">1</span>:</span>
+<span id="cb37-691"><a href="#cb37-691"></a>        targets_test_aux <span class="op">=</span> batch.numpy()</span>
+<span id="cb37-692"><a href="#cb37-692"></a>        targets_test<span class="op">=</span>np.append(targets_test,targets_test_aux)</span>
+<span id="cb37-693"><a href="#cb37-693"></a>    i<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb37-694"><a href="#cb37-694"></a><span class="in">```</span></span>
+<span id="cb37-695"><a href="#cb37-695"></a></span>
+<span id="cb37-698"><a href="#cb37-698"></a><span class="in">```{python}</span></span>
+<span id="cb37-699"><a href="#cb37-699"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-700"><a href="#cb37-700"></a></span>
+<span id="cb37-701"><a href="#cb37-701"></a><span class="bu">print</span>(targets_test.shape)</span>
+<span id="cb37-702"><a href="#cb37-702"></a>true_series<span class="op">=</span>targets_test<span class="op">*</span>train_std[<span class="st">'Total'</span>]<span class="op">+</span>train_mean[<span class="st">'Total'</span>]</span>
+<span id="cb37-703"><a href="#cb37-703"></a>true_series<span class="op">=</span>true_series.reshape((<span class="dv">17</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb37-704"><a href="#cb37-704"></a><span class="bu">print</span>(true_series)</span>
+<span id="cb37-705"><a href="#cb37-705"></a><span class="in">```</span></span>
+<span id="cb37-706"><a href="#cb37-706"></a></span>
+<span id="cb37-709"><a href="#cb37-709"></a><span class="in">```{python}</span></span>
+<span id="cb37-710"><a href="#cb37-710"></a><span class="co">#| output: true</span></span>
+<span id="cb37-711"><a href="#cb37-711"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-712"><a href="#cb37-712"></a></span>
+<span id="cb37-713"><a href="#cb37-713"></a><span class="co"># Verdaderos valores vs predicciones</span></span>
+<span id="cb37-714"><a href="#cb37-714"></a><span class="bu">print</span>(pd.DataFrame({<span class="st">'Verdaderos valores'</span>:true_series.reshape(<span class="dv">17</span>), <span class="st">'Predicciones'</span>:prediction_test.reshape(<span class="dv">17</span>)}))</span>
+<span id="cb37-715"><a href="#cb37-715"></a><span class="in">```</span></span>
+<span id="cb37-716"><a href="#cb37-716"></a></span>
+<span id="cb37-717"><a href="#cb37-717"></a>La raíz del error cuadrático medio de las predicciones respecto a los verdaderos valores en el </span>
+<span id="cb37-718"><a href="#cb37-718"></a>conjunto de prueba es igual a:</span>
+<span id="cb37-719"><a href="#cb37-719"></a></span>
+<span id="cb37-722"><a href="#cb37-722"></a><span class="in">```{python}</span></span>
+<span id="cb37-723"><a href="#cb37-723"></a><span class="co">#| output: true</span></span>
+<span id="cb37-724"><a href="#cb37-724"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-725"><a href="#cb37-725"></a></span>
+<span id="cb37-726"><a href="#cb37-726"></a>errors_squared<span class="op">=</span>tf.keras.metrics.mean_squared_error(true_series, prediction_test).numpy()</span>
+<span id="cb37-727"><a href="#cb37-727"></a><span class="bu">print</span>(<span class="st">"RECM:"</span>,errors_squared.mean()<span class="op">**</span><span class="fl">0.5</span>)</span>
+<span id="cb37-728"><a href="#cb37-728"></a><span class="in">```</span></span>
+<span id="cb37-729"><a href="#cb37-729"></a></span>
+<span id="cb37-732"><a href="#cb37-732"></a><span class="in">```{python}</span></span>
+<span id="cb37-733"><a href="#cb37-733"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-734"><a href="#cb37-734"></a></span>
+<span id="cb37-735"><a href="#cb37-735"></a>errors_squared</span>
+<span id="cb37-736"><a href="#cb37-736"></a><span class="in">```</span></span>
+<span id="cb37-737"><a href="#cb37-737"></a></span>
+<span id="cb37-738"><a href="#cb37-738"></a><span class="fu">#### Gráfico de las predicciones sobre los datos de prueba</span></span>
+<span id="cb37-739"><a href="#cb37-739"></a></span>
+<span id="cb37-742"><a href="#cb37-742"></a><span class="in">```{python}</span></span>
+<span id="cb37-743"><a href="#cb37-743"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-744"><a href="#cb37-744"></a></span>
+<span id="cb37-745"><a href="#cb37-745"></a>test_index<span class="op">=</span>test_df.index[<span class="op">-</span><span class="dv">17</span>:]</span>
+<span id="cb37-746"><a href="#cb37-746"></a>test_index.values</span>
+<span id="cb37-747"><a href="#cb37-747"></a><span class="in">```</span></span>
+<span id="cb37-748"><a href="#cb37-748"></a></span>
+<span id="cb37-751"><a href="#cb37-751"></a><span class="in">```{python}</span></span>
+<span id="cb37-752"><a href="#cb37-752"></a><span class="co">#| echo: false</span></span>
+<span id="cb37-753"><a href="#cb37-753"></a></span>
+<span id="cb37-754"><a href="#cb37-754"></a>true_series_final<span class="op">=</span>true_series.reshape(<span class="dv">17</span>)</span>
+<span id="cb37-755"><a href="#cb37-755"></a>prediction_test_final<span class="op">=</span>prediction_test.reshape(<span class="dv">17</span>)</span>
+<span id="cb37-756"><a href="#cb37-756"></a><span class="in">```</span></span>
+<span id="cb37-757"><a href="#cb37-757"></a></span>
+<span id="cb37-760"><a href="#cb37-760"></a><span class="in">```{python}</span></span>
+<span id="cb37-761"><a href="#cb37-761"></a><span class="co">#| output: true</span></span>
+<span id="cb37-762"><a href="#cb37-762"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb37-763"><a href="#cb37-763"></a></span>
+<span id="cb37-764"><a href="#cb37-764"></a>plt.plot(true_series_final)</span>
+<span id="cb37-765"><a href="#cb37-765"></a>plt.plot(prediction_test_final)</span>
+<span id="cb37-766"><a href="#cb37-766"></a>plt.legend([<span class="st">'Respesta real'</span>,<span class="st">'Predicción de la Respuesta'</span>],loc<span class="op">=</span><span class="st">"best"</span>, fontsize<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb37-767"><a href="#cb37-767"></a>plt.ylabel(<span class="st">'Y y $\hat</span><span class="sc">{Y}</span><span class="st">$ en conjunto de prueba'</span>, fontsize<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb37-768"><a href="#cb37-768"></a><span class="in">```</span></span>
+<span id="cb37-769"><a href="#cb37-769"></a></span>
+<span id="cb37-772"><a href="#cb37-772"></a><span class="in">```{python}</span></span>
+<span id="cb37-773"><a href="#cb37-773"></a><span class="in">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

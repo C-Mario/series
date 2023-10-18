@@ -1,8 +1,9 @@
 ---
 title: "Redes neuronales"
 jupyter: python3
-echo: false
+echo: true
 output: false
+code-fold: true
 ---
 
 ## ***Exportaciones***
@@ -131,6 +132,16 @@ plt.figure(figsize=(12, 8))
 ax = sns.violinplot(x = '', y = 'Datos normalizados', data = df_std)
 _ = ax.set_xticklabels(features.keys(), rotation=0)
 ```
+
+<br>
+
+### Configuración del problema de aprendizaje automático
+
+Se definen las clases y funciones necesarias para resolver el problema de redes neuronales por
+medio de tensores.
+
+- Se usará un tamaño de lote de **32**.
+- El número máximo de épocas será de **20**.
 
 ```{python}
 class WindowGenerator():
@@ -277,7 +288,7 @@ WindowGenerator.plot = plot
 
 ```{python}
 # Definimos número de épocas necesarias y funciones de pérdida
-MAX_EPOCHS = 200
+MAX_EPOCHS = 20
 
 def compile_and_fit(model, window, patience=2): #patiences como el número de épocas que espera antes de parar
   # Para evitar sobreajuste
@@ -295,13 +306,364 @@ def compile_and_fit(model, window, patience=2): #patiences como el número de é
   return history
 ```
 
+### Modelo de red neuronal multicapa
+
+El interés en este caso es predecir el valor del total de las exportaciones 1 paso adelante 
+(siguiente mes) con base en la información disponible de los últimos 12 meses del total de las exportaciones.
+
+```{python}
+#| echo: true
+#| code-fold: false
+
+w1 = WindowGenerator(input_width=12, label_width=1, shift=1,
+                     label_columns=['Total'])
+w1
+```
+
+```{python}
+#| echo: false
+
+for batch in w1.train.take(1):
+    inputs_train,targets_train = batch
+    
+print("Input shape:", inputs_train.numpy().shape)
+print("Target shape:", targets_train.numpy().shape)
+```
+
+```{python}
+#| echo: false
+
+for batch in w1.val.take(1):
+    inputs_val,targets_val = batch
+
+print("Input shape:", inputs_val.numpy().shape)
+print("Target shape:", targets_val.numpy().shape)
+```
+
+```{python}
+#| echo: false
+
+for batch in w1.test.take(1):
+    inputs_test,targets_test = batch
+
+print("Input shape:", inputs_val.numpy().shape)
+print("Target shape:", targets_val.numpy().shape)
+```
+
+```{python}
+#| echo: false
+
+w1.train.element_spec
+```
+
+A continuación se muestra la configuración del modelo. Se usan las 12 observaciones anteriores para 
+predecir la siguiente.
+
+```{python}
+#| output: true
+#| code-fold: false
+#| fig-align: center
+
+w1.plot()
+```
+
 <br>
 
-### Configuración para el ajuste de los modelos
+```{python}
+#| echo: false
 
-- Se usará un tamaño de lote de **32**.
-- El número máximo de épocas será de **20**.
+## Ejemplo de los lotes en los datos de entrenamiento
+i=1
+for batch in w1.train.take(1):
+    inputs, targets = batch
+    print("Covariable o input",i,inputs)
+    print("Respuesta o etiqueta",i,targets)
+    i=i+1
+```
+
+```{python}
+#| echo: false
+
+## Ejemplo de los lotes en los datos de validación
+i=1
+for batch in w1.val.take(1):
+    inputs, targets = batch
+    print("Covariable o input",i,inputs)
+    print("Respuesta o etiqueta",i,targets)
+    i=i+1
+```
+
+```{python}
+#| echo: false
+
+## Ejemplo de los lotes en los datos de prueba
+i=1
+for batch in w1.test.take(1):
+    inputs, targets = batch
+    print("Covariable o input",i,inputs)
+    print("Respuesta o etiqueta",i,targets)
+    i=i+1
+```
+
+```{python}
+#| echo: false
+
+input_dataset_train = w1.train.map(lambda x,y: x)
+target_dataset_train = w1.train.map(lambda x,y: y)
+```
+
+```{python}
+#| echo: false
+
+input_dataset_val = w1.val.map(lambda x,y: x)
+target_dataset_val = w1.val.map(lambda x,y: y)
+```
+
+```{python}
+#| echo: false
+
+input_dataset_test = w1.test.map(lambda x,y: x)
+target_dataset_test = w1.test.map(lambda x,y: y)
+```
+
+#### Tuning o búsqueda de los hiperparámetros
+
+La búsqueda de los hiperparámetros que minimicen el error cuadrático medio sobre el conjunto de 
+validación se hará con el método **BayesianOptimization Tuner**. El método consiste en escoger 
+aleatoriamente algunas (pocas) combinaciones de los parámetros, luego basado en el rendimiento de 
+esos hiperparámetros, escoge los siguientes mejores hiperparámetros. Es decir que toma en cuenta el
+histórico de los hiperparámetros que ya han sido probados en el modelo.
+
+```{python}
+#| echo: false
+
+from tensorflow import keras
+import keras_tuner as kt
+from tensorflow.keras import layers
+```
+
+```{python}
+def build_model(hp):
+    model = keras.Sequential()
+    model.add(layers.Dense(units=hp.Int("num_units", min_value=32, max_value=564, step=32),
+                activation=hp.Choice("activation", ["relu", "tanh"])))
+    # Tune the number of layers.
+    for i in range(hp.Int("num_layers", 1, 5)):
+        model.add(
+            layers.Dense(
+                # Tune number of units separately.
+                units=hp.Int(f"units_{i}", min_value=32, max_value=564, step=32),
+                activation=hp.Choice("activation", ["relu", "tanh"]),
+            )
+        )
+    if hp.Boolean("dropout"):
+        model.add(layers.Dropout(rate=0.25))
+    model.add(layers.Dense(1, activation="linear"))
+    learning_rate = hp.Float("lr", min_value=1e-4, max_value=1e-2, sampling="log")
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+        loss="mean_squared_error",
+        metrics=["mean_squared_error"]
+    )
+    return model
+
+
+build_model(kt.HyperParameters())
+```
+
+```{python}
+tuner_BayesianOptimization_mlp = kt.BayesianOptimization(
+    hypermodel=build_model,
+    objective="val_loss",
+    max_trials=10,
+    num_initial_points=None,
+    alpha=0.0001,
+    beta=2.6,
+    seed=1234,
+    hyperparameters=None,
+    tune_new_entries=True,
+    allow_new_entries=True,
+    max_retries_per_trial=0,
+    max_consecutive_failed_trials=5,
+    overwrite=True,
+    directory="dirsalida",
+    project_name="helloworld"
+)
+```
+
+```{python}
+#| echo: false
+
+tuner_BayesianOptimization_mlp.search_space_summary()
+```
+
+```{python}
+stop_early=tf.keras.callbacks.EarlyStopping(monitor="val_loss",patience=0)
+```
+
+```{python}
+tuner_BayesianOptimization_mlp.search((w1.train), epochs=20, validation_data=(w1.val),callbacks=[stop_early])
+```
+
+```{python}
+#| output: true
+
+# Get the top 2 models.
+models_mlp = tuner_BayesianOptimization_mlp.get_best_models(num_models=2)
+best_model_mlp = models_mlp[0]
+# Build the model.
+# Needed for `Sequential` without specified `input_shape`.
+best_model_mlp.build(input_shape=(32, 12, 1))
+best_model_mlp.summary()
+```
+
+```{python}
+#| echo: false
+#| output: false
+
+tuner_BayesianOptimization_mlp.results_summary()
+```
+
+#### Ajuste del mejor modelo con el conjunto de entrenamiento+validación
+
+```{python}
+#| echo: false
+
+train_plus_val=w1.train.concatenate(w1.val)###verificar que en efecto
+train_plus_val
+```
+
+```{python}
+#| code-fold: false
+#| output: true
+
+# Get the top 2 hyperparameters.
+best_hps_mlp = tuner_BayesianOptimization_mlp.get_best_hyperparameters(5)
+# Build the model with the best hp.
+callback=tf.keras.callbacks.EarlyStopping(monitor="loss",patience=5)
+model_mlp = build_model(best_hps_mlp[0])
+# Fit with the entire dataset.
+print(model_mlp.fit(train_plus_val, epochs=20,callbacks=[callback]))
+```
+
+```{python}
+#| echo: false
+
+model_mlp.layers[0].get_weights()[0]
+```
+
+```{python}
+#| echo: false
+
+print(model_mlp.layers[0].weights)
+```
+
+```{python}
+#| echo: false
+
+print(model_mlp.layers[0].bias.numpy())
+```
+
+<br>
+
+#### Errores de predicción del modelo
+
+```{python}
+#| output: true
+#| code-fold: false
+
+model_mlp.evaluate(w1.test, verbose=0)
+```
+
+```{python}
+#| code-fold: false
+
+input_predict_mlp=tf.constant(np.array(test_df[-17:]),dtype=tf.float32, shape=(17,1,1))
+prediction_test=model_mlp.predict(input_predict_mlp)*train_std['Total']+train_mean['Total']
+```
+
+```{python}
+#| output: false
+#| echo: false
+
+print(prediction_test.shape)
+print(prediction_test)
+```
+
+```{python}
+#| echo: false
+
+i=1
+for batch in target_dataset_test.take(17):
+    if i==1:
+        targets_test = batch.numpy()
+    elif i>1:
+        targets_test_aux = batch.numpy()
+        targets_test=np.append(targets_test,targets_test_aux)
+    i=i+1
+```
+
+```{python}
+#| echo: false
+
+print(targets_test.shape)
+true_series=targets_test*train_std['Total']+train_mean['Total']
+true_series=true_series.reshape((17,1,1))
+print(true_series)
+```
+
+```{python}
+#| output: true
+#| code-fold: false
+
+# Verdaderos valores vs predicciones
+print(pd.DataFrame({'Verdaderos valores':true_series.reshape(17), 'Predicciones':prediction_test.reshape(17)}))
+```
+
+La raíz del error cuadrático medio de las predicciones respecto a los verdaderos valores en el 
+conjunto de prueba es igual a:
+
+```{python}
+#| output: true
+#| code-fold: false
+
+errors_squared=tf.keras.metrics.mean_squared_error(true_series, prediction_test).numpy()
+print("RECM:",errors_squared.mean()**0.5)
+```
+
+```{python}
+#| echo: false
+
+errors_squared
+```
+
+#### Gráfico de las predicciones sobre los datos de prueba
+
+```{python}
+#| echo: false
+
+test_index=test_df.index[-17:]
+test_index.values
+```
+
+```{python}
+#| echo: false
+
+true_series_final=true_series.reshape(17)
+prediction_test_final=prediction_test.reshape(17)
+```
+
+```{python}
+#| output: true
+#| code-fold: false
+
+plt.plot(true_series_final)
+plt.plot(prediction_test_final)
+plt.legend(['Respesta real','Predicción de la Respuesta'],loc="best", fontsize=15)
+plt.ylabel('Y y $\hat{Y}$ en conjunto de prueba', fontsize=15)
+```
 
 ```{python}
 
 ```
+
