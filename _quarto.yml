@@ -8,12 +8,32 @@ website:
     left:
       - href: index.qmd
         text: Inicio
-      # - Descriptiva.qmd
-      # - descriptivoMario.qmd
-      - DExportaciones.qmd
-      - DBitcoin.qmd
-      - redes.qmd
-      - ejemplo.qmd
+      
+      - text: Análisis Descriptivo
+        menu:
+        - DExportaciones.qmd
+        - DBitcoin.qmd
+
+      - text: Árboles Exportaciones
+        menu:
+        - ModelosDeArbolesSerieExportacionesdoceRetardos.qmd
+        - ModelosDeArbolesSerieExportaciones.qmd
+
+      - text: Redes Exportaciones
+        menu:
+        - red_exportaciones_con_12.qmd
+        - red_exportaciones_con_2.qmd 
+        
+      - text: Árboles Bitcoin
+        menu:
+        - Arboles_Des_series.qmd
+
+      - text: Redes Bitcoin
+        menu:
+        - red_bitcoin_con_1_bayesiano.qmd
+        - red_bitcoin_con_1_grilla.qmd
+        # - red_bitcoin_con_3.qmd
+        
     right: 
       - text: GitHub
         icon: github

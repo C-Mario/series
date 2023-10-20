@@ -1,6 +1,5 @@
 ---
-title: "Descriptiva-josé"
-author: "Jose Valdes"
+title: "Bitcoin"
 lag: es
 format: html
 editor_options: 

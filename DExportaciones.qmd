@@ -1,13 +1,14 @@
 ---
-title: "Descriptiva-Serie-Exportaciones"
+title: "Exportaciones"
 lag: es
 format: html
 editor_options: 
-  chunk_output_type: inline
-  echo: FALSE
+chunk_output_type: inline
+code-fold: true
 ---
 
 ```{r}
+#| output: false
 library(TSstudio)
 library(zoo)
 library(xts)

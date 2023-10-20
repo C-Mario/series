@@ -1,0 +1,567 @@
+---
+title: "Predicción 1 paso adelante usando 12 retardos"
+jupyter: python3
+warning: false
+code-fold: true
+---
+
+Vamos a importar la bases de datos y a convertirlas en objetos de series de Tiempo. $\{X_t\}$
+
+```{python}
+# get working directory
+import os
+os.getcwd()
+```
+
+```{python}
+# librerias
+import pandas as pd
+import numpy as np
+import matplotlib.pylab as plt
+import sklearn
+import openpyxl
+from skforecast.ForecasterAutoreg import ForecasterAutoreg
+import warnings
+print(f"Matplotlib Version: {plt.__version__}")
+print(f"Pandas Version: {pd.__version__}")
+print(f"Numpy Version: {np.__version__}")
+print(f"Sklearn: {sklearn.__version__}")
+```
+
+```{python}
+# Lectura de la serie
+data = pd.read_excel("datos/Exportaciones.xlsx",
+                   header = 0, usecols = ['Mes','Total']).iloc[96:].reset_index(drop = True).round()
+data['Total'] = data['Total'].astype(int) 
+data
+```
+
+```{python}
+# tipo de datos
+print(data.info())
+```
+
+```{python}
+#mirando los datos
+#objeto ts
+exportaciones = data['Total']
+print(type(exportaciones))
+plt.plot(exportaciones)
+```
+
+```{python}
+print(f'Numero de filas con valores faltantes: {data.isnull().any(axis=1).mean()}')
+```
+
+```{python}
+data.shape
+```
+
+# Árboles de decisión
+
+### Creación de los rezagos
+
+Debido al análisis previo tomaremos los rezagos de 3 días atrás para poder predecir un paso adelante.
+
+```{python}
+from pandas import DataFrame
+# reframe as supervised learning
+# lag observation (t-1) is the input variable and t is the output variable.
+df1 = DataFrame() # original
+print(df1)
+df2 = DataFrame() #diferenciada
+print(df2)
+```
+
+```{python}
+# arreglo de datos para el arreglo de rezagos Serie Original
+indice = pd.date_range(start='1/1/2000', periods=282, freq='M')
+print(indice)
+originalDatadf = pd.DataFrame(data['Total'].values,index=indice)
+print(originalDatadf)
+```
+
+```{python}
+# Rezagos original
+for i in range(12,0,-1):
+    df1[['t-'+str(i)]] = originalDatadf.shift(i)
+print(df1)
+```
+
+```{python}
+# Create column t original
+df1['t'] = originalDatadf.values
+print(df1.head(14))
+```
+
+```{python}
+# Create a new subsetted dataframe, removing Nans from first 3 rows original
+df1_Ori = df1[12:]
+print(df1_Ori)
+df1_Ori.size
+```
+
+```{python}
+# Split data Serie Original
+Orig_Split = df1_Ori.values
+# split into lagged variables and original time series
+X1 = Orig_Split[:, 0:-1]  # slice all rows and start with column 0 and go up to but not including the last column
+y1 = Orig_Split[:,-1]  # slice all rows and last column, essentially separating out 't' column
+print(X1)
+print('Respuestas \n',y1)
+```
+
+# Árbol para Serie Original
+
+#### Entrenamiento, Validación y prueba
+
+```{python}
+Y1 = y1
+print('Complete Observations for Target after Supervised configuration: %d' %len(Y1))
+traintarget_size = int(len(Y1) * 0.70) 
+valtarget_size = int(len(Y1) * 0.10)+1# Set split
+testtarget_size = int(len(Y1) * 0.20)# Set split
+print(traintarget_size,valtarget_size,testtarget_size)
+print('Train + Validation + Test: %d' %(traintarget_size+valtarget_size+testtarget_size))
+```
+
+```{python}
+# Target Train-Validation-Test split(70-10-20)
+train_target, val_target,test_target = Y1[0:traintarget_size], Y1[(traintarget_size):(traintarget_size+valtarget_size)],Y1[(traintarget_size+valtarget_size):len(Y1)]
+
+print('Observations for Target: %d' % (len(Y1)))
+print('Training Observations for Target: %d' % (len(train_target)))
+print('Validation Observations for Target: %d' % (len(val_target)))
+print('Test Observations for Target: %d' % (len(test_target)))
+```
+
+```{python}
+# Features Train--Val-Test split
+
+trainfeature_size = int(len(X1) * 0.70)
+valfeature_size = int(len(X1) * 0.10)+1# Set split
+testfeature_size = int(len(X1) * 0.20)# Set split
+train_feature, val_feature,test_feature = X1[0:traintarget_size],X1[(traintarget_size):(traintarget_size+valtarget_size)] ,X1[(traintarget_size+valtarget_size):len(Y1)]
+
+print('Observations for Feature: %d' % (len(X1)))
+print('Training Observations for Feature: %d' % (len(train_feature)))
+print('Validation Observations for Feature: %d' % (len(val_feature)))
+print('Test Observations for Feature: %d' % (len(test_feature)))
+```
+
+### Árbol
+
+```{python}
+# Decision Tree Regresion Model
+from sklearn.tree import DecisionTreeRegressor
+# Create a decision tree regression model with default arguments
+decision_tree_Orig = DecisionTreeRegressor()  # max-depth not set
+# The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples.
+# Fit the model to the training features(covariables) and targets(respuestas)
+decision_tree_Orig.fit(train_feature, train_target)
+# Check the score on train and test
+print("Coeficiente R2 sobre el conjunto de entrenamiento:",decision_tree_Orig.score(train_feature, train_target))
+print("Coeficiente R2 sobre el conjunto de Validación:",decision_tree_Orig.score(val_feature,val_target))  # predictions are horrible if negative value, no relationship if 0
+print("el RECM sobre validación es:",(((decision_tree_Orig.predict(val_feature)-val_target)**2).mean()) )
+```
+
+Vemos que el R2 para los datos de validación es bueno así sin ningún ajuste, Se relizara un ajuste de la profundidad como hiperparametro para ver si mejora dicho valor
+
+```{python}
+# Find the best Max Depth
+
+# Loop through a few different max depths and check the performance
+# Try different max depths. We want to optimize our ML models to make the best predictions possible.
+# For regular decision trees, max_depth, which is a hyperparameter, limits the number of splits in a tree.
+# You can find the best value of max_depth based on the R-squared score of the model on the test set.
+
+for d in [2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15]:
+    # Create the tree and fit it
+    decision_tree_Orig = DecisionTreeRegressor(max_depth=d)
+    decision_tree_Orig.fit(train_feature, train_target)
+    
+    # Print out the scores on train and test
+    print('max_depth=', str(d))
+    print("Coeficiente R2 sobre el conjunto de entrenamiento:",decision_tree_Orig.score(train_feature, train_target))
+    print("Coeficiente R2 sobre el conjunto de validación:",decision_tree_Orig.score(val_feature, val_target), '\n')  # You want the test score to be positive and high
+    print("el RECM sobre el conjunto de validación es:",sklearn.metrics.mean_squared_error(decision_tree_Orig.predict(val_feature),val_target, squared=False))
+```
+
+Note que los scores para el conjunto de validación son negativos para todas las profundidades evaluadas. Ahora uniremos validacion y entrenamiento para re para reestimar los parametros
+
+```{python}
+print(type(train_feature))
+print(type(val_feature))
+#######
+print(type(train_target))
+print(type(val_target))
+####
+print(train_feature.shape)
+print(val_feature.shape)
+#####
+####
+print(train_target.shape)
+print(val_target.shape)
+###Concatenate Validation and test
+train_val_feature=np.concatenate((train_feature,val_feature),axis=0)
+train_val_target=np.concatenate((train_target,val_target),axis=0)
+print(train_val_feature.shape)
+print(train_val_target.shape)
+```
+
+```{python}
+# Use the best max_depth 
+decision_tree_Orig = DecisionTreeRegressor(max_depth=4)  # fill in best max depth here
+decision_tree_Orig.fit(train_val_feature, train_val_target)
+
+# Predict values for train and test
+train_val_prediction = decision_tree_Orig.predict(train_val_feature)
+test_prediction = decision_tree_Orig.predict(test_feature)
+
+# Scatter the predictions vs actual values
+plt.scatter(train_val_prediction, train_val_target, label='train')  # blue
+plt.scatter(test_prediction, test_target, label='test')  # orange
+# Agrega títulos a los ejes
+plt.xlabel('Valores Predichos')  # Título para el eje x
+plt.ylabel('Valores Objetivo')  # Título para el eje y
+# Muestra una leyenda
+plt.legend()
+plt.show()
+print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squared_error( train_val_prediction, train_val_target,squared=False))
+
+print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(test_prediction, test_target,squared=False))
+```
+
+```{python}
+from sklearn import tree
+
+listacaract=list(df1_Ori.columns.values)
+respuesta=listacaract.pop()
+text_representation = tree.export_text(decision_tree_Orig)
+print(text_representation)
+```
+
+```{python}
+fig = plt.figure(figsize=(25,20))
+_ = tree.plot_tree(decision_tree_Orig, 
+                   feature_names=listacaract,  
+                   class_names=[respuesta],
+                   filled=True)
+```
+
+Ahora miraremos las predicciones comparadas con los valores verdaderos, para ver más claro lo anterior.
+
+```{python}
+print(train_val_prediction.size)
+print(train_val_target.size)
+
+print(test_prediction.size)
+print(test_target.size)
+```
+
+```{python}
+indicetrian_val_test=df1_Ori.index
+print(indicetrian_val_test.size)  ###Tamaño del índice
+indicetrain_val=indicetrian_val_test[0:225]
+indicetest=indicetrian_val_test[225:280]
+```
+
+```{python}
+print(indicetrain_val.size)
+print(indicetest.size)
+```
+
+```{python}
+targetjoint=np.concatenate((train_val_target,test_target))
+predictionjoint=np.concatenate((train_val_prediction,test_prediction))
+print(targetjoint.size)
+print(predictionjoint.size)
+```
+
+```{python}
+d = {'observado': targetjoint, 'Predicción': predictionjoint}
+ObsvsPred1=pd.DataFrame(data=d,index=indicetrian_val_test)
+ObsvsPred1.head(10)
+```
+
+```{python}
+#gráfico
+ax = ObsvsPred1['observado'].plot(marker="o", figsize=(10, 6), linewidth=1, markersize=4)  # Ajusta el grosor de las líneas y puntos
+ObsvsPred1['Predicción'].plot(marker="o", linewidth=1, markersize=2, ax=ax)  # Ajusta el grosor de las líneas y puntos
+# Agrega una línea vertical roja
+ax.axvline(x=indicetrian_val_test[223].date(), color='red', linewidth=0.5)  # Ajusta el grosor de la línea vertical
+# Muestra una leyenda
+plt.legend()
+plt.show()
+```
+
+# Serie de Exportaciones sin Tendencia
+
+Implementaremos ahora el modelo de árboles sobre la serie sin tendencia, eliminada usando la estimación dada por medio del filtro de promedios móviles. Vamos a importar la bases de datos y a convertirlas en objetos de series de Tiempo. $\{X_t\}$
+
+```{python}
+# Lectura de la serie
+data2 = pd.read_excel("ExportacionesSinTendencia.xlsx",
+                   header = 0, usecols = ['Fecha','ExportacionesSinTend']).reset_index(drop = True).round()
+data2['ExportacionesSinTend'] = data2['ExportacionesSinTend'].astype(int) 
+data2
+```
+
+```{python}
+# tipo de datos
+print(data2.info())
+```
+
+```{python}
+#mirando los datos
+#objeto ts
+exportaciones = data2['ExportacionesSinTend']
+print(type(exportaciones))
+plt.plot(exportaciones)
+```
+
+```{python}
+print(f'Numero de filas con valores faltantes: {data2.isnull().any(axis=1).mean()}')
+```
+
+```{python}
+data2.shape
+```
+
+# Árboles de decisión
+
+### Creación de los rezagos
+
+Tomaremos los rezagos de 12 meses atrás para poder predecir un paso adelante.
+
+```{python}
+from pandas import DataFrame
+# reframe as supervised learning
+# lag observation (t-1) is the input variable and t is the output variable.
+df1 = DataFrame() # original
+print(df1)
+df2 = DataFrame() #diferenciada
+print(df2)
+```
+
+```{python}
+# arreglo de datos para el arreglo de rezagos Serie Original
+indice = pd.date_range(start='1/7/2000', periods=270, freq='M')
+print(indice)
+originalDatadf = pd.DataFrame(data2['ExportacionesSinTend'].values,index=indice)
+print(originalDatadf)
+```
+
+```{python}
+# Rezagos original
+for i in range(12,0,-1):
+    df1[['t-'+str(i)]] = originalDatadf.shift(i)
+print(df1)
+```
+
+```{python}
+# Create column t original
+df1['t'] = originalDatadf.values
+print(df1.head(14))
+```
+
+```{python}
+# Create a new subsetted dataframe, removing Nans from first 3 rows original
+df1_Ori = df1[12:]
+print(df1_Ori)
+df1_Ori.size
+```
+
+```{python}
+# Split data Serie Original
+Orig_Split = df1_Ori.values
+# split into lagged variables and original time series
+X1 = Orig_Split[:, 0:-1]  # slice all rows and start with column 0 and go up to but not including the last column
+y1 = Orig_Split[:,-1]  # slice all rows and last column, essentially separating out 't' column
+print(X1)
+print('Respuestas \n',y1)
+```
+
+# Árbol para Serie Sin Tendencia
+
+#### Entrenamiento, Validación y prueba
+
+```{python}
+Y1 = y1
+print('Complete Observations for Target after Supervised configuration: %d' %len(Y1))
+traintarget_size = int(len(Y1) * 0.70) 
+valtarget_size = int(len(Y1) * 0.10)+1# Set split
+testtarget_size = int(len(Y1) * 0.20)# Set split
+print(traintarget_size,valtarget_size,testtarget_size)
+print('Train + Validation + Test: %d' %(traintarget_size+valtarget_size+testtarget_size))
+```
+
+```{python}
+# Target Train-Validation-Test split(70-10-20)
+train_target, val_target,test_target = Y1[0:traintarget_size], Y1[(traintarget_size):(traintarget_size+valtarget_size)],Y1[(traintarget_size+valtarget_size):len(Y1)]
+
+print('Observations for Target: %d' % (len(Y1)))
+print('Training Observations for Target: %d' % (len(train_target)))
+print('Validation Observations for Target: %d' % (len(val_target)))
+print('Test Observations for Target: %d' % (len(test_target)))
+```
+
+```{python}
+# Features Train--Val-Test split
+
+trainfeature_size = int(len(X1) * 0.70)
+valfeature_size = int(len(X1) * 0.10)+1# Set split
+testfeature_size = int(len(X1) * 0.20)# Set split
+train_feature, val_feature,test_feature = X1[0:traintarget_size],X1[(traintarget_size):(traintarget_size+valtarget_size)] ,X1[(traintarget_size+valtarget_size):len(Y1)]
+
+print('Observations for Feature: %d' % (len(X1)))
+print('Training Observations for Feature: %d' % (len(train_feature)))
+print('Validation Observations for Feature: %d' % (len(val_feature)))
+print('Test Observations for Feature: %d' % (len(test_feature)))
+```
+
+### Árbol
+
+```{python}
+# Decision Tree Regresion Model
+from sklearn.tree import DecisionTreeRegressor
+# Create a decision tree regression model with default arguments
+decision_tree_Orig = DecisionTreeRegressor()  # max-depth not set
+# The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples.
+# Fit the model to the training features(covariables) and targets(respuestas)
+decision_tree_Orig.fit(train_feature, train_target)
+# Check the score on train and test
+print("Coeficiente R2 sobre el conjunto de entrenamiento:",decision_tree_Orig.score(train_feature, train_target))
+print("Coeficiente R2 sobre el conjunto de Validación:",decision_tree_Orig.score(val_feature,val_target))  # predictions are horrible if negative value, no relationship if 0
+print("el RECM sobre validación es:",(((decision_tree_Orig.predict(val_feature)-val_target)**2).mean()) )
+```
+
+Vemos que el R2 para los datos de validación es malo pues es negativo, Se relizará un ajuste de la profundidad como hiperparametro para ver si mejora dicho valor
+
+```{python}
+# Find the best Max Depth
+
+# Loop through a few different max depths and check the performance
+# Try different max depths. We want to optimize our ML models to make the best predictions possible.
+# For regular decision trees, max_depth, which is a hyperparameter, limits the number of splits in a tree.
+# You can find the best value of max_depth based on the R-squared score of the model on the test set.
+
+for d in [2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15]:
+    # Create the tree and fit it
+    decision_tree_Orig = DecisionTreeRegressor(max_depth=d)
+    decision_tree_Orig.fit(train_feature, train_target)
+    
+    # Print out the scores on train and test
+    print('max_depth=', str(d))
+    print("Coeficiente R2 sobre el conjunto de entrenamiento:",decision_tree_Orig.score(train_feature, train_target))
+    print("Coeficiente R2 sobre el conjunto de validación:",decision_tree_Orig.score(val_feature, val_target), '\n')  # You want the test score to be positive and high
+    print("el RECM sobre el conjunto de validación es:",sklearn.metrics.mean_squared_error(decision_tree_Orig.predict(val_feature),val_target, squared=False), '\n')
+```
+
+Note que los scores para el conjunto de validación son negativos para todas las profundidades evaluadas. Tomaremos el más cercano a cero que el el de la profundidad 6. Ahora uniremos validacion y entrenamiento para re para reestimar los parametros
+
+```{python}
+print(type(train_feature))
+print(type(val_feature))
+#######
+print(type(train_target))
+print(type(val_target))
+####
+print(train_feature.shape)
+print(val_feature.shape)
+#####
+####
+print(train_target.shape)
+print(val_target.shape)
+###Concatenate Validation and test
+train_val_feature=np.concatenate((train_feature,val_feature),axis=0)
+train_val_target=np.concatenate((train_target,val_target),axis=0)
+print(train_val_feature.shape)
+print(train_val_target.shape)
+```
+
+```{python}
+# Use the best max_depth 
+decision_tree_Orig = DecisionTreeRegressor(max_depth=6)  # fill in best max depth here
+decision_tree_Orig.fit(train_val_feature, train_val_target)
+
+# Predict values for train and test
+train_val_prediction = decision_tree_Orig.predict(train_val_feature)
+test_prediction = decision_tree_Orig.predict(test_feature)
+
+# Scatter the predictions vs actual values
+plt.scatter(train_val_prediction, train_val_target, label='train')  # blue
+plt.scatter(test_prediction, test_target, label='test')  # orange
+# Agrega títulos a los ejes
+plt.xlabel('Valores Predichos')  # Título para el eje x
+plt.ylabel('Valores Objetivo')  # Título para el eje y
+# Muestra una leyenda
+plt.legend()
+plt.show()
+print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squared_error( train_val_prediction, train_val_target,squared=False))
+
+print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(test_prediction, test_target,squared=False))
+```
+
+```{python}
+from sklearn import tree
+
+listacaract=list(df1_Ori.columns.values)
+respuesta=listacaract.pop()
+text_representation = tree.export_text(decision_tree_Orig)
+print(text_representation)
+```
+
+```{python}
+fig = plt.figure(figsize=(25,20))
+_ = tree.plot_tree(decision_tree_Orig, 
+                   feature_names=listacaract,  
+                   class_names=[respuesta],
+                   filled=True)
+```
+
+Ahora miraremos las predicciones comparadas con los valores verdaderos, para ver más claro lo anterior.
+
+```{python}
+print(train_val_prediction.size)
+print(train_val_target.size)
+
+print(test_prediction.size)
+print(test_target.size)
+```
+
+```{python}
+indicetrian_val_test=df1_Ori.index
+print(indicetrian_val_test.size)  ###Tamaño del índice
+indicetrain_val=indicetrian_val_test[0:206]
+indicetest=indicetrian_val_test[206:258]
+```
+
+```{python}
+print(indicetrain_val.size)
+print(indicetest.size)
+```
+
+```{python}
+targetjoint=np.concatenate((train_val_target,test_target))
+predictionjoint=np.concatenate((train_val_prediction,test_prediction))
+print(targetjoint.size)
+print(predictionjoint.size)
+```
+
+```{python}
+d = {'observado': targetjoint, 'Predicción': predictionjoint}
+ObsvsPred1=pd.DataFrame(data=d,index=indicetrian_val_test)
+ObsvsPred1.tail(52)
+```
+
+```{python}
+#gráfico
+ax = ObsvsPred1['observado'].plot(marker="o", figsize=(10, 6), linewidth=1, markersize=4)  # Ajusta el grosor de las líneas y puntos
+ObsvsPred1['Predicción'].plot(marker="o", linewidth=1, markersize=2, ax=ax)  # Ajusta el grosor de las líneas y puntos
+# Agrega una línea vertical roja
+ax.axvline(x=indicetrian_val_test[223].date(), color='red', linewidth=0.5)  # Ajusta el grosor de la línea vertical
+# Muestra una leyenda
+plt.legend()
+plt.show()
+```
