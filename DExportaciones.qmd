@@ -3,6 +3,7 @@ title: "Exportaciones"
 lag: es
 format: html
 editor_options: 
+  chunk_output_type: console
 chunk_output_type: inline
 code-fold: true
 ---
@@ -21,6 +22,9 @@ library(tsibble)
 library(lubridate)
 library(dygraphs)
 library(MASS)
+library(fabletools)
+library(TSA)
+library(dplyr)
 ```
 
 # Exportaciones mensuales de Colombia
@@ -345,7 +349,8 @@ sprintf("El valor de la frecuencia donde se máximiza el periodograma para la se
 ```
 
 ```{r}
-sprintf("El periodo correspondiente es aproximadamente: %s",1/Periodograma$freq[ubicacionElim])
+sprintf("El periodo correspondiente es aproximadamente: %s",
+        1/Periodograma$freq[ubicacionElim])
 ```
 
 ```{r}
@@ -360,4 +365,154 @@ sprintf("El valor de la frecuencia donde se máximiza el periodograma para la se
 
 ```{r}
 sprintf("El periodo correspondiente es aproximadamente: %s",1/Periodograma$freq[ubicacionElim])
+```
+
+## Análisis Estacional
+
+```{r}
+#Estacionalidad plot
+TSstudio::ts_seasonal(na.omit(noTendlexportaciones_ts2), type = "all")
+```
+
+el periodograma y el plot nos muestran un comportamiento que podríamos denominar anual
+
+```{r}
+#estacionaidad
+TSstudio::ts_seasonal(lexportaciones_ts, type = "cycle")
+```
+
+mirando la serie sin eliminarla tendencia vemos que el patrón aparece también
+
+### Modelamiento No tendencia
+
+```{r}
+#| output: false
+library(tidyverse)
+library(tsibble)
+library(fable)
+library(fabletools)
+library(TSA)
+```
+
+```{r}
+tsibble_Expo <- as_tsibble(na.omit(noTendlexportaciones_ts2))
+colnames(tsibble_Expo)
+names(tsibble_Expo) <- c("Indice", "Valor")
+#
+noTend_tsibble <- tsibble_Expo|>dplyr::select(Valor)
+```
+
+```{r}
+#### Varios modelos la mismo tiempo
+
+ajuste_final_models <- noTend_tsibble%>%model(
+ `Fourier1notendExpo`=ARIMA(Valor~fourier(K=1)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+ `Fourier3notendExpo`=ARIMA(Valor~fourier(K=3)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+ `Fourier6notendExpo`=ARIMA(Valor~fourier(K=6)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+  `Fourier12notendExpo`=ARIMA(Valor~fourier(K=6)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+`DummynotendExpo`=ARIMA(Valor~season()+pdq(0, 0, 0) +
+                       PDQ(0, 0, 0))
+                                        )
+
+glance(ajuste_final_models)
+```
+
+Probando con distintos ajustes de los modelos se nota que los valores de los criterios de información son bastante similares, lo cuál nos dice que los modelos no están capturando de buena manera el comportamiento de la serie, además, la varianza de los modelos es muy alta. aún así veremos el fourire con 6 componentes que parece ser el que mejor ajusta.
+
+```{r}
+ajuste_final_models %>% 
+  dplyr::select(Fourier6notendExpo) %>% coef()
+```
+
+```{r}
+Modelo_serie_noTen_models<-noTend_tsibble%>%left_join(fitted(ajuste_final_models)|>group_by(.model)%>%
+    pivot_wider(names_from = .model, values_from = .fitted))
+```
+
+```{r}
+Modelo_serie_noTen_models %>%
+  autoplot() +
+  geom_line(data=Modelo_serie_noTen_models,aes(y=Valor
+                                         ,colour="real"))+
+  geom_line(data=Modelo_serie_noTen_models,aes(y=Fourier6notendExpo,colour="ajustado"))+
+  scale_color_manual(name = "real/ajustado", values = c("real" = "black", "ajustado" = "red"))
+```
+
+### Diferenciando para ver si removemos la estacionalidad
+
+Usaremos la diferenciación en primer orden pero para el $lag = 12$ dado por el periodograma para para ver si así logramos eliminar el patrón estacional presentado
+
+```{r}
+# diferenciando para el patron estacional
+dEstacional <- diff(na.omit(noTendlexportaciones_ts2), lag=12)
+plot(dEstacional)
+abline(h=0, col = "red")
+```
+
+### Modelamiento diferenciada
+
+```{r}
+#| output: false 
+library(tidyverse)
+library(tsibble) 
+library(fable) 
+library(fabletools) 
+library(TSA)
+```
+
+```{r}
+tsibble_Expo <- as_tsibble(na.omit(dlexportaciones)) 
+colnames(tsibble_Expo) 
+names(tsibble_Expo) <- c("Indice", "Valor") 
+#
+noTend_tsibble <- tsibble_Expo|>dplyr::select(Valor)
+```
+
+```{r}
+#### Varios modelos la mismo tiempo
+
+ajuste_final_models <- noTend_tsibble%>%model(
+ `Fourier1notendExpo`=ARIMA(Valor~fourier(K=1)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+ `Fourier3notendExpo`=ARIMA(Valor~fourier(K=3)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+ `Fourier6notendExpo`=ARIMA(Valor~fourier(K=6)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+  `Fourier12notendExpo`=ARIMA(Valor~fourier(K=6)+pdq(0, 0, 0) + 
+                           PDQ(0, 0, 0)),
+`DummynotendExpo`=ARIMA(Valor~season()+pdq(0, 0, 0) +
+                       PDQ(0, 0, 0))
+                                        )
+
+glance(ajuste_final_models)
+```
+
+Probando con distintos ajustes de los modelos se nota que los valores de los criterios de información son bastante similares, lo cuál nos dice que los modelos no están capturando de buena manera el comportamiento de la serie, además, la varianza de los modelos es muy alta. aún así veremos el fourire con 6 componentes que parece ser el que mejor ajusta.
+
+```{r}
+ajuste_final_models %>%    
+  dplyr::select(Fourier6notendExpo) %>% coef()
+```
+
+```{r}
+Modelo_serie_noTen_models<-noTend_tsibble%>%left_join(fitted(ajuste_final_models)|>group_by(.model)%>%     pivot_wider(names_from = .model, values_from = .fitted))
+```
+
+```{r}
+Modelo_serie_noTen_models %>%   autoplot() +   geom_line(data=Modelo_serie_noTen_models,aes(y=Valor                                          ,colour="real"))+   geom_line(data=Modelo_serie_noTen_models,aes(y=Fourier6notendExpo,colour="ajustado"))+   scale_color_manual(name = "real/ajustado", values = c("real" = "black", "ajustado" = "red"))
+```
+
+### Diferenciando para ver si removemos la estacionalidad
+
+Usaremos la diferenciación en primer orden pero para el $lag = 3$ pues para la serie deiferencia el periodoes de $2.5$ si así logramos eliminar el patrón estacional presentado
+
+```{r}
+# diferenciando para el patron estacional 
+dEstacional <- diff(dlexportaciones, lag=12)
+plot(dEstacional) 
+abline(h=0, col = "red")
 ```
