@@ -502,7 +502,7 @@ print("Coeficiente R2 sobre el conjunto de Validación:",decision_tree_Orig.scor
 print("el RECM sobre validación es:",(((decision_tree_Orig.predict(val_feature)-val_target)**2).mean()) )
 ```
 
-Vemos que el R2 para los datos de validación es malo pue ses negativo, Se relizará un ajuste de la profundidad como hiperparametro para ver si mejora dicho valor
+Vemos que el R2 para los datos de validación es malo pues  es negativo, Se relizará un ajuste de la profundidad como hiperparametro para ver si mejora dicho valor
 
 ```{python}
 # Find the best Max Depth
@@ -617,17 +617,92 @@ print(predictionjoint.size)
 
 ```{python}
 d = {'observado': targetjoint, 'Predicción': predictionjoint}
-ObsvsPred1=pd.DataFrame(data=d,index=indicetrian_val_test)
-ObsvsPred1.tail(54)
+ObsvsPred2=pd.DataFrame(data=d,index=indicetrian_val_test)
+ObsvsPred2.tail(54)
 ```
 
 ```{python}
 #gráfico
-ax = ObsvsPred1['observado'].plot(marker="o", figsize=(10, 6), linewidth=1, markersize=4)  # Ajusta el grosor de las líneas y puntos
-ObsvsPred1['Predicción'].plot(marker="o", linewidth=1, markersize=2, ax=ax)  # Ajusta el grosor de las líneas y puntos
+ax = ObsvsPred2['observado'].plot(marker="o", figsize=(10, 6), linewidth=1, markersize=4)  # Ajusta el grosor de las líneas y puntos
+ObsvsPred2['Predicción'].plot(marker="o", linewidth=1, markersize=2, ax=ax)  # Ajusta el grosor de las líneas y puntos
 # Agrega una línea vertical roja
 ax.axvline(x=indicetrian_val_test[223].date(), color='red', linewidth=0.5)  # Ajusta el grosor de la línea vertical
 # Muestra una leyenda
 plt.legend()
 plt.show()
+```
+
+Ahora nos devolveremos a la escala original
+
+```{python}
+#formando la de vuelta a la escala de los datos 
+# datos transfromados para la diferencia
+# traer datos
+data_3 = pd.ExcelFile('datos/LExportaciones.xlsx')
+print(data_3.sheet_names)
+# dataframe con los datos
+data_3 = data_3.parse('Sheet 1')
+print(data_3)
+```
+```{python}
+#mirando los datos
+#objeto ts
+# nombre
+data_3.columns = ['Fecha','Valor']
+# fecha
+data_3['Fecha']=pd.to_datetime(data_3['Fecha'])###Sólo es necesario si no tiene formato de fecha
+LExportaciones = data_3.set_index('Fecha')
+#LExportaciones=LExportaciones.asfreq('M')
+print(type(LExportaciones))
+LExportaciones = LExportaciones.drop(['2017-01-01'])
+# para tipo de dato
+indiceL = LExportaciones.index
+d = {'observado L': LExportaciones['Valor']}
+ObsL=pd.DataFrame(data=d,index=indiceL)
+ObsL.head(10)
+```
+
+Ahora devolvemos la diferenciación
+```{python}
+#necesitaremos arreglar los indices
+indices = ObsL['observado L'][6:275].index
+ObsvsPred2['Predicción'].index = indices
+# aqui devolvemos la diferenciación en escala log
+yhat_Dif = ObsvsPred2['Predicción'] + ObsL['observado L'][6:275]
+#yhat_Dif = yhat_Dif.drop('2000-07-01')
+print(yhat_Dif)
+```
+
+```{python}
+#volver a escala normal
+yhat = (((0.45)*yhat_Dif) + 1)**(1/0.45)
+print(yhat)
+```
+```{python}
+y = ObsvsPred1['observado'][6:275]
+#necesitaremos arreglar los indices
+indices = ObsL['observado L'][6:275].index
+y.index = indices
+print(y)
+#y = y.drop('2017-01-03')
+d = {'observado': y, 'Predicción': yhat}
+ObsvsPred3=pd.DataFrame(data=d,index=indices)
+ObsvsPred3.head(10)
+```
+
+```{python}
+#gráfico
+ax = ObsvsPred3['observado'].plot(marker="o", figsize=(10, 6), linewidth=2, markersize=4)  # Ajusta el grosor de las líneas y puntos
+ObsvsPred3['Predicción'].plot(marker="o", linewidth=1, markersize=2, ax=ax)  # Ajusta el grosor de las líneas y puntos
+# Agrega una línea vertical roja
+ax.axvline(x=indicetrian_val_test[223].date(), color='red', linewidth=0.5)  # Ajusta el grosor de la línea vertical
+# Muestra una leyenda
+plt.legend()
+plt.show()
+```
+
+```{python}
+#metrica
+print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squared_error( yhat[:222], y[:222],squared=False))
+print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(yhat[222:], y[222:],squared=False))
 ```

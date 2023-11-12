@@ -120,7 +120,7 @@ for i in range(len(pacf)):
         break
 ```
 
-Observamos que con el **pacf** se nos recomienda usar solo un retraso el mas proximo, lo cuál nos recueda que cuando se quizo establecer una componente estacional se sugeria un periodo de 2.5, por lo tanto teniendo encuenta lo anterior usaremos **3 retrasos** para la serie original
+Observamos que con el **pacf** se nos recomienda usar solo un retraso el mas proximo, por lo tanto teniendo encuenta lo anterior usaremos **1 retrasos** para la serie original
 
 ## Serie Trasnformada y diferenciada
 
@@ -185,13 +185,13 @@ for i in range(len(pacf)):
         break
 ```
 
-Vemos que para la serie diferencidad tenemos un resultado igual que para la serie original, asì tomaremos lo mismo **3 retrasos**
+Vemos que para la serie diferencidad tenemos un resultado igual que para la serie original, asì tomaremos lo mismo **1 retrasos**
 
 # Árboles de decisión
 
 ### Creación de los rezagos
 
-Debido al análisis previo tomaremos los rezagos de 3 días atrás para poder predecir un paso adelante.
+Debido al análisis previo tomaremos los rezagos de 1 días atrás para poder predecir un paso adelante.
 
 ```{python}
 from pandas import DataFrame
@@ -221,14 +221,14 @@ print(dlDatadf)
 
 ```{python}
 # Rezagos original
-for i in range(3,0,-1):
+for i in range(1,0,-1):
     df1[['t-'+str(i)]] = originalDatadf.shift(i)
 print(df1)
 ```
 
 ```{python}
 # REzagos diferenciada
-for i in range(3,0,-1):
+for i in range(1,0,-1):
     df2[['t-'+str(i)]] = dlDatadf.shift(i)
 print(df2)
 ```
@@ -247,19 +247,19 @@ print(df2.head(14))
 
 ```{python}
 # Create a new subsetted dataframe, removing Nans from first 7 rows original
-df1_Ori = df1[3:]
+df1_Ori = df1[1:]
 print(df1_Ori)
 df1_Ori.size
 ```
 
 ```{python}
 # Create a new subsetted dataframe, removing Nans from first 7 rows diferenciada
-df2_Dif = df2[3:]
+df2_Dif = df2[1:]
 print(df2_Dif)
 df2_Dif.size
 ```
 
-hemos creado lo necesario para tener los 3 rezagos y la prediccion un paso adelante ahora. así tenemos los modelos : 1. Para los datos originales $$y_{t} = f(y_{t-1},y_{t-2},y_{t-3}) + \epsilon$$ 2. Para la serie con estabilización de varianza y difereciada $$\Delta y_t = f(\Delta y_{t-1}, \Delta y_{t-2}, \Delta y_{t-3}) + \epsilon$$
+hemos creado lo necesario para tener el rezago atrás y la prediccion un paso adelante ahora. así tenemos los modelos : 1. Para los datos originales $$y_{t} = f(y_{t-1}) + \epsilon $$ 2. Para la serie con estabilización de varianza y difereciada $$\Delta y_t = f(\Delta y_{t-1}) + \epsilon $$
 
 ### División de los datos
 
@@ -360,7 +360,7 @@ for d in [2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15]:
 
 ```
 
-Note que el score mayor para el conjunto de validación es para max depth = 5. después este valor el R2 comienza a oscilar en valores cercanos a 0.7. Ahora uniremos validacion y entrenamiento para re para reestimar los parametros
+Note que el score mayor para el conjunto de validación es para max depth = 6. después este valor el R2 comienza a oscilar en valores cercanos a 0.8. Ahora uniremos validacion y entrenamiento para re para reestimar los parametros
 
 ```{python}
 print(type(train_feature))
@@ -384,7 +384,7 @@ print(train_val_target.shape)
 
 ```{python}
 # Use the best max_depth 
-decision_tree_Orig = DecisionTreeRegressor(max_depth=5)  # fill in best max depth here
+decision_tree_Orig = DecisionTreeRegressor(max_depth=6)  # fill in best max depth here
 decision_tree_Orig.fit(train_val_feature, train_val_target)
 
 # Predict values for train and test
@@ -405,7 +405,7 @@ print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squ
 print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(test_prediction, test_target,squared=False))
 ```
 
-Vemos que el RECM es menor para el entrenamiento y mayor para la prubea lo cuál podría indicar sobre ajuste pero notamos en el gráfico que para los valores de prueba se queda con la ultimá predicción dada para el entrenamiento
+Vemos que el RECM es menor para el entrenamiento y mayor para la prubea lo cuál podría indicar sobre ajuste pero notamos en el gráfico que para los valores de prueba se queda con valores cercanos a ultimá predicción dada para el entrenamiento.
 
 ```{python}
 from sklearn import tree
@@ -470,7 +470,7 @@ plt.legend()
 plt.show()
 ```
 
-Podemos observar que como nos anticipaba el RECM en el entrenamiento las predicciones son cercanas al valor real, pero para los datos de prueba se queda con lo ultimo visto para el entrenamiento sin tener encuenta el comportamiento de la serie.
+Podemos observar que como nos anticipaba el RECM en el entrenamiento las predicciones son cercanas al valor real, pero para los datos de prueba se queda con valores cercanos a lo ultimo visto para el entrenamiento sin tener encuenta el comportamiento de la serie.
 
 # Árbol para datos Diferenciados
 
@@ -526,7 +526,7 @@ print("Coeficiente R2 sobre el conjunto de Validación:",decision_tree_Dif.score
 print("el RECM sobre validación es:",(((decision_tree_Dif.predict(val_feature)-val_target)**2).mean()) )
 ```
 
-Vemos que el $R^2$ en la validaciòn nos da negativo lo cual indica que el modelo es malo en las predicciones, pues es mejor predecir con la media cal sería un $R^2 = 0$. intentaremos ajustar la profundidad del árbol para ver si mejoramos esto.
+Vemos que el $R^2$ en la validaciòn nos da negativo lo cual indica que el modelo es malo en las predicciones, pues es mejor predecir con la media lo cual sería un $R^2 = 0$. intentaremos ajustar la profundidad del árbol para ver si mejoramos esto.
 
 ```{python}
 # Find the best Max Depth
@@ -594,7 +594,7 @@ print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squ
 print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(test_prediction, test_target,squared=False))
 ```
 
-Podemos notar que aparecen dos valores extremos los cuales pueden influir en el resultado, ademàs los valores de RECM son similares para entrenamiento y prueba.
+Podemos notar que aparecen dos valores extremos los cuales pueden influir en el resultado, además los valores de RECM son similares para entrenamiento y prueba.
 
 ```{python}
 from sklearn import tree
@@ -659,33 +659,90 @@ plt.legend()
 plt.show()
 ```
 
-Podemos observar que dado que esta seríe es estacionaría los alores oscilan alrededor de un punto fijo el cual es $0$ y los valores de predicción son cercanos a él, con ellos el modelo no toma encuenta la información de los rezagos, para la predicción solo usa la media muestral lo cual se reflejaba en el $R^2 \approx 0$
+Podemos observar que dado que esta seríe es estacionaría los valores oscilan alrededor de un punto fijo el cual es $0$ y los valores de predicción son cercanos a él, con ellos el modelo no toma encuenta la información de los rezagos, para la predicción solo usa la media muestral lo cual se reflejaba en el $R^2 \approx 0$
 
-Con esto podemos concluir que **los árboles de decisión** no son un buen modelo para tratar con una serie cómo esta
+Con esto podemos concluir que **los árboles de decisión** no son un buen modelo para tratar con una serie cómo esta aparentemente.
 
-Esto sería lle varlo a la original lo cual me parece mala idea porque los valores son 0 entonces prácticamente usa el retardo anterior cómo predicción, además no se si poner la logaritmica
+Ahora lo correcto sería llevar esto a la serie original para saber si esto lo anterior es correcto, además recordar que esta serie no solo esta diferenciada sino trasnformada.
 
-Ahora para poder obtener los valores en la serie original necesitamos hacer la transfromacion de las predicciones via $$\hat{y}_{t+h} = \hat{\Delta} y_{t+1} + y_{t}$$
+Ahora para poder obtener los valores en la serie sin diferenciar necesitamos hacer la transfromacion de las predicciones via $$\hat{y}_{t+h} = \hat{\Delta} y_{t+1} + y_{t}$$
+
+Primero trabajaremos en tener los datos trasnfromados de referencia
 
 ```{python}
-yhat = ObsvsPred2['Predicción']+ObsvsPred1['observado'].shift(1)
-yhat = yhat.drop('2017-01-04')
-print(yhat)
+#formando la de vuelta a la escala de los datos 
+# datos transfromados para la diferencia
+# traer datos
+data_3 = pd.ExcelFile('LBitcoin.xlsx')
+print(data_3.sheet_names)
+# dataframe con los datos
+data_3 = data_3.parse('Sheet1')
+print(data_3)
 ```
 
 ```{python}
+#mirando los datos
+#objeto ts
+# nombre
+data_3.columns = ['Fecha','Valor']
+# fecha
+data_3['Fecha']=pd.to_datetime(data_3['Fecha'])###Sólo es necesario si no tiene formato de fecha
+LBitcoin = data_3.set_index('Fecha')
+LBitcoin=LBitcoin.asfreq('D')
+print(type(LBitcoin))
+LBitcoin = LBitcoin.drop(['2017-01-01'])
+# para tipo de dato
+indiceL = LBitcoin.index
+d = {'observado L': LBitcoin['Valor']}
+ObsL=pd.DataFrame(data=d,index=indiceL)
+ObsL.head(10)
+```
+
+Ahora si nos devolvemos la diferenciación en esta escala
+
+```{python}
+# aqui devolvemos la diferenciación en escala log
+yhat_Dif = ObsvsPred2['Predicción'] + ObsL['observado L']
+yhat_Dif = yhat_Dif.drop('2017-01-02')
+print(yhat_Dif)
+```
+
+Con estos datos ahora pasamos a la escala normal 
+
+```{python}
+# volver a escala normal
+yhat = np.exp(yhat_Dif)
+print(yhat)
+```
+
+Ahora si con esto miramos la observación regresando a los datos en escala original
+```{python}
 y = ObsvsPred1['observado']
-y = y.drop('2017-01-04')
+y = y.drop('2017-01-03')
 d = {'observado': y, 'Predicción': yhat}
 ObsvsPred3=pd.DataFrame(data=d,index=indicetrian_val_test)
 ObsvsPred3.head(10)
 ```
 
 ```{python}
-ax = ObsvsPred3.plot( marker="o", figsize=(12,8))
-ax.axvline(x=indicetrian_val_test[1458].date(),color='red')
+#gráfico
+ax = ObsvsPred3['observado'].plot(marker="o", figsize=(10, 6), linewidth=2, markersize=4)  # Ajusta el grosor de las líneas y puntos
+ObsvsPred3['Predicción'].plot(marker="o", linewidth=1, markersize=2, ax=ax)  # Ajusta el grosor de las líneas y puntos
+# Agrega una línea vertical roja
+ax.axvline(x=indicetrian_val_test[1459].date(), color='red', linewidth=0.5)  # Ajusta el grosor de la línea vertical
+# Muestra una leyenda
+plt.legend()
+plt.show()
 ```
 
-Notamos los valores predichos para la diferencia son muy cercanos a cero lo cual al llervalos
+Notamos que para la ventana de tiempo seleccionada potencialmente es bastante bueno usar el valor del día anterior cómo predictoar, además que por el problema de los arboles al trabajar con una sería con tendencia creciente es mejor primero trabajar con la seríe diferenciada y devolverse.
 
-Podemos concluir que los arboles de deicison no son buenos tratando con serie que presentan tendencia potencialmente estocastica y que
+Para poder tener uns idea más clara miraremos la métrica RECM.
+
+```{python}
+#metrica
+print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squared_error( yhat[:1458], y[:1458],squared=False))
+print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(yhat[1458:], y[1458:],squared=False))
+```
+
+Podemos observar que el RECM en el entrenamiento vuelve a ser bajo, pero a diferencia de cuando no sé tenia en cuenta la tendencia al estimar para la diferenciación y volver a los datos originales se tiene un buen pronostico.
