@@ -3,7 +3,7 @@ title: "Exportaciones"
 lag: es
 format: html
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 chunk_output_type: inline
 code-fold: true
 ---

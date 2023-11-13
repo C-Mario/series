@@ -1,0 +1,539 @@
+---
+title: "Suavizamiento exponencial y rolling Bitcoin"
+code-fold: true
+warning: false
+grid: 
+  body-width: 1500px
+---
+
+```{r}
+#| include: false
+library(tidyverse)
+library(forecast)
+library(tseries)
+library(xts)
+options(scipen = 12)
+```
+
+```{r}
+BTC_Daily <- read.csv("datos/BTC-Daily.csv")
+Data <- data.frame(BTC_Daily$date,BTC_Daily$close)
+colnames(Data) <- c("FechaTiempo", "Valor")
+
+Data$FechaTiempo <- strftime(Data$FechaTiempo, format="%Y-%m-%d")
+Data$FechaTiempo <- as.Date(Data$FechaTiempo)
+
+Bitcoin <- Data %>%
+      filter(FechaTiempo >= as.Date("2017-01-01"),
+             FechaTiempo <= as.Date("2021-12-31")) |> 
+      arrange(FechaTiempo)
+head(Bitcoin); tail(Bitcoin)
+```
+
+```{r}
+# objeto xts  
+Data_xts <- xts::xts(Bitcoin$Valor, order.by = Bitcoin$FechaTiempo)
+plot(Data_xts)
+```
+
+```{r}
+#transformación logarítmica
+lData_xts <- log(Data_xts)
+plot(lData_xts)
+```
+
+```{r}
+# pasando a objeto ts
+ldata_ts <- TSstudio::xts_to_ts(lData_xts, frequency = 365,
+                                start = as.Date("2017-01-01"))
+plot(ldata_ts)
+```
+
+## Suavizamiento exponencial
+
+```{r}
+lserie <- length(ldata_ts)
+ntrain <- trunc(lserie*0.8)
+train <- window(ldata_ts, end = time(ldata_ts)[ntrain])
+test <- window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) 
+ntest <- length(test)
+paste("Número de datos en el conjunto de entrenamiento:", ntrain)
+paste("Número de datos en el conjunto de entrenamiento:", ntest)
+```
+
+### Modelo Holt-Winters aditivo con parámetros $\alpha, \beta$ y $\gamma$.
+
+Se ajusta el modelo de Holt-Winters asumiendo una componente estacional de 1 año. Las componentes del modelo están envueltas de forma aditiva.
+
+```{r}
+grilla_abc <- cbind(seq(0.01,0.99,0.1),seq(0.01,0.99,0.1))#seq(0.01,0.99,0.1)
+colnames(grilla_abc)<-c("alpha", "beta") #"gamma"
+grilla_abc <- tibble::as_tibble(grilla_abc)
+grilla_abc <- expand.grid(alpha=grilla_abc$alpha,beta=grilla_abc$beta)
+#gamm=grilla_abc$gamma
+
+best_params <- NULL
+best_aic <- Inf
+
+for (i in 1:dim(grilla_abc)[1]) {
+  alpha <- as.numeric(grilla_abc[i,][1])
+  beta <- as.numeric(grilla_abc[i,][2])
+  #gamma <- as.numeric(grilla_abc[i,][3])
+
+  holtwinters_model <- HoltWinters(train, seasonal = "additive",
+                                   alpha = alpha, beta = beta,
+                                   gamma = FALSE)
+
+  residuals <- residuals(holtwinters_model)
+  n <- length(residuals)
+  k <- 3  
+  sigma <- sqrt(sum(residuals^2) / n)
+  aic <- n * log(sigma^2) + 2 * k
+
+  if (aic < best_aic) {
+    best_params = c(alpha = alpha, beta = beta) #gamma = gamma
+    best_aic = aic
+  }
+}
+
+final_model <- HoltWinters(train, seasonal = "additive",
+                           alpha = best_params['alpha'], beta = best_params['beta'])
+
+forecast <- forecast(final_model, h = ntest)
+
+pred_log_1 <- autoplot(forecast, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia') +
+  autolayer(window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) +
+  autolayer(forecast$mean, series="Predicciones sobre los datos de prueba", lwd = 0.8) + 
+  autolayer(forecast$fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +   theme(legend.position = "bottom", legend.direction="vertical") 
+print(pred_log_1)
+```
+
+Los parámetros de suavizado que minimizan el **AIC** son los siguientes:
+
+-   $\alpha =$ `r best_params['alpha']`
+-   $\beta =$ `r best_params['beta']`
+-   $\gamma =$ `r best_params['gamma']`
+
+```{r}
+accuracy(forecast, test)[,c(2,3)]
+```
+
+```{r}
+predicciones <- InvBoxCox(forecast$mean, lambda=0)
+datos_test <- window(InvBoxCox(ldata_ts, lambda=0), start = time(ldata_ts)[ntrain]+1/365)
+datos_train <- window(InvBoxCox(ldata_ts, lambda=0), end = time(ldata_ts)[ntrain])
+train_fitted <- InvBoxCox(forecast$fitted, lambda=0)
+
+pred_real_1 <- autoplot(predicciones, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia') +
+  autolayer(datos_test, series="Datos de prueba", lwd = 0.8) +
+  autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) + 
+  autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8,
+            color = "black") +
+  autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) + 
+  theme(legend.position = "bottom", legend.direction="vertical")
+print(pred_real_1)
+```
+
+### Modelo multiplicativo Holt-Winters parámetros $\alpha, \beta$ y $\gamma$
+
+Se ajusta el modelo de Holt-Winters asumiendo una componente estacional de 1 año. Las componentes del modelo están envueltas de forma aditiva.
+
+```{r}
+grilla <- cbind(seq(0.01,0.99,0.1),seq(0.01,0.99,0.1),seq(0.01,0.99,0.1))
+colnames(grilla)<-c("alpha","beta","gamma")
+grilla <- tibble::as_tibble(grilla)
+grilla <- expand.grid(alpha=grilla$alpha,beta=grilla$beta,
+                        gamm=grilla$gamma)
+
+best_params <- NULL
+best_aic <- Inf
+
+for (i in 1:dim(grilla)[1]) {
+  alpha <- as.numeric(grilla[i,][1])
+  beta <- as.numeric(grilla[i,][2])
+  gamma <- as.numeric(grilla[i,][3])
+
+  holtwinters_model <- HoltWinters(train, seasonal = "multiplicative",
+                                   alpha = alpha, beta = beta, gamma = gamma)
+
+  residuals <- residuals(holtwinters_model)
+  n <- length(residuals)
+  k <- 3
+  sigma <- sqrt(sum(residuals^2) / n)
+  aic <- n * log(sigma^2) + 2 * k
+
+  if (aic < best_aic) {
+    best_params = c(alpha = alpha, beta = beta, gamma = gamma)
+    best_aic = aic
+  }
+}
+
+final_model <- HoltWinters(train, seasonal = "multiplicative",
+                           alpha = best_params['alpha'], beta = best_params['beta'],
+                           gamma = best_params['gamma'])
+
+forecast <- forecast(final_model, h = ntest-2)
+
+pred_log_2 <- autoplot(forecast, main = 'Predicciones HoltWinters multiplicativo (Nivel + Tendencia) x Estacionalidad') +
+  autolayer(window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) +
+  autolayer(forecast$mean, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(forecast$fitted, series="predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+Los parámetros de suavizado que minimizan el **AIC** son los siguientes:
+
+-   $\alpha =$ `r best_params['alpha']`
+-   $\beta =$ `r best_params['beta']`
+-   $\gamma =$ `r best_params['gamma']`
+
+```{r}
+accuracy(forecast, test)[,c(2,3)]
+```
+
+```{r}
+predicciones <- InvBoxCox(forecast$mean, lambda=0)
+datos_test <- window(InvBoxCox(ldata_ts, lambda=0), start = time(ldata_ts)[ntrain]+1/365)
+datos_train <- window(InvBoxCox(ldata_ts, lambda=0), end = time(ldata_ts)[ntrain])
+train_fitted <- InvBoxCox(forecast$fitted, lambda=0)
+
+pred_real_2 <- autoplot(predicciones, main = 'Predicciones HoltWinters multiplicativo (Nivel + Tendencia) x Estacionalidad') +
+  autolayer(datos_test, series="Datos de prueba", lwd = 0.8) +
+  autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8,
+            color = "black") +
+  autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+### Modelo Holt parámetros $\alpha$ y $\beta$
+
+Se ajusta el modelo de Holt-Winters donde las componentes del modelo están envueltas de forma aditiva pero solo se considera el nivel y la tendencia.
+
+```{r}
+grilla <- cbind(seq(0.01,0.99,0.1),seq(0.01,0.99,0.1))
+colnames(grilla)<-c("alpha","beta")
+grilla <- tibble::as_tibble(grilla)
+grilla <- expand.grid(alpha=grilla$alpha,beta=grilla$beta)
+
+best_params <- NULL
+best_aic <- Inf
+
+for (i in 1:dim(grilla)[1]) {
+  alpha <- as.numeric(grilla[i,][1])
+  beta <- as.numeric(grilla[i,][2])
+
+  if (beta < alpha){
+  holtwinters_model <- holt(train, alpha = alpha, beta = beta, h = ntest)
+  }
+  residuals <- residuals(holtwinters_model)
+  n <- length(residuals)
+  k <- 2
+  sigma <- sqrt(sum(residuals^2) / n)
+  aic <- n * log(sigma^2) + 2 * k
+
+  if (aic < best_aic) {
+    best_params = c(alpha = alpha, beta = beta)
+    best_aic = aic
+  }
+}
+
+final_model <- holt(train, seasonal = "additive",
+                           alpha = best_params['alpha'], beta = best_params['beta'], h = ntest)
+
+forecast_holt <- forecast(final_model)
+
+pred_log_3 <- autoplot(forecast_holt, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia') +
+  autolayer(window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) +
+  autolayer(forecast_holt$mean, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(forecast_holt$fitted, series="predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+```{r}
+accuracy(forecast_holt, test)[,c(2,3)]
+```
+
+```{r}
+predicciones <- InvBoxCox(forecast_holt$mean, lambda=0)
+datos_test <- window(InvBoxCox(ldata_ts, lambda=0), start = time(ldata_ts)[ntrain]+1/365)
+datos_train <- window(InvBoxCox(ldata_ts, lambda=0), end = time(ldata_ts)[ntrain])
+train_fitted <- InvBoxCox(forecast_holt$fitted, lambda=0)
+
+pred_real_3 <- autoplot(predicciones, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia') +
+  autolayer(datos_test, series="Datos de prueba", lwd = 0.8) +
+  autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8,
+            color = "black") +
+  autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+### Modelo Holt parámetros $\alpha$ y $\beta$ con damped
+
+Se ajusta el modelo de Holt-Winters donde las componentes del modelo están envueltas de forma aditiva pero solo se considera el nivel y la tendencia. Se adiciona un parámetro damped.
+
+```{r}
+grilla <- cbind(seq(0.01,0.99,0.1),seq(0.01,0.99,0.1))
+colnames(grilla)<-c("alpha","beta")
+grilla <- tibble::as_tibble(grilla)
+grilla <- expand.grid(alpha=grilla$alpha,beta=grilla$beta)
+
+best_params <- NULL
+best_aic <- Inf
+
+for (i in 1:dim(grilla)[1]) {
+  alpha <- as.numeric(grilla[i,][1])
+  beta <- as.numeric(grilla[i,][2])
+
+  if (beta < alpha){
+  holtwinters_model <- holt(train, alpha = alpha, beta = beta, h = ntest, damped = TRUE)
+  }
+  residuals <- residuals(holtwinters_model)
+  n <- length(residuals)
+  k <- 2
+  sigma <- sqrt(sum(residuals^2) / n)
+  aic <- n * log(sigma^2) + 2 * k
+
+  if (aic < best_aic) {
+    best_params = c(alpha = alpha, beta = beta)
+    best_aic = aic
+  }
+}
+
+final_model <- holt(train, seasonal = "additive",
+                           alpha = best_params['alpha'], beta = best_params['beta'], 
+                           h = ntest, damped = TRUE)
+
+forecast_holt <- forecast(final_model)
+
+pred_log_4 <- autoplot(forecast_holt, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia con damped') +
+  autolayer(window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) +
+  autolayer(forecast_holt$mean, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(forecast_holt$fitted, series="predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+```{r}
+accuracy(forecast_holt, test)[,c(2,3)]
+```
+
+```{r}
+predicciones <- InvBoxCox(forecast_holt$mean, lambda=0)
+datos_test <- window(InvBoxCox(ldata_ts, lambda=0), start = time(ldata_ts)[ntrain]+1/365)
+datos_train <- window(InvBoxCox(ldata_ts, lambda=0), end = time(ldata_ts)[ntrain])
+train_fitted <- InvBoxCox(forecast_holt$fitted, lambda=0)
+
+pred_real_4 <- autoplot(predicciones, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia con damped') +
+  autolayer(datos_test, series="Datos de prueba", lwd = 0.8) +
+  autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8,
+            color = "black") +
+  autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+### Modelos Naive y drift
+
+Se hace una comparación con los modelos Naive (tomando como predicción la últiva observación), y el modelo de una caminata aleatoria con drift.
+
+```{r}
+naive <- naive(train, h = nrow(test))
+drift <- rwf(train, h = nrow(test), drift = TRUE)
+```
+
+```{r}
+accuracy(naive, test)[,c(2,3)]
+accuracy(drift, test)[,c(2,3)]
+```
+
+```{r}
+# forecast_naive <- forecast(naive)
+
+pred_log_5 <- autoplot(naive, main = 'Predicciones modelo Naive') +
+  autolayer(window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) +
+  autolayer(naive$fitted, series="predicciones sobre los datos de entrenamiento", lwd = 0.8) +                  autolayer(naive$mean, series="Predicciones sobre los datos de prueba", lwd = 1) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+
+
+pred_log_6 <- autoplot(drift, main = 'Predicciones modelo de caminata aleatoria con drift') +
+  autolayer(window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) +
+  autolayer(drift$fitted, series="predicciones sobre los datos de entrenamiento", lwd = 0.8) +                  autolayer(drift$mean, series="Predicciones sobre los datos de prueba", lwd = 1) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+
+```
+
+```{r}
+predicciones <- InvBoxCox(naive$mean, lambda=0)
+datos_test <- window(InvBoxCox(ldata_ts, lambda=0), start = time(ldata_ts)[ntrain]+1/365)
+datos_train <- window(InvBoxCox(ldata_ts, lambda=0), end = time(ldata_ts)[ntrain])
+train_fitted <- InvBoxCox(naive$fitted, lambda=0)
+
+pred_real_5 <- autoplot(predicciones, main = 'Predicciones modelo Naive') +
+  autolayer(datos_test, series="Datos de prueba", lwd = 0.8) +
+  autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8,
+            color = "black") +
+  autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+```{r}
+predicciones <- InvBoxCox(drift$mean, lambda=0)
+datos_test <- window(InvBoxCox(ldata_ts, lambda=0), start = time(ldata_ts)[ntrain]+1/365)
+datos_train <- window(InvBoxCox(ldata_ts, lambda=0), end = time(ldata_ts)[ntrain])
+train_fitted <- InvBoxCox(drift$fitted, lambda=0)
+
+pred_real_6 <- autoplot(predicciones, main = 'Predicciones modelo de caminata aleatoria con drift') +
+  autolayer(datos_test, series="Datos de prueba", lwd = 0.8) +
+  autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8,
+            color = "black") +
+  autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical")
+```
+
+<!-- ### Holt parámetros $\alpha$ y $\beta$ -->
+
+<!-- ```{r} -->
+
+<!-- grilla <- cbind(seq(0.01,0.99,0.1),seq(0.01,0.99,0.1)) -->
+
+<!-- colnames(grilla)<-c("alpha","beta") -->
+
+<!-- grilla <- tibble::as_tibble(grilla) -->
+
+<!-- grilla <- expand.grid(alpha=grilla$alpha,beta=grilla$beta)  -->
+
+<!-- best_params <- NULL -->
+
+<!-- best_aic <- Inf -->
+
+<!-- for (i in 1:dim(grilla)[1]) { -->
+
+<!--   alpha <- as.numeric(grilla[i,][1]) -->
+
+<!--   beta <- as.numeric(grilla[i,][2]) -->
+
+<!--   if (beta < alpha){ -->
+
+<!--   holtwinters_model <- holt(train, alpha = alpha, beta = beta, h = ntest, -->
+
+<!--                             damped = TRUE, exponential = TRUE) -->
+
+<!--   } -->
+
+<!--   residuals <- residuals(holtwinters_model) -->
+
+<!--   n <- length(residuals) -->
+
+<!--   k <- 2   -->
+
+<!--   sigma <- sqrt(sum(residuals^2) / n) -->
+
+<!--   aic <- n * log(sigma^2) + 2 * k -->
+
+<!--   if (aic < best_aic) { -->
+
+<!--     best_params = c(alpha = alpha, beta = beta) -->
+
+<!--     best_aic = aic -->
+
+<!--   } -->
+
+<!-- } -->
+
+<!-- final_model <- holt(train, seasonal = "additive", -->
+
+<!--                            alpha = best_params['alpha'], beta = best_params['beta'], h = ntest, damped = TRUE) -->
+
+<!-- forecast_holt <- forecast(final_model) -->
+
+<!-- autoplot(forecast_holt) + -->
+
+<!--   autolayer(window(ldata_ts, start = time(ldata_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) + -->
+
+<!--   autolayer(forecast_holt$mean, series="Predicciones sobre los datos de prueba", lwd = 0.8) +  -->
+
+<!--   autolayer(forecast_holt$fitted, series="predicciones sobre los datos de entrenamiento", lwd = 0.8) +  -->
+
+<!--   theme(legend.position = "bottom", legend.direction="vertical") -->
+
+<!-- accuracy(forecast_holt, test) -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+
+<!-- predicciones <- InvBoxCox(forecast_holt$mean, lambda=0) -->
+
+<!-- datos_test <- window(InvBoxCox(ldata_ts, lambda=0), start = time(ldata_ts)[ntrain]+1/365) -->
+
+<!-- datos_train <- window(InvBoxCox(ldata_ts, lambda=0), end = time(ldata_ts)[ntrain]) -->
+
+<!-- train_fitted <- InvBoxCox(forecast_holt$fitted, lambda=0) -->
+
+<!-- autoplot(predicciones) + -->
+
+<!--   autolayer(datos_test, series="Datos de prueba", lwd = 0.8) + -->
+
+<!--   autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) +  -->
+
+<!--   autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8, -->
+
+<!--             color = "black") + -->
+
+<!--   autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +  -->
+
+<!--   theme(legend.position = "bottom", legend.direction="vertical") -->
+
+<!-- ``` -->
+
+### Predicciones en escala logarítmica
+
+A continuación se presentan los resultados de los modelos ajustados en escala logarítmica. Se muestran las predicciones sobre los datos de entrenamiento y sobre los datos de prueba.
+
+```{r}
+#| layout-ncol: 2
+
+pred_log_1; pred_log_2; pred_log_3; pred_log_4; pred_log_5; pred_log_6
+```
+
+### Predicciones en escala original
+
+Deshaciendo la transformación logarítmica, los resultados en la escala original de la serie son los siguientes:
+
+```{r}
+#| layout-ncol: 2
+
+pred_real_1; pred_real_2; pred_real_3; pred_real_4; pred_real_5; pred_real_6
+```
+
+## Rolling
+
+```{r}
+h <- 5
+
+fchstepahe <- matrix(0, nrow = ntest, ncol = h)
+verval <- cbind(test[1:ntest])
+
+for(j in 2:h){
+  verval = cbind(verval, c(test[j:ntest], rep(NA,j-1)))
+}
+# verval <- cbind(Empleo$Tasa_desempleo[1:ntest], c(Empleo$Tasa_desempleo[2:ntest],NA), c(Empleo$Tasa_desempleo[3:ntest], NA), c(Empleo$Tasa_desempleo[4:ntest], NA), c(Empleo$Tasa_desempleo[5:ntest], NA), c(Empleo$Tasa_desempleo[6:ntest], NA))
+
+#Creacion ventanas de rolling
+for(i in 1:(ntest)){
+  x = window(ldata_ts, end = time(ldata_ts)[ntrain] + (i-1)/365)
+  refit = stats::HoltWinters(x, seasonal = "additive",
+                           alpha = 0.81, beta = 0.01, 
+                           gamma = 0.91)
+    fchstepahe[i,] = as.numeric(forecast::forecast(refit,h = h)$mean)
+}
+#calculamos los errores de prediccion
+errores_pred <- verval-InvBoxCox(fchstepahe, lambda = 0)
+#calculamos el error cuadrático medio de prediccion
+ECM=apply(errores_pred^2,MARGIN = 2,mean,na.rm=TRUE) 
+RECM=sqrt(ECM) ##Se le saca raíz 
+RECM
+```
