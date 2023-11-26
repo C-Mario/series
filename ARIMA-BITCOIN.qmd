@@ -1,0 +1,262 @@
+---
+title: "ARIMA-Bitcoin"
+lag: es
+format: html
+editor_options: 
+  chunk_output_type: inline
+chunk_output_type: inline
+code-fold: true
+---
+
+```{r}
+#| output: false
+#librerias
+library(urca)
+library(tseries)
+library(lmtest)
+library(forecast)
+library(tsoutliers)
+```
+
+```{r}
+#datos
+BTC_Daily <- read.csv("datos/BTC-Daily.csv")
+Data <- data.frame(BTC_Daily$date,BTC_Daily$close)
+Data <- data.frame(BTC_Daily$date,BTC_Daily$close)
+colnames(Data) <- c("FechaTiempo", "Valor")
+# limpiando datos faltantes
+str(Data)
+Data$FechaTiempo <- strftime(Data$FechaTiempo, format="%Y-%m-%d")
+str(Data)
+Data$FechaTiempo <- as.Date(Data$FechaTiempo)
+# procesamiento de los datos
+
+Bitcoin <- Data %>%
+      filter(FechaTiempo >= as.Date("2017-01-01"),
+             FechaTiempo <= as.Date("2021-12-31"))
+str(Bitcoin)
+# objeto serie de tiempo
+Data_xts <- xts::xts(Bitcoin$Valor, order.by = Bitcoin$FechaTiempo)
+```
+
+Para poder comparar modelos por su capacidad descriptiva vamos hacer un split de los datos
+
+```{r}
+length(Data_xts)
+ntrain <- trunc(length(Data_xts)*0.8)
+train <- window(Data_xts, end=time(Data_xts)[ntrain])
+test <- window(Data_xts, start=time(Data_xts)[ntrain]+1/365)
+ntest <- length(test)
+paste("Número de datos en el conjunto de entrenamiento:", ntrain)
+paste("Número de datos en el conjunto de prueba:", ntest) 
+```
+
+# Modelo ARIMA para Bitcoin
+
+Para este tipo de modelo la serie puede ser no estacionaria, además si tiene tendencia esta se considerar estocástica y debe tener presencia de al menos una raíz unitaria. Teniendo en cuenta estas consideraciones trabajaremos con la serie transformada.
+
+```{r}
+#trasnformación
+lData_xts <- log(Data_xts)
+plot(lData_xts)
+#
+ldata_ts <- TSstudio::xts_to_ts(lData_xts,frequency = 365,
+                                start = as.Date("2017-01-01"))
+# plot acf y pacf
+acf(lData_xts)
+pacf(lData_xts)
+```
+
+\
+Vemos que en el **acf** de cae lentamente lo cuál nos aclara más la tendencia vista en el gráfico y para el **pacf** muestra un alto nivel de correlación con el primer rezago
+
+## Prueba de Raíz unitaria
+
+Ahora vamos a verificar si la serie presenta uno o varias raíces unitarias
+
+```{r}
+ar(lData_xts)# Selecciona un AR usando AIC
+#test de dickek fuller
+tseries::adf.test(lData_xts, k = 1)
+summary(urca::ur.df(lData_xts, type = "drift", lag = 1))
+
+```
+
+Podemos observar que basados en la prueba de raíz unitaria de dickey fuller tenemos presencia de al menos una raíz en nuestra serie por tanto, no es estacionaria. Ahora miramos que pasa para la primera diferencia
+
+```{r}
+#diferenciada
+dldata_xts <- dldata<-diff(lData_xts)
+dldata_xts <- dldata_xts[-1]
+plot(dldata_xts)
+# test de dickey fuller
+pacf(dldata_xts)
+acf(dldata_xts,lag.max = 20)
+ar(dldata_xts)
+tseries::adf.test(dldata_xts, k = 1)
+summary(urca::ur.df(dldata_xts, type = "none"))
+```
+
+Vemos que según esto con una sola diferencia basta para tener que el proceso sea estacionario.
+
+## Identificación del modelo
+
+pasaremos a conocer los valores para $p$ y $q$ en el modelo
+
+```{r}
+#para q
+acf(dldata_xts, lag.max = 15, ci.type = "ma")
+# para p
+pacf(dldata_xts,lag.max = sqrt(length(lData_xts)))
+```
+
+Vemos que dado el **acf** puede ser un de orden $1$ y del **pacf** tenemos que podría ser de orden $1$ o $10$. Con esto tenemos las siguientes posibilidades $ARIMA(1,1,0), ARIMA(0,1,1), ARIMA(0,1,10), ARIMA(1,1,1)$ y $ARIMA(1,1,10)$
+
+## Modelos posibles
+
+### Modelo ARIMA(1,1,0)
+
+```{r}
+ARIMA110 <- forecast::Arima(train, order = c(1,1,0), lambda = 0,
+                            include.drift = TRUE)
+lmtest::coeftest(ARIMA110)
+```
+
+Vemos que el parámetro es significante así $ARIMA(1,1,0)$ pasa a evaluación
+
+```{r}
+#Almacenar el valor de todos los modelos
+Arima_AIC <- NULL
+Arima_BIC <- NULL
+# 
+Arima_AIC <- cbind(AIC(ARIMA110))
+Arima_BIC <- cbind(BIC(ARIMA110))
+```
+
+### Modelo ARIMA(0,1,1)
+
+```{r}
+ARIMA011 <- forecast::Arima(train, order = c(0,1,1), lambda = 0,
+                            include.drift = TRUE)
+lmtest::coeftest(ARIMA011)
+```
+
+Vemos que el parámetro es significante así $ARIMA(0,1,1)$ pasa a evaluación.
+
+```{r}
+# Almacenar cirterios
+Arima_AIC <- cbind(Arima_AIC, AIC(ARIMA011))
+Arima_BIC <- cbind(Arima_BIC, BIC(ARIMA011))
+```
+
+### Modelo ARIMA(0,1,10)
+
+```{r}
+ARIMA0110 <- forecast::Arima(train, order = c(0,1,10), lambda = 0,
+                             include.drift = TRUE)
+lmtest::coeftest(ARIMA0110)
+```
+
+Notamos que se requiere refinar el modelo pues encontramos varios coeficiente no significativos, así empezaremos el refinamiento fijando en $0$ aquellos $p$ más altos no significantes bajo un $\alpha= 0.05$.
+
+```{r}
+ARIMA0110 <- forecast::Arima(train, order = c(0,1,10), lambda = 0,
+                             include.drift = TRUE,
+                             fixed = c(NA,NA,0,0,0,0,0,0,0,NA,0))
+lmtest::coeftest(ARIMA0110)
+```
+
+Vemos que para $ARIMA(0,1,10)$ solo quedaron tres parámetros y sigue para evaluación.
+
+```{r}
+# Almacenar cirterios
+Arima_AIC <- cbind(Arima_AIC, AIC(ARIMA0110))
+Arima_BIC <- cbind(Arima_BIC, BIC(ARIMA0110))
+```
+
+### Modelo ARIMA(1,1,1)
+
+```{r}
+ARIMA111 <- forecast::Arima(train, order = c(1,1,1), lambda = 0,
+                            include.drift = TRUE)
+lmtest::coeftest(ARIMA111)
+```
+
+Vemos que dado el $\alpha$ que se maneja entonces el parámetro asociado al promedio móvil es insignificante por tanto volvemos a un $ARIMA(1,1,0)$
+
+```{r}
+# Almacenar cirterios
+Arima_AIC <- cbind(Arima_AIC, AIC(ARIMA0110))
+Arima_BIC <- cbind(Arima_BIC, BIC(ARIMA0110))
+```
+
+### Modelo ARIMA(1,1,10)
+
+```{r}
+ARIMA1110 <- forecast::Arima(train, order = c(1,1,10), lambda = 0,
+                             include.drift = TRUE)
+lmtest::coeftest(ARIMA1110)
+```
+
+Notamos que ninguno de los parámetros es significante entonces descartamos por completo este modelo.
+
+### Selección de modelo
+
+Miraremos los valores guardados para cada uno de los $3$ modelos que tenemos ajustamos en la parte anterior
+
+```{r}
+#poniendo nombres
+colnames(Arima_AIC) <- c("ARIMA(1,1,0)","ARIMA(0,1,1)",
+                         "ARIMA(0,1,10)")
+colnames(Arima_BIC) <- c("ARIMA(1,1,0)","ARIMA(0,1,1)",
+                         "ARIMA(0,1,10)")
+rownames(Arima_AIC) <- c("AIC")
+rownames(Arima_BIC) <- c("BIC")
+#
+Arima_AIC
+Arima_AIC
+```
+
+Vemos que el valor de menor en ambos criterios es para el $ARIMA(0,1,1)$ .
+
+## Comprobación de Supuestos
+
+Realizaremos para el modelo destacado la comprobación de supuestos.
+
+```{r}
+residuales <- ARIMA011$residuals
+#
+plot(residuales)
+acf(residuales)
+pacf(residuales)
+```
+
+Vemos que potencialmente se tiene un outlier así pasaremos a su detección si es posible
+
+### Detección de outlier
+
+```{r}
+#
+(coef <- tsoutliers::coefs2poly(ARIMA011))
+#
+(outliers <- tsoutliers::locate.outliers(residuales,coef))
+```
+
+Vemos que se encuentran automaticamente mas de 100 outliers de diferentes tipos
+
+```{r}
+#intentamos tener encuenta el efecto
+n    <- length(train)
+xreg <-  outliers.effects(outliers,n)
+```
+
+intentaremos volver a estimar el modelo teniendo en cuenta la influencia de estos outliers
+
+```{r}
+ARIMA011 <- forecast::auto.arima(train, d=1, D=0, max.p = 0,
+                                 max.q = 1,start.p=0, start.q=1,
+                                 lambda = 0, seasonal=FALSE,ic="aic",
+                                 xreg=xreg,allowdrift = TRUE,
+                                 stepwise = FALSE)
+lmtest::coeftest(ARIMA011)
+```

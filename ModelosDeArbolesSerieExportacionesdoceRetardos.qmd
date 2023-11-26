@@ -75,7 +75,7 @@ print(df2)
 
 ```{python}
 # arreglo de datos para el arreglo de rezagos Serie Original
-indice = pd.date_range(start='1/1/2000', periods=282, freq='M')
+indice = pd.date_range(start='1/1/2000', periods=282, freq='MS')
 print(indice)
 originalDatadf = pd.DataFrame(data['Total'].values,index=indice)
 print(originalDatadf)
@@ -301,21 +301,35 @@ Implementaremos ahora el modelo de árboles sobre la serie sin tendencia, elimin
 
 ```{python}
 # Lectura de la serie
-data2 = pd.read_excel("ExportacionesSinTendencia.xlsx",
-                   header = 0, usecols = ['Fecha','ExportacionesSinTend']).reset_index(drop = True).round()
-data2['ExportacionesSinTend'] = data2['ExportacionesSinTend'].astype(int) 
-data2
+data2 = pd.ExcelFile('ExportacionesSinTendencia.xlsx')
+print(data2.sheet_names)
+# dataframe con los datos
+data2 = data2.parse('Sheet1')
+print(data2)
+print(type(data2))
 ```
 
 ```{python}
 # tipo de datos
 print(data2.info())
+# nombre
+data2.columns = ['Fecha','Valor']
+print(data2.info())
+```
+
+```{python}
+# fecha
+data2['Fecha']=pd.to_datetime(data2['Fecha'])###Sólo es necesario si no tiene formato de fecha
+dlData = data2.set_index('Fecha')
+#dlData=dlData.asfreq('M')
+print(type(dlData))
+print(dlData)
 ```
 
 ```{python}
 #mirando los datos
 #objeto ts
-exportaciones = data2['ExportacionesSinTend']
+exportaciones = data2['Valor']
 print(type(exportaciones))
 plt.plot(exportaciones)
 ```
@@ -325,7 +339,7 @@ print(f'Numero de filas con valores faltantes: {data2.isnull().any(axis=1).mean(
 ```
 
 ```{python}
-data2.shape
+dlData.shape
 ```
 
 # Árboles de decisión
@@ -346,40 +360,40 @@ print(df2)
 
 ```{python}
 # arreglo de datos para el arreglo de rezagos Serie Original
-indice = pd.date_range(start='1/7/2000', periods=270, freq='M')
+indice = pd.date_range(start='2/1/2000', periods=281, freq='MS')
 print(indice)
-originalDatadf = pd.DataFrame(data2['ExportacionesSinTend'].values,index=indice)
-print(originalDatadf)
+difDatadf = pd.DataFrame(data2['Valor'].values,index=indice)
+print(difDatadf)
 ```
 
 ```{python}
 # Rezagos original
 for i in range(12,0,-1):
-    df1[['t-'+str(i)]] = originalDatadf.shift(i)
-print(df1)
+    df2[['t-'+str(i)]] = difDatadf.shift(i)
+print(df2)
 ```
 
 ```{python}
 # Create column t original
-df1['t'] = originalDatadf.values
-print(df1.head(14))
+df2['t'] = difDatadf.values
+print(df2.head(14))
 ```
 
 ```{python}
 # Create a new subsetted dataframe, removing Nans from first 3 rows original
-df1_Ori = df1[12:]
-print(df1_Ori)
-df1_Ori.size
+df2_dif = df2[12:]
+print(df2_dif)
+df2_dif.size
 ```
 
 ```{python}
 # Split data Serie Original
-Orig_Split = df1_Ori.values
+dif_Split = df2_dif.values
 # split into lagged variables and original time series
-X1 = Orig_Split[:, 0:-1]  # slice all rows and start with column 0 and go up to but not including the last column
-y1 = Orig_Split[:,-1]  # slice all rows and last column, essentially separating out 't' column
-print(X1)
-print('Respuestas \n',y1)
+X2 = dif_Split[:, 0:-1]  # slice all rows and start with column 0 and go up to but not including the last column
+y2 = dif_Split[:,-1]  # slice all rows and last column, essentially separating out 't' column
+print(X2)
+print('Respuestas \n',y2)
 ```
 
 # Árbol para Serie Sin Tendencia
@@ -387,20 +401,20 @@ print('Respuestas \n',y1)
 #### Entrenamiento, Validación y prueba
 
 ```{python}
-Y1 = y1
-print('Complete Observations for Target after Supervised configuration: %d' %len(Y1))
-traintarget_size = int(len(Y1) * 0.70) 
-valtarget_size = int(len(Y1) * 0.10)+1# Set split
-testtarget_size = int(len(Y1) * 0.20)# Set split
+Y2 = y2
+print('Complete Observations for Target after Supervised configuration: %d' %len(Y2))
+traintarget_size = int(len(Y2) * 0.70) 
+valtarget_size = int(len(Y2) * 0.10)+1# Set split
+testtarget_size = int(len(Y2) * 0.20)# Set split
 print(traintarget_size,valtarget_size,testtarget_size)
 print('Train + Validation + Test: %d' %(traintarget_size+valtarget_size+testtarget_size))
 ```
 
 ```{python}
 # Target Train-Validation-Test split(70-10-20)
-train_target, val_target,test_target = Y1[0:traintarget_size], Y1[(traintarget_size):(traintarget_size+valtarget_size)],Y1[(traintarget_size+valtarget_size):len(Y1)]
+train_target, val_target,test_target = Y2[0:traintarget_size], Y2[(traintarget_size):(traintarget_size+valtarget_size)],Y2[(traintarget_size+valtarget_size):len(Y2)]
 
-print('Observations for Target: %d' % (len(Y1)))
+print('Observations for Target: %d' % (len(Y2)))
 print('Training Observations for Target: %d' % (len(train_target)))
 print('Validation Observations for Target: %d' % (len(val_target)))
 print('Test Observations for Target: %d' % (len(test_target)))
@@ -409,12 +423,12 @@ print('Test Observations for Target: %d' % (len(test_target)))
 ```{python}
 # Features Train--Val-Test split
 
-trainfeature_size = int(len(X1) * 0.70)
-valfeature_size = int(len(X1) * 0.10)+1# Set split
-testfeature_size = int(len(X1) * 0.20)# Set split
-train_feature, val_feature,test_feature = X1[0:traintarget_size],X1[(traintarget_size):(traintarget_size+valtarget_size)] ,X1[(traintarget_size+valtarget_size):len(Y1)]
+trainfeature_size = int(len(X2) * 0.70)
+valfeature_size = int(len(X2) * 0.10)+1# Set split
+testfeature_size = int(len(X2) * 0.20)# Set split
+train_feature, val_feature,test_feature = X2[0:traintarget_size],X2[(traintarget_size):(traintarget_size+valtarget_size)] ,X2[(traintarget_size+valtarget_size):len(Y2)]
 
-print('Observations for Feature: %d' % (len(X1)))
+print('Observations for Feature: %d' % (len(X2)))
 print('Training Observations for Feature: %d' % (len(train_feature)))
 print('Validation Observations for Feature: %d' % (len(val_feature)))
 print('Test Observations for Feature: %d' % (len(test_feature)))
@@ -531,10 +545,10 @@ print(test_target.size)
 ```
 
 ```{python}
-indicetrian_val_test=df1_Ori.index
+indicetrian_val_test=df2_dif.index
 print(indicetrian_val_test.size)  ###Tamaño del índice
-indicetrain_val=indicetrian_val_test[0:206]
-indicetest=indicetrian_val_test[206:258]
+indicetrain_val=indicetrian_val_test[0:215]
+indicetest=indicetrian_val_test[215:268]
 ```
 
 ```{python}
@@ -588,7 +602,7 @@ data_3['Fecha']=pd.to_datetime(data_3['Fecha'])###Sólo es necesario si no tiene
 LExportaciones = data_3.set_index('Fecha')
 #LExportaciones=LExportaciones.asfreq('M')
 print(type(LExportaciones))
-LExportaciones = LExportaciones.drop(['2017-01-01'])
+LExportaciones = LExportaciones.drop(['2000-01-01'])
 # para tipo de dato
 indiceL = LExportaciones.index
 d = {'observado L': LExportaciones['Valor']}
@@ -598,13 +612,15 @@ ObsL.head(10)
 
 Ahora devolvemos la diferenciación
 ```{python}
-#necesitaremos arreglar los indices
-indices = ObsL['observado L'][12:270].index
-ObsvsPred2['Predicción'].index = indices
+#necesitaremos arreglar
+#ObsL['observado L'] = ObsL['observado L']
+# Resetear los índices
+#ObsL['observado L'] = ObsL['observado L'].reset_index(drop=True)
+#ObsvsPred2['Predicción'].index = indices
 # aqui devolvemos la diferenciación en escala log
-yhat_Dif = ObsvsPred2['Predicción'] + ObsL['observado L'][12:270]
-#yhat_Dif = yhat_Dif.drop('2000-07-01')
-print(yhat_Dif)
+yhat_Dif = ObsvsPred2['Predicción'] + ObsL['observado L']
+yhat_Dif = yhat_Dif.iloc[12:]
+print(yhat_Dif.head(15))
 ```
 
 ```{python}
@@ -613,15 +629,15 @@ yhat = (((0.45)*yhat_Dif) + 1)**(1/0.45)
 print(yhat)
 ```
 ```{python}
-y = ObsvsPred1['observado'][12:270]
+y = ObsvsPred1['observado']
 #necesitaremos arreglar los indices
-indices = ObsL['observado L'][12:270].index
-y.index = indices
+indices = ObsL['observado L'].index
 print(y)
 #y = y.drop('2017-01-03')
 d = {'observado': y, 'Predicción': yhat}
 ObsvsPred3=pd.DataFrame(data=d,index=indices)
-ObsvsPred3.head(10)
+ObsvsPred3 = ObsvsPred3.iloc[12:]
+ObsvsPred3.head(15)
 ```
 
 ```{python}
@@ -636,7 +652,8 @@ plt.show()
 ```
 
 ```{python}
+y = y.drop('2001-01-01')
 #metrica
-print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squared_error( yhat[:222], y[:222],squared=False))
-print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(yhat[222:], y[222:],squared=False))
+print("Raíz de la Pérdida cuadrática Entrenamiento:",sklearn.metrics.mean_squared_error( yhat[:215], y[:215],squared=False))
+print("Raíz de la Pérdida cuadrática Prueba:",sklearn.metrics.mean_squared_error(yhat[215:], y[215:],squared=False))
 ```
