@@ -1,0 +1,254 @@
+---
+title: "Bitcoin ARMA"
+lag: es
+format: html
+editor_options: 
+  chunk_output_type: inline
+chunk_output_type: inline
+code-fold: true
+---
+
+# Modelo ARMA para Bitcoin
+
+Debido a que el modelo arma tiene cómo supuesto que funciona para series estacionarias trabajaremos con la series donde la estabilización de la varianza se ha realizado y esta diferenciada la cual potencialmente tiene comportamiento de una serie estacionaria.
+
+```{r}
+# datos transformados y diferenciadods
+plot(dldata_xts, main = "Serie tranformada y diferenciada" )
+```
+
+Vemos que dicha serie parece tener un comportamiento estacionario y un valor extremo en el año 2020.
+
+## Búsqueda de Hiperparametros
+
+```{r}
+#acf
+acf(dldata_xts)
+acf(dldata_xts, ci.type='ma', lag.max = 10)
+#pacf
+pacf(dldata_xts, lag.max = 42)
+```
+
+-   Notamos que la **acf** cae rápidamente a $0$ por tanto podemos un modelo ARMA podría ser buena idea.
+
+-   Del anterior gráfico vemos que después del retrazo $10$ los valores son casi nulos, así miraremos solo para estos primeros 10 y vemos que para el lag $1$ sale un poco de la bandas de confianza, por tanto es posible un MA $q=1$.
+
+-   En el **pacf** notamos que los lag $1,10$ se salen de las bandas de confianza, a pesar de que valores para rezagos más altos se sale algunos ligeramente Consideraremos solo estos dos primeros de donde tenemos que posiblemente se ten un AR $p = 1$ o $p =10$.
+
+    Del análisis anterior tenemos cinco posibles modelos los cuales vamos a mirar todos de una manera rápida luego detallaremos los que consideremos más posibles.
+
+    ## Modelos posibles
+
+    Compararemos los modelos posibles ajustando los manualmente con apoyo del paquete *forecast* y su función *Arima*, además se usaran los criterios de **AIC** y **BIC** para tomar la decisión de que modelo usar para pronosticos
+
+    ### Modelo MA(1)
+
+    ```{r}
+    #|output: false
+    library(forecast)
+    ```
+
+    ```{r}
+    mod_proMov1 <- forecast::Arima(dldata_xts,order=c(0,0,1),
+                                   include.mean=FALSE) 
+    lmtest::coeftest(mod_auto10)
+    summary(mod_proMov1)
+    ```
+
+    Vemos que el coeficiente estimado es significativo, así tendremos que evaluar el modelo $MA(1)$
+
+    ```{r}
+    #Almacenar el valor de todos los modelos
+    Arma_AIC <- NULL
+    Arma_BIC <- NULL
+    # 
+    Arma_AIC <- cbind(AIC(mod_proMov1))
+    Arma_BIC <- cbind(BIC(mod_proMov1))
+    ```
+
+### Modelo AR(1)
+
+```{r}
+mod_Auto1 <- forecast::Arima(dldata_xts,order=c(1,0,0),
+                               include.mean=FALSE) 
+lmtest::coeftest(mod_Auto1)
+summary(mod_Auto1)
+```
+
+-   Vemos que el coeficiente estimado es significativo, así tendremos que evaluar el modelo $AR(1)$
+
+```{r}
+# Almacenar cirterios
+Arma_AIC <- cbind(Arma_AIC, AIC(mod_Auto1))
+Arma_BIC <- cbind(Arma_BIC, BIC(mod_Auto1))
+```
+
+### Modelo AR(10)
+
+```{r}
+mod_Auto10 <- forecast::Arima(dldata_xts,order=c(10,0,0),
+                               include.mean=FALSE) 
+lmtest::coeftest(mod_Auto10)
+```
+
+Notamos que se requiere refinar el modelo pues encontramos varios coeficiente no significativos, así empezaremos el refinamiento fijando en $0$ aquellos $p$ más altos no significantes bajo un $\alpha= 0.05$.
+
+```{r}
+mod_Auto10 <- forecast::Arima(dldata_xts,order=c(10,0,0),
+                               include.mean=FALSE,
+                              fixed = c(NA,0,0,0,0,0,0,0,0,NA)) 
+lmtest::coeftest(mod_Auto10)
+summary(mod_Auto10)
+```
+
+Después de ir uno por uno usando el criterio estipulado anteriormente vemos que son significativos ambos coeficientes tanto $1$ cómo $10$, así tendremos que evaluar el modelo $AR(10)$
+
+```{r}
+# Almacenar cirterios
+Arma_AIC <- cbind(Arma_AIC, AIC(mod_Auto10))
+Arma_BIC <- cbind(Arma_BIC, BIC(mod_Auto10))
+```
+
+### Modelo ARMA(1,1)
+
+```{r}
+mod_1Arma1 <- forecast::Arima(dldata_xts,order=c(1,0,1),
+                               include.mean=FALSE) 
+lmtest::coeftest(mod_1Arma1)
+```
+
+Cómo hablamos anteriormente de la significancia pues para $\alpha= 0.05$, solo tendríamos en cuenta la parte del modelo auto-regresivo, lo cual sería un $AR(1)$ el cual ya analizamos así no evaluaremos, ni refinaremos este modelo más, pero tendremos eso encuenta.
+
+### Modelo ARMA(10,1)
+
+```{r}
+mod_10Arma1 <- forecast::Arima(dldata_xts,order=c(10,0,1),
+                               include.mean=FALSE) 
+lmtest::coeftest(mod_10Arma1)
+```
+
+Cómo ocurrió anteriormente se requiere refinar el modelo pues encontramos varios coeficiente no significativos, así empezaremos el refinamiento fijando en $0$ aquellos $p$ más altos no significantes bajo un $\alpha= 0.05$.
+
+```{r}
+mod_10Arma1 <- forecast::Arima(dldata_xts,order=c(10,0,1),
+                               include.mean=FALSE,
+                               fixed = c(NA,0,0,0,0,0,0,0,0,NA,NA)) 
+lmtest::coeftest(mod_10Arma1)
+```
+
+LLegado a este punto donde se fue fijando en $0$ uno a uno desde los valores más alto de $p$ no siginifiativos vemos que para $1$ tampoco lo es así.
+
+```{r}
+mod_10Arma1 <- forecast::Arima(dldata_xts,order=c(10,0,1),
+                               include.mean=FALSE,
+                               fixed = c(0,0,0,0,0,0,0,0,0,NA,NA)) 
+lmtest::coeftest(mod_10Arma1)
+summary(mod_10Arma1)
+```
+
+Ahora nos queda que el coeficiente $1$ del polinomio de promedios móviles y el $10$ del polinomio auto-regresivo son significantes entonces:
+
+```{r}
+# Almacenar cirterios
+Arma_AIC <- cbind(Arma_AIC, AIC(mod_10Arma1))
+Arma_BIC <- cbind(Arma_BIC, BIC(mod_10Arma1))
+```
+
+## Selección de modelo
+
+Miraremos los valores guardados para cada uno de los $4$ modelos que tenemos
+
+```{r}
+#poniendo nombres
+colnames(Arma_AIC) <- c("MA(1)","AR(1)","AR(10)","ARMA(10,1)")
+colnames(Arma_BIC) <- c("MA(1)","AR(1)","AR(10)","ARMA(10,1)")
+rownames(Arma_AIC) <- c("AIC")
+rownames(Arma_BIC) <- c("BIC")
+#
+Arma_AIC
+Arma_BIC
+```
+
+-   El valor más pequeño de **AIC** es para el modelo $AR(10)$
+
+-   El valor más pequeño de **BIC** es para el modelo $AR(1)$
+
+    ## Comprobación de supuestos
+
+Realizaremos la comprobación de supuestos para los dos modelos destacados anteriormente
+
+### Modelo AR(1)
+
+```{r}
+# autoregresivo 1
+resi_Auto1 <- mod_Auto1$residuals
+#
+plot(resi_Auto1)
+acf(resi_Auto1)
+pacf(resi_Auto1)
+```
+
+```{r}
+#Test de normalidad
+tseries::jarque.bera.test(resi_Auto1)
+```
+
+Vemos que se rechaza la hipótesis nula de que los *residuales* vengan de una distribución normal
+
+```{r}
+#CUMSUM
+res  <- resi_Auto1
+cum  <- cumsum(res)/sd(res)
+N    <- length(res)
+cumq <- cumsum(res^2)/sum(res^2)
+Af <- 0.971 ###Cuantil del 95% para la estad?stica cusum
+co <- 0.02893####Valor del cuantil apro para cusumsq para n interpolación
+LS <- Af*sqrt(N)+2*Af*c(1:length(res))/sqrt(N)
+LI <- -LS
+LQS <- co+(1:length(res))/N
+LQI <- -co+(1:length(res))/N
+plot(cum,type="l",ylim=c(min(LI),max(LS)),xlab="t",ylab="",main="CUSUM")
+lines(LS,type="S",col="red")
+lines(LI,type="S",col="red")
+#CUSUMSQ
+plot(cumq,type="l",xlab="t",ylab="",main="CUSUMSQ")                      
+lines(LQS,type="S",col="red")                                                                           
+lines(LQI,type="S",col="red")
+```
+
+### Modelo AR(10)
+
+```{r}
+# autoregresivo 10
+resi_Auto10 <- mod_auto10$residuals
+#
+plot(resi_Auto10)
+acf(resi_Auto10)
+pacf(resi_Auto10)
+```
+
+```{r}
+#Test de normalidad
+tseries::jarque.bera.test(resi_Auto10)
+```
+
+```{r}
+#CUMSUM
+res  <- resi_Auto10
+cum  <- cumsum(res)/sd(res)
+N    <- length(res)
+cumq <- cumsum(res^2)/sum(res^2)
+Af <- 0.971 ###Cuantil del 95% para la estad?stica cusum
+co <- 0.02893####Valor del cuantil apro para cusumsq para n interpolación
+LS <- Af*sqrt(N)+2*Af*c(1:length(res))/sqrt(N)
+LI <- -LS
+LQS <- co+(1:length(res))/N
+LQI <- -co+(1:length(res))/N
+plot(cum,type="l",ylim=c(min(LI),max(LS)),xlab="t",ylab="",main="CUSUM")
+lines(LS,type="S",col="red")
+lines(LI,type="S",col="red")
+#CUSUMSQ
+plot(cumq,type="l",xlab="t",ylab="",main="CUSUMSQ")                      
+lines(LQS,type="S",col="red")                                                                           
+lines(LQI,type="S",col="red")
+```

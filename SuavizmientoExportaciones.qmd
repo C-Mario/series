@@ -1,0 +1,126 @@
+---
+title: "Suviazmiento Exponencial"
+code-fold: true
+warning: false
+grid: 
+  body-width: 1500px
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Suavizamiento Exponencial
+
+```{r}
+#| include: false
+library(tidyverse)
+library(forecast)
+library(tseries)
+library(xts)
+options(scipen = 12)
+```
+
+```{r}
+#Cargar datos
+load(file = "_environment.RData")
+
+#Ajuste del formato de los datos
+options(scipen = 12)
+Exportaciones$Total <- round(Exportaciones$Total)
+Exportaciones$Mes <- as.yearmon(Exportaciones$Mes)
+
+# Cambiar la ventana de datos
+Exportaciones <- Exportaciones[97:378,]
+
+# Crear dataframe
+exportaciones <- data.frame(as.Date(Exportaciones$Mes),Exportaciones$Total)
+colnames(exportaciones) <- c("Fecha", "Dato")
+#Crear objeto de tipo ts indicandole la fecha de inicio y la frecuencia
+exportaciones_ts <- ts(exportaciones$Dato,start = c(2000,01),frequency = 12)
+# Transformada
+lexportaciones_ts <- (1/0.45)*((exportaciones_ts^(0.45))-1)
+```
+
+Dividiremos la información en los conjuntos de datos de entrenamiento $80\%$ y prueba $20\%$.
+
+```{r}
+lserie <- length(lexportaciones_ts)
+ntrain <- trunc(lserie * 0.8)
+train <- window(lexportaciones_ts, end = time(lexportaciones_ts)[ntrain])
+test <- window(lexportaciones_ts, start = time(lexportaciones_ts)[ntrain]
+               + 1/365 ) 
+ntest <- length(test)
+paste("Número de datos en el conjunto de entrenamiento:", ntrain)
+paste("Número de datos en el conjunto de entrenamiento:", ntest)
+```
+
+```{r}
+grilla_abc <- cbind(seq(0.01,0.99,0.1),seq(0.01,0.99,0.1),seq(0.01,0.99,0.1))
+colnames(grilla_abc)<-c("alpha","beta","gamma")
+grilla_abc <- tibble::as_tibble(grilla_abc)
+grilla_abc <- expand.grid(alpha=grilla_abc$alpha,beta=grilla_abc$beta,
+                        gamm=grilla_abc$gamma) 
+
+best_params <- NULL
+best_aic <- Inf
+
+for (i in 1:dim(grilla_abc)[1]) {
+  alpha <- as.numeric(grilla_abc[i,][1])
+  beta <- as.numeric(grilla_abc[i,][2])
+  gamma <- as.numeric(grilla_abc[i,][3])
+
+  holtwinters_model <- HoltWinters(train, seasonal = "additive",
+                                   alpha = alpha, beta = beta, gamma = gamma)
+
+  residuals <- residuals(holtwinters_model)
+  n <- length(residuals)
+  k <- 3  
+  sigma <- sqrt(sum(residuals^2) / n)
+  aic <- n * log(sigma^2) + 2 * k
+
+  if (aic < best_aic) {
+    best_params = c(alpha = alpha, beta = beta, gamma = gamma)
+    best_aic = aic
+  }
+}
+
+final_model <- HoltWinters(train, seasonal = "additive",
+                           alpha = best_params['alpha'], beta = best_params['beta'], 
+                           gamma = best_params['gamma'])
+```
+
+```{r}
+forecast <- forecast(final_model, h = ntest)
+
+pred_log_1 <- autoplot(forecast, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia + Estacionalidad') +  
+  autolayer(window(lexportaciones_ts, start = time(lexportaciones_ts)[ntrain]+1/365) , series="Datos de prueba", lwd = 0.8) +
+  autolayer(forecast$mean, series="Predicciones sobre los datos de prueba", lwd = 0.8) +
+  autolayer(forecast$fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) +
+  theme(legend.position = "bottom", legend.direction="vertical") 
+print(pred_log_1)
+```
+
+Los parámetros de suavizado que minimizan el **AIC** son los siguientes:
+
+-   $\alpha =$ `r best_params['alpha']`
+-   $\beta =$ `r best_params['beta']`
+-   $\gamma =$ `r best_params['gamma']`
+
+```{r}
+accuracy(forecast, test)[,c(2,3)]
+```
+
+```{r}
+predicciones <- InvBoxCox(forecast$mean, lambda=0.45)
+datos_test <- window(InvBoxCox(lexportaciones_ts, lambda=0.45), start = time(lexportaciones_ts)[ntrain]+1/365)
+datos_train <- window(InvBoxCox(lexportaciones_ts, lambda=0.45), end = time(lexportaciones_ts)[ntrain])
+train_fitted <- InvBoxCox(forecast$fitted, lambda=0.45)
+
+pred_real_1 <- autoplot(predicciones, main = 'Predicciones HoltWinters aditivo Nivel + Tendencia + Estacionalidad') +
+  autolayer(datos_test, series="Datos de prueba", lwd = 0.8) +
+  autolayer(predicciones, series="Predicciones sobre los datos de prueba", lwd = 0.8) + 
+  autolayer(datos_train, series="Datos de entrenamiento", lwd = 0.8,
+            color = "black") +
+  autolayer(train_fitted, series="Predicciones sobre los datos de entrenamiento", lwd = 0.8) + 
+  theme(legend.position = "bottom", legend.direction="vertical")
+print(pred_real_1)
+```
